@@ -11,10 +11,10 @@ use Magento\Framework\View\Element\Template;
 /** @var Template $block */
 ?>
 <template x-if="suggestions.length > 0">
-        <div class="w-full leading-normal transition appearance-none text-grey-800 flex flex-col mt-2 absolute max-h-96 overflow-y-auto border-t-4"
+    <div class="w-full leading-normal transition appearance-none text-grey-800 flex flex-col mt-1 absolute max-h-96 overflow-y-auto"
          style="z-index: 2;">
         <template x-for="suggestion in suggestions">
-            <div class="flex justify-between p-2 text-sm bg-container-lighter cursor-pointer border-b !outline-0 focus:bg-container hover:bg-container"
+            <div class="flex justify-between p-2 bg-container-lighter even:bg-container cursor-pointer border border-container focus:bg-container-darker hover:bg-container-darker"
                  :class="suggestion.row_class ? suggestion.row_class : ''"
                  role="option"
                  tabindex="0"
@@ -25,37 +25,36 @@ use Magento\Framework\View\Element\Template;
                  @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
             >
                 <template x-if="suggestion.type === 'product'">
-                    <div class="product-search-item flex">
+                    <div class="product-item flex">
                         <template x-if="suggestion.image">
-                            <img class="qs-option-image mr-2"
-                                 :src="suggestion.image ? suggestion.image: ''"
+                            <img class="qs-option-image mr-2" :src="suggestion.image ? suggestion.image: ''"
                                  :alt="suggestion.title ? suggestion.title : ''"/>
                         </template>
 
                         <div class="qs-option-info-container">
-                            <div class="qs-option-name font-bold mb-1" x-text="suggestion.title"></div>
+                            <div class="qs-option-name" x-text="suggestion.title"></div>
                             <div class="price-box">
                                 <template x-if="!hasSpecialPrice(suggestion)">
-                                    <span class="price-wrapper">
-                                        <span class="price-container">
-                                            <span x-html="formatPrice(suggestion.price)" class="price font-bold"></span>
+                                    <span class="price-container">
+                                        <span class="price-wrapper">
+                                            <span x-html="formatPrice(suggestion.price)" class="price"></span>
                                         </span>
                                     </span>
                                 </template>
 
                                 <template x-if="hasSpecialPrice(suggestion)">
-                                    <span class="price-wrapper">
+                                    <span class="price-container">
                                         <span class="old-price sly-old-price mr-1">
                                             <span class="price-label hidden"><?= __('Regular Price') ?></span>
-                                            <span class="price-container">
+                                            <span class="price-wrapper">
                                                 <span x-html="formatPrice(suggestion.price)"
                                                       class="price font-regular line-through text-gray-900"></span>
                                             </span>
                                         </span>
                                         <span class="special-price">
                                             <span class="price-label hidden"><?= __('Special Price') ?></span>
-                                            <span class="price-container">
-                                                <span x-html="formatPrice(suggestion.final_price)" class="price font-bold"></span>
+                                            <span class="price-wrapper">
+                                                <span x-html="formatPrice(suggestion.final_price)" class="price"></span>
                                             </span>
                                         </span>
                                     </span>

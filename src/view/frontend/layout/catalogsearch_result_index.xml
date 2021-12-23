@@ -6,6 +6,10 @@
             <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template" name="tweakwise.navigation.slider" template="Emico_Tweakwise::layer/navigation-slider.phtml" />
             <block ifconfig="tweakwise/layered/enabled" name="loading" template="Hyva_Theme::ui/loading.phtml"/>
         </referenceBlock>
-        <referenceBlock name="product_list_toolbar" template="Emico_Tweakwise::product/list/toolbar.phtml" />
+        <referenceBlock name="product_list_toolbar">
+            <action method="setTemplate" ifconfig="tweakwise/layered/enabled" >
+                <argument name="template" xsi:type="string">Emico_Tweakwise::product/list/toolbar.phtml</argument>
+            </action>
+        </referenceBlock>
     </body>
 </page>

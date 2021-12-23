@@ -13,6 +13,9 @@
     </head>
     <body>
         <referenceBlock name="header-search" template="Emico_Tweakwise::html/header/search-form.phtml">
+            <action method="setTemplate" ifconfig="tweakwise/autocomplete/enabled">
+                <argument name="template" xsi:type="string">Emico_Tweakwise::html/header/search-form.phtml</argument>
+            </action>
             <block class="Emico\Tweakwise\Block\Autocomplete\FormMini" ifconfig="tweakwise/autocomplete/enabled" name="tweakwise.quick.search" template="Emico_Tweakwise::quick-search.phtml"/>
         </referenceBlock>
     </body>
