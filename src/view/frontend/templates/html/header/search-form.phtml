@@ -1,0 +1,122 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Zitmaxx\ThemeIcons\ViewModel\ThemeIcons;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Search\Helper\Data as SearchHelper;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var SearchHelper $helper */
+/** @var ViewModelRegistry $viewModels */
+
+$helper = $this->helper(SearchHelper::class);
+
+/** @var ThemeIcons $icons */
+$icons = $viewModels->require(ThemeIcons::class);
+?>
+<script>
+    'use strict';
+
+    function tweakwiseQuickSearch() {
+        return {
+            minSearchLength: 3,
+            suggestions: [],
+            close() {
+                this.suggestions = []
+            },
+            suggest() {
+                const term = this.$refs.searchInput.value
+                if (term.length >= this.minSearchLength) {
+                    this.fetchSuggestions(term)
+                } else {
+                    this.suggestions = []
+                }
+            },
+            fetchSuggestions(term) {
+                fetch(
+                    window.BASE_URL + 'search/ajax/suggest?' + new URLSearchParams({q: term}),
+                    {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }
+                )
+                    .then(response => response.json())
+                    .then(result => this.suggestions = result)
+            },
+            clickSuggestion(suggestion) {
+                if (suggestion.type === 'product') {
+                    this.goToProduct(suggestion.url)
+                } else {
+                    this.search(suggestion.title)
+                }
+            },
+            search(term) {
+                this.$refs.searchInput.value = term;
+                document.getElementById('search_mini_form').submit()
+            },
+            goToProduct(url) {
+                window.location.href = url
+            },
+            focusElement(element) {
+                if (element && element.nodeName === 'DIV') {
+                    element.focus()
+                    this.$refs.searchInput.value = element.getAttribute('data-title')
+                    return true
+                } else {
+                    return false
+                }
+            },
+            hasSpecialPrice(suggestion) {
+                return (Math.abs(suggestion.final_price - suggestion.price) > 0.0001)
+            },
+            formatPrice(price) {
+                return hyva.formatPrice(price, false)
+            }
+        }
+    }
+</script>
+<div class="w-full text-black relative mt-5 mb-2 lg:mt-0 lg:absolute lg:right-6 lg:top-10 lg:w-2/5" x-data="tweakwiseQuickSearch()">
+    <form class="form minisearch relative" id="search_mini_form"
+          action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>" method="get">
+        <label class="hidden" for="search" data-role="minisearch-label">
+            <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+        </label>
+        <input id="search"
+               x-ref="searchInput"
+               type="search"
+               autocomplete="off"
+               name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+               value="<?= $escaper->escapeHtmlAttr($helper->getEscapedQueryText()) ?>"
+               placeholder="<?= $escaper->escapeHtmlAttr(__('Search entire store here...')) ?>"
+               maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+               class="placeholder-gray-400 w-full px-4 py-1.5 text-lg leading-normal transition appearance-none text-grey-800 rounded-full border-gray-300 shadow-inner
+                focus:outline-none focus:border-gray-500  lg:py-2.5"
+               @focus.once="suggest"
+               @input.debounce.300="suggest"
+               @click.away="close"
+               @keydown.arrow-down.prevent="focusElement($el.querySelector('[tabindex]'))"
+        />
+        <?= $block->getChildHtml('tweakwise.quick.search'); ?>
+        <button type="submit" name="search" class="btn absolute right-0 top-0 px-4 lg:py-3 lg:px-8">
+            <?= $icons->searchHtml(
+                "mr-2",
+                20,
+                20
+            ) ?>
+            <?= $escaper->escapeHtml(__('Search')) ?>
+        </button>
+    </form>
+</div>

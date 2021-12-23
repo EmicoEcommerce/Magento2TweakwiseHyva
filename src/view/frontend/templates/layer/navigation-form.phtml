@@ -1,0 +1,398 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+?>
+<script>
+    function tweakwiseNavigationForm() {
+        return {
+            ajaxFilters: false,
+            formFilters: false,
+            seoEnabled: false,
+            ajaxEndpoint: '/tweakwise/ajax/navigation',
+            filterFormSelector: '#facet-filter-form',
+            filterSelector: '#facet-filter-form',
+            productListSelector: '.products.wrapper',
+            toolbarSelector: '.toolbar.toolbar-products',
+            isLoading: false,
+            currentXhr: null,
+            fetchController: null,
+            init(initialValues) {
+                const filterOptions = initialValues.tweakwiseNavigationForm
+
+                if (filterOptions) {
+                    this.ajaxEndpoint = filterOptions.ajaxEndpoint;
+                    this.ajaxFilters = filterOptions.ajaxFilters;
+                    this.formFilters = filterOptions.formFilters;
+                    this.seoEnabled = filterOptions.seoEnabled;
+                }
+
+                this.bindFilterClickEvents();
+
+                if (this.ajaxFilters) {
+                    this.bindAjaxFilterRemoveEvents();
+                    this.bindAjaxPopChangeHandler();
+
+                    const pmOptions = initialValues.tweakwisePMPageReload
+
+                    if (pmOptions && pmOptions.reloadList && pmOptions.cookieName) {
+                        this.pmListReload(pmOptions.cookieName);
+                    }
+                }
+            },
+            bindFilterClickEvents() {
+                const filterForm = document.querySelector(this.filterFormSelector);
+
+                if (!filterForm) {
+                    return;
+                }
+
+                if (this.formFilters) {
+                    const jsButtons = filterForm.querySelectorAll('.js-btn-filter');
+                    Array.from(jsButtons).forEach((jsButton) => {
+                        jsButton.addEventListener('click', (event) => this.formFilterHandler(event));
+                    });
+                } else if (this.ajaxFilters) {
+                    filterForm.addEventListener('change', (event) => this.ajaxHandler(event));
+                } else {
+                    filterForm.addEventListener('change', (event) => this.defaultHandler(event));
+                }
+            },
+
+            /**
+             * Init list reload for Personal Merchandising Cookie
+             */
+            pmListReload(cookieName) {
+                if (hyva.getCookie(cookieName) !== null) {
+                    const event = document.createEvent('HTMLEvents');
+                    event.initEvent('change', true, false);
+                    this.$el.dispatchEvent(event);
+                }
+            },
+
+            /**
+             * Serialize the form element but skip unwanted inputs
+             */
+            getFilterParameters() {
+                const filterForm = document.querySelector(this.filterFormSelector);
+
+                if (!filterForm) {
+                    return;
+                }
+
+                const skipFilters = Array.from(filterForm.querySelectorAll('.js-skip-submit'));
+                let data = new FormData(filterForm);
+
+                skipFilters.forEach(skipFilter => {
+                    for (let entry of data) {
+                        if (skipFilter.getAttribute('name') === entry[0]) {
+                            data.delete(entry[0]);
+                        }
+                    }
+                });
+
+                return this.serialize(data);
+            },
+
+            // ------- Default filter handling (i.e. no ajax and no filter form)
+            /**
+             * Navigate to the selected filter url
+             */
+            defaultHandler(event) {
+                const a = event.target.tagName === 'A' ? event.target : this.getParent(event.target, 'a');
+                const href = this.findHref(a);
+                if (href) {
+                    window.location.href = href;
+                    return false;
+                }
+            },
+
+            /**
+             * Should return the url to navigate to
+             */
+            findHref(aElement) {
+                const href = aElement.getAttribute('href');
+                if (this.seoEnabled) {
+                    const seoHref = aElement.dataset.seoHref;
+                    return seoHref ? seoHref : href;
+                }
+
+                return href;
+            },
+            // ------- End of default filter handling
+
+            // ------- Handling for ajax filtering (i.e. only ajax filtering)
+            /**
+             * Filter remove events are only relevant for ajax filtering. If ajaxFilters is false then we just navigate
+             * to the url specified in the a.
+             */
+            bindAjaxFilterRemoveEvents() {
+                const filterForm = document.querySelector(this.filterFormSelector);
+
+                if (!filterForm || !filterForm.querySelectorAll('a.remove').length) {
+                    return;
+                }
+
+                Array.from(filterForm.querySelectorAll('a.remove')).forEach((element) => {
+                    element.addEventListener('click', (event) => this.ajaxClearHandler(event));
+                });
+            },
+            bindAjaxPopChangeHandler() {
+                window.onpopstate = (event) => {
+                    if (event.state && event.state.html) {
+                        this.ajaxUpdateBlocks(event.state.html);
+                    }
+                };
+            },
+
+            /**
+             * This provides a means to disable ajax filtering.
+             * If you dont want ajax filtering for certain filters add a data-no-ajax attribute.
+             */
+            noAjax(event) {
+                if (event.target.dataset.isSlider || event.target.tagName === 'FORM') {
+                    return false;
+                } else {
+                    return this.getParent(event.target, 'a').dataset.noAjax;
+                }
+            },
+
+            /**
+             * Handle Ajax request for new content
+             */
+            ajaxHandler(event) {
+                event.preventDefault();
+
+                if (event.target.classList.contains('js-skip-submit')) {
+                    return;
+                }
+
+                if (this.currentXhr) {
+                    this.fetchController.abort()
+                }
+
+                if (this.noAjax(event)) {
+                    this.defaultHandler(event);
+                    return;
+                }
+
+                this.ajaxStartLoader();
+
+                let fetchUrl = this.ajaxEndpoint;
+                const filterParams = this.getFilterParameters();
+
+                if (filterParams) {
+                    fetchUrl = `${fetchUrl}?${filterParams}`;
+                }
+
+                this.fetchController = new AbortController();
+                const signal = this.fetchController.signal
+
+                const options = {
+                    signal: signal,
+                    cache: 'force-cache'
+                }
+
+                this.currentXhr = fetch(fetchUrl, options)
+                    .then(response => response.json())
+                    .then(response => {
+                        this.ajaxUpdateBlocks(response.html);
+                        this.ajaxUpdateState(response);
+                    })
+                    .catch((error) => {
+                        if (error.name !== 'AbortError') {
+                            // Something went wrong, try to navigate to the selected filter
+                            console.error('Error:', error);
+                            return;
+                            this.defaultHandler(event);
+                        } else {
+                            console.log('Aborted:', error);
+                        }
+                    })
+                    .then(() => this.ajaxStopLoader());
+            },
+
+            /**
+             * Handle filter clear events
+             */
+            ajaxClearHandler(event) {
+                const filterId = event.currentTarget.dataset.jsFilterId;
+                const filter = document.getElementById(filterId);
+
+                if (filter) {
+                    event.preventDefault();
+                    // Set filter disabled so that it will not be submitted when change is triggered
+                    filter.disabled = true;
+                    if (this.formFilters) {
+                        // Simulate click so that the form will be submitted
+                        document.querySelector('.js-btn-filter').click();
+                    } else {
+                        const event = document.createEvent('HTMLEvents');
+                        event.initEvent('change', true, false);
+                        filter.dispatchEvent(event);
+                    }
+                }
+            },
+
+            /**
+             * Update all relevant html with response data
+             */
+            ajaxUpdateBlocks(htmlResponse) {
+                const filterSelector = this.filterSelector;
+                const productListSelector = this.productListSelector;
+                const toolbarSelector = this.toolbarSelector;
+
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = htmlResponse;
+
+                const newFilters = wrapper.querySelector(filterSelector);
+                const newProductList = wrapper.querySelector(productListSelector);
+                const newProductListJs = newProductList.getElementsByTagName('script');
+
+                const newToolbar = wrapper.querySelectorAll(toolbarSelector);
+                const newToolbarJs = this.getPreviousSibling(newToolbar[0], 'script');
+
+                if (newProductListJs || newToolbarJs) {
+                    let oldJs = document.getElementById('updated-catalog-js');
+                    if (oldJs) {
+                        oldJs.remove();
+                    }
+
+                    let script = document.createElement('script');
+                    script.id = 'updated-catalog-js';
+
+                    if (newProductListJs) {
+                        Array.from(newProductListJs).forEach((scriptTag) => {
+                            script.text += scriptTag.innerHTML;
+                        });
+                    }
+
+                    if (newToolbarJs) {
+                        script.text += newToolbarJs.innerHTML;
+                    }
+
+                    document.querySelector('head').appendChild(script);
+                }
+
+                if (newFilters) {
+                    const oldFilters = document.querySelector(filterSelector);
+                    this.replaceNode(oldFilters, newFilters)
+                }
+
+                const newToolbarFirst = newToolbar[0];
+                const newToolbarLast = newToolbar[1];
+                const toolbars = document.querySelectorAll(toolbarSelector);
+
+                /*
+                The product list comes after the toolbar.
+                We use this construction as there could be more product lists on the page
+                and we dont want to replace them all
+                */
+                if (newProductList && toolbars.length) {
+                    const forms = newProductList.querySelectorAll('form');
+                    const formKey = hyva.getFormKey();
+
+                    if (forms && formKey) {
+                        Array.from(forms).forEach((form) => {
+                            const formKeyInput = document.createElement('input');
+                            formKeyInput.type = 'hidden';
+                            formKeyInput.name = 'form_key';
+                            formKeyInput.value = formKey;
+
+                            form.appendChild(formKeyInput);
+                        });
+                    }
+
+                    const oldProductList = this.getNextSibling(toolbars[0], productListSelector)
+                    this.replaceNode(oldProductList, newProductList)
+                }
+
+                if (newToolbarFirst && toolbars) {
+                    const oldToolbarFirst = toolbars[0]
+                    this.replaceNode(oldToolbarFirst, newToolbarFirst);
+                }
+
+                if (newToolbarLast && toolbars) {
+                    const oldToolbarLast = toolbars[1]
+                    this.replaceNode(oldToolbarLast, newToolbarLast);
+                }
+            },
+            ajaxUpdateState(response) {
+                window.history.pushState({html: response.html}, '', response.url);
+            },
+            ajaxStartLoader() {
+                this.isLoading = true;
+            },
+            ajaxStopLoader() {
+                this.isLoading = false;
+            },
+            // ------- End of handling for ajax filtering
+
+            // ------- Handling for form filters.
+            // ------- Note that is only used when ajax is not enabled and form filters is enabled
+            formFilterHandler() {
+                const filterUrl = this.getFilterParameters();
+                if (filterUrl) {
+                    window.location = '?' + filterUrl;
+                } else {
+                    window.location = window.location.href.replace(window.location.search, '');
+                }
+            },
+            // ------- End of handling for form filters
+
+            // ------- Utility methods
+            getParent(elem, selector) {
+                let parent = elem.parentNode;
+
+                if (!selector) return parent;
+
+                while (parent) {
+                    if (parent.matches(selector)) return parent;
+                    parent = parent.parentNode
+                }
+            },
+            getPreviousSibling(elem, selector) {
+                let sibling = elem.previousElementSibling;
+
+                if (!selector) return sibling;
+
+                while (sibling) {
+                    if (sibling.matches(selector)) return sibling;
+                    sibling = sibling.previousElementSibling
+                }
+            },
+            getNextSibling(elem, selector) {
+                let sibling = elem.nextElementSibling;
+
+                if (!selector) return sibling;
+
+                while (sibling) {
+                    if (sibling.matches(selector)) return sibling;
+                    sibling = sibling.nextElementSibling
+                }
+            },
+            replaceNode(oldElement, newElement) {
+                if (!oldElement || !oldElement.parentNode || !newElement) {
+                    return;
+                }
+
+                oldElement.parentNode.replaceChild(newElement, oldElement);
+            },
+            serialize(formData) {
+                return new URLSearchParams(formData).toString();
+            },
+            // ------- End of utility methods
+        }
+    }
+</script>

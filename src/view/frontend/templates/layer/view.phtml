@@ -1,0 +1,182 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Emico\Tweakwise\Model\Catalog\Layer\Filter;
+use Emico\Tweakwise\Model\NavigationConfig;
+use Magento\LayeredNavigation\Block\Navigation;
+
+/** @var Navigation $block */
+
+if (!$block->canShowBlock()) {
+    return;
+}
+
+/** @var $filters Filter[] */
+$filters = $block->getFilters();
+
+/** @var NavigationConfig $tweakwiseNavigationConfig */
+$tweakwiseNavigationConfig = $block->getData('tweakwise_navigation_config');
+
+$jsFormConfig = $tweakwiseNavigationConfig->getJsFormConfig();
+$renderFilterButton = $tweakwiseNavigationConfig->isFormFilters();
+
+$hasFilters = count($filters) > 0;
+$filtered = count($block->getLayer()->getState()->getFilters());
+?>
+
+    <div class="block filter border border-container bg-container p-2 md:p-0 md:border-0 md:bg-transparent my-6<?= (!$hasFilters ? ' filter-no-options' : '') ?>"
+         x-data="initLayeredNavigation()"
+         x-init="checkIsMobileResolution()"
+         @resize.window.debounce="checkIsMobileResolution()"
+         @visibilitychange.window.debounce="checkIsMobileResolution()"
+    >
+        <div class="block-title flex items-center justify-between md:p-0"
+             @click="blockOpen = !blockOpen"
+        >
+            <span class="text-primary text-md text-xl md:text-2xl font-semibold uppercase"
+                  data-count="<?= $filtered ?>">
+                <?= __('Shop By') ?>
+            </span>
+            <span class="py-1 px-1 bg-container-lighter rounded border border-container-darker hidden"
+                  :class="{ 'block' : isMobile, 'hidden': !isMobile }">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     xmlns="http://www.w3.org/2000/svg"
+                     class="transition-transform transform duration-300 ease-in-out text-primary"
+                     :class="blockOpen ? 'rotate-180' : ''">
+                    <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </div>
+
+        <div class="block-content filter-content pt-2" x-show="isMobile && blockOpen || !isMobile">
+            <form id="facet-filter-form"
+                <?php if ($jsFormConfig): ?>
+                    x-data="tweakwiseNavigationForm()"
+                    x-init='init(<?= $jsFormConfig ?>)'
+                <?php endif; ?>
+            >
+                <?= $block->getChildHtml('state'); ?>
+
+                <?php if ($block->getLayer()->getState()->getFilters()): ?>
+                    <div class="block-actions filter-actions">
+                        <a href="<?= $block->getClearUrl() ?>"
+                           class="action clear filter-clear text-xs text-primary underline hover:text-primary-darker"><span><?= __('Clear All') ?></span></a>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($hasFilters): ?>
+                    <div class="filter-options" id="narrow-by-list">
+                        <?php foreach ($tweakwiseNavigationConfig->getFilterFormInput() as $name => $value): ?>
+                            <?php //These are tweakwise system parameters which are needed for ajax navigation?>
+                            <input type="hidden" name="<?= $name ?>" value="<?= $value ?>">
+                        <?php endforeach; ?>
+
+                        <?php foreach ($block->getFilters() as $filter): ?>
+                            <?php if ($filter->getItemsCount()): ?>
+                                <?php if ($filter->isCollapsible()): ?>
+
+                                    <?php $filterActive = $filter->isDefaultCollapsed() ? 'false' : 'true'; ?>
+
+                                    <div class="filter-option card my-4 pb-0 <?= $filter->getCssClass() ?>"
+                                         x-data="{ open: <?= $filterActive ?> }">
+                                        <div class="filter-options-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container pb-2"
+                                             :class="{ 'border-b': open }"
+                                             @click="open = !open">
+                                        <span class="title flex text-md md:text-lg font-semibold">
+                                            <?= __($filter->getName()) ?>
+
+                                            <?php $tooltip = $filter->getTooltip(); ?>
+                                            <?php if ($tooltip): ?>
+                                                <?php $tooltip = htmlentities($tooltip); ?>
+                                                <span class="tooltip ml-2 mt-1">
+                                                    <span class="tooltip-toggle"></span>
+                                                    <span class="tooltip-content"><?= $tooltip ?></span>
+                                                </span>
+                                            <?php endif; ?>
+                                        </span>
+
+                                            <span class="py-1 px-1 rounded border border-container">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 class="transition-transform transform duration-300 ease-in-out text-primary"
+                                                 :class="open ? 'rotate-180' : ''">
+                                                <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2"
+                                                      stroke-linecap="round"
+                                                      stroke-linejoin="round"/>
+                                            </svg>
+                                        </span>
+                                        </div>
+                                        <div class="filter-options-content py-3 hidden"
+                                             :class="{ '!block': open, 'hidden': !open }"
+                                        >
+                                            <?= /* @noEscape */
+                                            $block->getChildBlock('renderer')->render($filter) ?>
+                                        </div>
+                                    </div>
+
+                                    <?php if ($renderFilterButton): ?>
+                                        <div class="show-items-link">
+                                            <button type="button"
+                                                    class="btn btn-primary btn-block js-btn-filter"
+                                            >
+                                                <?= __('Show <span>%1</span> items',
+                                                    $this->getLayer()->getProductCount()); ?>
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <?= $block->getChildHtml('loading') ?>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function initLayeredNavigation() {
+            return {
+                isMobile: false,
+                blockOpen: false,
+                checkIsMobileResolution() {
+                    this.isMobile = window.outerWidth < 768
+                }
+            }
+        }
+
+        /**
+         * Sort items based on alternate sort (if available)
+         */
+
+        function initTweakwiseNavigationItems() {
+            return {
+                moreItemsShow: false,
+                type: this.moreItemsShow ? 'alternateSort' : 'originalSort',
+                initSort(hasAlternateSort) {
+                    if (!hasAlternateSort || this.$refs.items || this.$refs.items.children) {
+                        return;
+                    }
+
+                    const items = this.$refs.items;
+
+                    [].slice.call(items.children).sort((a, b) => a.dataset[this.type].localeCompare(b.dataset[this.type]))
+                        .forEach((item) => {
+                            items.appendChild(item);
+                        });
+                }
+            }
+        }
+    </script>
+
+<?= $block->getChildHtml('tweakwise.navigation.form'); ?>
+<?= $block->getChildHtml('tweakwise.navigation.slider'); ?>

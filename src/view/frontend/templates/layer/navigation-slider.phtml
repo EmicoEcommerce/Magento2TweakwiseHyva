@@ -1,0 +1,291 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+
+$noUiSliderUrl = $block->getViewFileUrl('Emico_TweakwiseHyva::js/lib/nouislider.min.js');
+?>
+<script>
+    function tweakwiseNavigationSlider() {
+        return {
+            filterUrl: '',
+            container: '',
+            min: 0,
+            max: 99999999,
+            step: 1,
+            currentMin: 0,
+            currentMax: 99999999,
+            formFilters: false,
+            ajaxFilters: false,
+            urlInputSelector: 'input.slider-url-value',
+            init(initialValues, prefix, postfix) {
+                const sliderOptions = initialValues.tweakwiseNavigationSlider
+                if (sliderOptions) {
+                    this.ajaxFilters = sliderOptions.ajaxFilters;
+                    this.container = sliderOptions.container;
+                    this.currentMax = sliderOptions.currentMax;
+                    this.currentMin = sliderOptions.currentMin;
+                    this.filterUrl = sliderOptions.filterUrl;
+                    this.formFilters = sliderOptions.formFilters;
+                    this.max = sliderOptions.max;
+                    this.min = sliderOptions.min;
+                }
+
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+
+                script.addEventListener('load', () => {
+                    this.createSlider();
+                    this.bindInputChangeEvents();
+                });
+
+                script.src = '<?= $escaper->escapeJs($escaper->escapeUrl($noUiSliderUrl)) ?>';
+                document.head.appendChild(script);
+            },
+            createSlider() {
+                const slider = this.$refs.slider;
+
+                if (!slider) {
+                    return
+                }
+
+                noUiSlider.create(slider, {
+                    start: [this.currentMin, this.currentMax],
+                    connect: true,
+                    step: this.step,
+                    range: {
+                        'min': this.min,
+                        'max': this.max
+                    }
+                });
+
+                slider.noUiSlider.on('update', (values) => {
+                    const minValue = values[0] * this.step;
+                    const maxValue = values[1] * this.step;
+                    this.updateLabels(minValue, maxValue);
+                });
+
+                slider.noUiSlider.on('set', (values) => {
+                    const minValue = values[0] * this.step;
+                    const maxValue = values[1] * this.step;
+                    this.filterChange(minValue, maxValue);
+                });
+            },
+            updateLabels(minValue, maxValue) {
+                const sliderContainer = this.$el;
+                const isPrice = sliderContainer.dataset.isPrice;
+
+                sliderContainer.querySelector('.current-min-value .value').innerHTML = isPrice ? hyva.formatPrice(minValue) : minValue;
+                sliderContainer.querySelector('.current-max-value .value').innerHTML = isPrice ? hyva.formatPrice(maxValue) : maxValue;
+                sliderContainer.querySelector('input.slider-min').value = minValue;
+                sliderContainer.querySelector('input.slider-max').value = maxValue;
+
+                const sliderUrlValue = minValue + '-' + maxValue;
+                const sliderUrlInput = sliderContainer.querySelector(this.urlInputSelector);
+                sliderUrlInput.value = sliderUrlValue;
+
+                this.updateSliderDisabledAttribute(sliderUrlInput, sliderUrlValue);
+            },
+            bindInputChangeEvents() {
+                const sliderContainer = this.$el;
+                sliderContainer.querySelector('input.slider-min').addEventListener('change', () => this.updateSliderUrlInput());
+                sliderContainer.querySelector('input.slider-max').addEventListener('change', () => this.updateSliderUrlInput());
+            },
+            updateSliderUrlInput() {
+                const sliderContainer = this.$el;
+                const sliderUrlInput = sliderContainer.querySelector(this.urlInputSelector);
+                const minValue = sliderContainer.querySelector('input.slider-min').value;
+                const maxValue = sliderContainer.querySelector('input.slider-max').value;
+                const inputValue = minValue + '-' + maxValue;
+                sliderUrlInput.value = inputValue;
+
+                this.updateSliderDisabledAttribute(sliderUrlInput, inputValue);
+                this.updateLabels(minValue, maxValue);
+                this.updateSlider(minValue, maxValue);
+            },
+            updateSlider(minValue, maxValue) {
+                const slider = this.$refs.slider;
+
+                if (!slider) {
+                    return
+                }
+
+                slider.noUiSlider.set([minValue, maxValue]);
+            },
+            updateSliderDisabledAttribute(sliderUrlInput, inputValue) {
+                sliderUrlInput.disabled = inputValue === sliderUrlInput.dataset.disabledInput;
+            },
+            filterChange(minValue, maxValue) {
+                if (this.formFilters) {
+                    this.formFilterChange(minValue, maxValue);
+                } else if (this.ajaxFilters) {
+                    this.ajaxChange(minValue, maxValue);
+                } else {
+                    this.defaultChange(minValue, maxValue);
+                }
+            },
+            defaultChange(minValue, maxValue) {
+                let url = this.filterUrl;
+                url = url.replace(encodeURI('{{from}}'), minValue);
+                url = url.replace('{{from}}', minValue);
+                url = url.replace(encodeURI('{{to}}'), maxValue);
+                url = url.replace('{{to}}', maxValue);
+                window.location.href = url;
+            },
+            ajaxChange(minValue, maxValue) {
+                this.formFilterChange(minValue, maxValue);
+                const sliderContainer = this.$el;
+                const sliderUrlInput = sliderContainer.querySelector(this.urlInputSelector);
+                const event = document.createEvent('HTMLEvents');
+                event.initEvent('change', true, false);
+                sliderUrlInput.dispatchEvent(event);
+            },
+            formFilterChange(minValue, maxValue) {
+                const sliderContainer = this.$el;
+                sliderContainer.dataset.min = minValue;
+                sliderContainer.dataset.max = maxValue;
+            }
+        }
+    }
+</script>
+
+<style>
+  /*
+    * Functional styling;
+    * These styles are required for noUiSlider to function.
+    * You don't need to change these rules to apply your design.
+  */
+
+  .tw-range-slider.noUi-target,
+  .tw-range-slider.noUi-target * {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    touch-action: none;
+    user-select: none;
+  }
+
+  .tw-range-slider.noUi-target {
+    position: relative;
+    margin: 10px;
+  }
+
+  .tw-range-slider .noUi-base,
+  .tw-range-slider .noUi-connects {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Wrapper for all connect elements.
+   */
+  .tw-range-slider .noUi-connects {
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .tw-range-slider .noUi-connect,
+  .tw-range-slider .noUi-origin {
+    will-change: transform;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    -ms-transform-origin: 0 0;
+    -webkit-transform-origin: 0 0;
+    -webkit-transform-style: preserve-3d;
+    transform-origin: 0 0;
+    transform-style: flat;
+  }
+
+  /* Offset direction
+   */
+  .tw-range-slider.noUi-txt-dir-rtl.noUi-horizontal .noUi-origin {
+    left: 0;
+    right: auto;
+  }
+
+  .tw-range-slider.noUi-horizontal .noUi-origin {
+    height: 0;
+  }
+
+  .tw-range-slider .noUi-handle {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    position: absolute;
+  }
+
+  .tw-range-slider .noUi-touch-area {
+    height: 100%;
+    width: 100%;
+  }
+
+  .tw-range-slider .noUi-state-tap .noUi-connect,
+  .tw-range-slider .noUi-state-tap .noUi-origin {
+    transition: transform 0.3s;
+  }
+
+  .tw-range-slider .noUi-state-drag * {
+    cursor: inherit !important;
+  }
+
+  .tw-range-slider.noUi-horizontal {
+    height: 10px;
+  }
+
+  .tw-range-slider.noUi-target {
+    background: #e4e4e7;
+  }
+
+  .tw-range-slider .noUi-connect {
+    background: #3b82f6;
+  }
+
+  .tw-range-slider .noUi-draggable {
+    cursor: ew-resize;
+  }
+
+  .tw-range-slider .noUi-handle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid #a1a1aa;
+    background: white;
+    cursor: default;
+    right: -13px;
+    top: -8px;
+  }
+
+  .tw-range-slider .noUi-handle:hover,
+  .tw-range-slider .noUi-active {
+    border-color: #52525b;
+  }
+
+
+  /* Touch UI */
+  @media (hover: none) {
+    .tw-range-slider.noUi-target {
+      margin: 16px;
+    }
+
+    .tw-range-slider .noUi-handle {
+      width: 32px;
+      height: 32px;
+      right: -16px;
+      top: -11px;
+    }
+  }
+</style>

@@ -1,0 +1,140 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Emico\Tweakwise\Block\LayeredNavigation\RenderLayered\SwatchRenderer;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Swatches\ViewModel\Product\Renderer\Configurable as ConfigurableViewModel;
+
+/** @var SwatchRenderer $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ConfigurableViewModel $configurableViewModel */
+$configurableViewModel = $viewModels->require(ConfigurableViewModel::class);
+
+$swatchData = $block->getSwatchData();
+
+if (!$swatchData['swatches']) {
+    return;
+}
+
+?>
+
+<script>
+    function initLayeredSwatch_<?= $escaper->escapeJs($swatchData['attribute_code']) ?>() {
+        return {
+            getSwatchType(typeNumber) {
+                switch (typeNumber) {
+                    case "1":
+                        return "color"
+                    case "2":
+                        return "image"
+                    case "0":
+                    default:
+                        return "text"
+                }
+            },
+            getSwatchBackgroundStyle(type, value, image) {
+                if (this.getSwatchType(type) === "color") {
+                    return 'background-color:' + value;
+                } else if (this.getSwatchType(type) === "image") {
+                    return "background: #ffffff url('" + image + "') no-repeat center";
+                } else {
+                    return '';
+                }
+            },
+            activeTooltipItem: false,
+            tooltipPositionElement: false,
+            isTooltipVisible() {
+                return this.activeTooltipItem
+            },
+            getTooltipImageStyle() {
+                const type = this.activeTooltipItem.type;
+
+                if (this.getSwatchType(type) === "color") {
+                    return 'background-color:' + this.activeTooltipItem.value + '; width: 110px; height: 90px;';
+                } else if (this.getSwatchType(type) === "image") {
+                    return "background: #ffffff url('" + this.activeTooltipItem.thumb +
+                        "') center center no-repeat; width: 110px; height: 90px;";
+                } else {
+                    return 'display:none';
+                }
+            },
+            getTooltipPosition() {
+                return this.tooltipPositionElement ?
+                    (
+                        `top: ${this.tooltipPositionElement.offsetTop}px;` +
+                        `left: ${this.tooltipPositionElement.offsetLeft}px;`
+                    ) : ''
+            },
+            getTooltipLabel() {
+                return this.activeTooltipItem.label || ''
+            },
+            isVisualSwatch() {
+                return this.getSwatchType(this.activeTooltipItem.type) !== 'text'
+            }
+        }
+    }
+</script>
+
+<div class="swatch-attribute swatch-layered <?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
+     x-data="initLayeredSwatch_<?= $escaper->escapeJs($swatchData['attribute_code']) ?>()"
+     data-attribute-code="<?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
+     data-attribute-id="<?= $escaper->escapeHtmlAttr($swatchData['attribute_id']) ?>">
+    <div class="swatch-attribute-options clearfix flex flex-row flex-wrap">
+        <?php foreach ($swatchData['options'] as $option => $label): ?>
+            <?php
+            $item = $block->getItemForSwatch($option);
+            $value = $swatchData['swatches'][$option]['value'];
+            $type = $swatchData['swatches'][$option]['type'];
+            $swatchImage = $escaper->escapeUrl($block->getSwatchPath('swatch_image', $value));
+            $swatchThumb = $escaper->escapeUrl($block->getSwatchPath('swatch_thumb', $value));
+            ?>
+
+            <a <?= $block->renderAnchorHtmlTagAttributes($item); ?>
+                    aria-label="<?= $label['label'] ?>"
+                    class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex border justify-center"
+            >
+                <?php $cssId = $item->getCssId(); ?>
+
+                <label for="<?= $cssId ?>"
+                       class="swatch-option-inner cursor-pointer relative block select-none m-0"
+                       :class="{ 'w-6 h-6' : getSwatchType('<?= (string)$type; ?>') !== 'text' }"
+                       :style="getSwatchBackgroundStyle('<?= (string)$type ?>', '<?= (string)$value ?>', '<?= (string)$swatchImage ?>')"
+                    <?php if ($configurableViewModel->getShowSwatchTooltip()): ?>
+                        @mouseenter.self="activeTooltipItem = {
+                            attribute: '<?= $escaper->escapeHtmlAttr($value) ?>',
+                            type: '<?= $escaper->escapeHtmlAttr($type) ?>',
+                            id: '<?= $escaper->escapeHtmlAttr($option) ?>',
+                            label: '<?= $escaper->escapeHtmlAttr($label['label']) ?>',
+                            thumb: '<?= $escaper->escapeUrl($swatchThumb) ?>',
+                            value: '<?= $escaper->escapeHtmlAttr($value) ?>'
+                        }; tooltipPositionElement = $event.target;"
+                        @mouseleave.self="activeTooltipItem = false"
+                    <?php endif; ?>
+                >
+                    <input id="<?= $cssId ?>" style="display: none"
+                           name="<?= $item->getFilter()->getFacet()->getFacetSettings()->getUrlKey() ?>[]"
+                           type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
+                           value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
+                    >
+                    <?php if ((string)$type === "0"): ?>
+                        <?= $escaper->escapeHtml($value ?: $label['label']) ?>
+                    <?php endif; ?>
+                </label>
+            </a>
+        <?php endforeach; ?>
+    </div>
+    <?php if ($configurableViewModel->getShowSwatchTooltip()): ?>
+        <?= /* @noEscape */
+        $block->getBlockHtml('product.swatch.tooltip'); ?>
+    <?php endif; ?>
+</div>

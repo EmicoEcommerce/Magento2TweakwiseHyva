@@ -1,0 +1,167 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Magento\Catalog\Block\Product\ProductList\Toolbar;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Magento2.Security.IncludeFile.FoundIncludeFile
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Escaper $escaper */
+/** @var Toolbar $block */
+
+$additionalOptions = ['page' => 'p'];
+
+// TODO: add tweakwise config value here
+/** @var NavigationConfig $tweakwiseNavigationConfig */
+//$tweakwiseNavigationConfig = $block->getData('tweakwise_navigation_config');
+$hasTweakwiseAjaxFilters = true; //$tweakwiseNavigationConfig->isAjaxFilters();
+?>
+<script>
+    function tweakwiseNavigationToolbar() {
+        return {
+            options: <?= /* @noEscape */ $block->getWidgetOptionsJson($additionalOptions) ?>.productListToolbarForm || {},
+            ajaxFilters: <?= $hasTweakwiseAjaxFilters ?>,
+            filterFormSelector: '#facet-filter-form',
+            pagerItemSelector: '.pages li.item a',
+            init() {
+                const filterForm = document.querySelector(this.filterFormSelector);
+                const pagerLinks = this.$el.querySelectorAll(this.pagerItemSelector);
+
+                if (this.ajaxFilters && filterForm && pagerLinks.length) {
+                    Array.from(pagerLinks).forEach((pagerLink) => {
+                        pagerLink.addEventListener('click', (event) => this.handleTweakwisePagerClick(event));
+                    });
+                }
+            },
+            getUrlParams: function () {
+                let decode = window.decodeURIComponent,
+                    urlPaths = this.options.url.split('?'),
+                    urlParams = urlPaths[1] ? urlPaths[1].split('&') : [],
+                    params = {},
+                    parameters, i;
+
+                for (i = 0; i < urlParams.length; i++) {
+                    parameters = urlParams[i].split('=');
+                    params[decode(parameters[0])] = parameters[1] !== undefined ?
+                        decode(parameters[1].replace(/\+/g, '%20')) :
+                        '';
+                }
+
+                return params;
+            },
+            getCurrentLimit: function () {
+                return this.getUrlParams()[this.options.limit] || this.options.limitDefault;
+            },
+            getCurrentPage: function () {
+                return this.getUrlParams()[this.options.page] || 1;
+            },
+            changeUrl(paramName, paramValue, defaultValue) {
+                const filterForm = document.querySelector(this.filterFormSelector);
+
+                if (!this.ajaxFilters || !filterForm) {
+                    this.handleDefaultAction(paramName, paramValue, defaultValue)
+                }
+
+                const inputs = filterForm.querySelectorAll('input[name=' + paramName + ']');
+
+                if (inputs.length) {
+                    Array.from(inputs).forEach((input) => {
+                        input.setAttribute('value', paramValue);
+                    });
+                } else {
+                    const input = document.createElement('input');
+                    input.name = paramName;
+                    filterForm.appendChild(input);
+                    input.setAttribute('value', paramValue);
+                    input.style.display = 'none';
+                }
+
+                const event = document.createEvent('HTMLEvents');
+                event.initEvent('change', true, false);
+                filterForm.dispatchEvent(event);
+
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            },
+            handleTweakwisePagerClick(event) {
+                event.preventDefault();
+
+                const page = event.currentTarget.getAttribute('href') || '';
+                const pageMatch = new RegExp('[?&]p=(\\\d+)').exec(page);
+                let pageValue = 1;
+
+                if (pageMatch) {
+                    pageValue = pageMatch[1];
+                }
+
+                return this.changeUrl('p', pageValue, pageValue);
+            },
+            handleDefaultAction(paramName, paramValue, defaultValue) {
+                let urlPaths = this.options.url.split('?'),
+                    baseUrl = urlPaths[0],
+                    paramData = this.getUrlParams(),
+                    currentPage = this.getCurrentPage(),
+                    newPage;
+
+                /**
+                 * calculates the page on which the first item of the current page will
+                 * be with the new limit and sets that number as the new page
+                 */
+                if (currentPage > 1 && paramName === this.options.limit) {
+                    newPage = Math.floor(this.getCurrentLimit() * (currentPage - 1) / paramValue) + 1;
+
+                    if (newPage > 1) {
+                        paramData[this.options.page] = newPage;
+                    } else {
+                        delete paramData[this.options.page];
+                    }
+                }
+
+                paramData[paramName] = paramValue;
+
+                if (this.options.post) {
+                    hyva.postForm({action: baseUrl, data: paramData});
+                } else {
+                    if (paramValue === defaultValue.toString()) {
+                        delete paramData[paramName];
+                    }
+                    paramData = Object.keys(paramData).length === 0 ? '' : '?' + (new URLSearchParams(paramData));
+                    location.href = baseUrl + paramData
+                }
+            }
+        }
+    }
+</script>
+
+<?php if ($block->getCollection()->getSize()): ?>
+    <div x-data="tweakwiseNavigationToolbar()"
+         x-init="init()"
+         class="toolbar toolbar-products grid grid-cols-4 sm:grid-cols-8 md:grid-cols-4
+            lg:grid-cols-8  grid-flow-row gap-2 items-center">
+        <?php if ($block->isExpanded()): ?>
+            <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/viewmode.phtml') ?>
+            <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/sorter.phtml') ?>
+        <?php endif; ?>
+
+        <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/amount.phtml') ?>
+
+        <?= $block->getPagerHtml() ?>
+
+        <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/limiter.phtml') ?>
+
+    </div>
+
+    <style>
+      /* Does not work with Tweakwise */
+      .toolbar.toolbar-products .action.sorter-action.sort-asc {
+        display: none;
+      }
+    </style>
+<?php endif ?>

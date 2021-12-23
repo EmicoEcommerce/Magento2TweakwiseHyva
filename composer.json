@@ -1,0 +1,23 @@
+{
+    "name": "emico/tweakwise_hyva",
+    "description": "Hyvä Themes Compatibility module for Emico_Tweakwise",
+    "type": "magento2-module",
+    "require": {
+        "magento/framework": "*",
+        "hyva-themes/magento2-compat-module-fallback": "*",
+        "emico/tweakwise": "*"
+    },
+    "authors": [{
+        "name": "Emico B.V.",
+        "email": "info@emico.nl"
+    }],
+    "license": "see LICENSE.md",
+    "autoload": {
+        "files": [
+            "src/registration.php"
+        ],
+        "psr-4": {
+            "Emico\\TweakwiseHyva\\": "src/"
+        }
+    }
+}

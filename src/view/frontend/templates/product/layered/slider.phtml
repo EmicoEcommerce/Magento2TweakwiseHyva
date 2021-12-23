@@ -1,0 +1,88 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Emico\Tweakwise\Block\LayeredNavigation\RenderLayered\SliderRenderer;
+
+/** @var SliderRenderer $block */
+
+$itemPrefix = $block->getItemPrefix();
+$itemPostfix = $block->getItemPostfix();
+$urlKey = $block->getUrlKey();
+$minValue = $block->getMinValue();
+$maxValue = $block->getMaxValue();
+$currentMinValue = $block->getCurrentMinValue();
+$currentMaxValue = $block->getCurrentMaxValue();
+$sliderUrlInputValue = sprintf('%s-%s', $currentMinValue, $currentMaxValue);
+$disabledSliderUrlInputValue = sprintf('%s-%s', $minValue, $maxValue);
+
+$jsSliderConfig = $block->getJsSliderConfig();
+?>
+<div class="slider-attribute" id="attribute-slider-<?= $block->getCssId() ?>"
+    <?php if ($jsSliderConfig): ?>
+        x-data="tweakwiseNavigationSlider()"
+        x-init='init(<?= $jsSliderConfig ?>)'
+        data-is-price="<?= $urlKey === 'price' ?>"
+    <?php endif; ?>
+>
+    <div class="labels flex justify-between">
+        <span class="min-value text-sm">
+            <span class="prefix"><?= $itemPrefix ?></span>
+            <span class="value"><?= $block->renderValue($minValue) ?></span>
+            <span class="postfix"><?= $itemPostfix ?></span>
+        </span>
+        <span class="max-value text-sm">
+            <span class="prefix"><?= $itemPrefix ?></span>
+            <span class="value"><?= $block->renderValue($maxValue) ?></span>
+            <span class="postfix"><?= $itemPostfix ?></span>
+        </span>
+    </div>
+    <div class="tw-range-slider slider" x-ref="slider"></div>
+    <div class="labels flex justify-between">
+        <span class="current-min-value text-sm">
+            <span class="prefix"><?= $itemPrefix ?></span>
+            <span class="value"><?= $block->renderValue($currentMinValue) ?></span>
+            <span class="postfix"><?= $itemPostfix ?></span>
+        </span>
+        <span class="current-max-value text-sm">
+            <span class="prefix"><?= $itemPrefix ?></span>
+            <span class="value"><?= $block->renderValue($currentMaxValue) ?></span>
+            <span class="postfix"><?= $itemPostfix ?></span>
+        </span>
+    </div>
+    <div class="slider-inputs w-full flex justify-between mt-2">
+        <div class="slider-min-wrapper w-2/5">
+            <label for="<?= $urlKey ?>-min" class="text-sm mb-0"><?= __('From') ?></label>
+            <input type="text"
+                   class="slider-min js-skip-submit w-full"
+                   id="<?= $urlKey ?>-min"
+                   name="<?= $urlKey ?>-min"
+                   value="<?= $currentMinValue ?>"
+            >
+        </div>
+        <div class="slider-max-wrapper w-2/5">
+            <label for="<?= $urlKey ?>-max" class="text-sm mb-0"><?= __('To') ?></label>
+            <input type="text"
+                   class="slider-max js-skip-submit w-full"
+                   id="<?= $urlKey ?>-max"
+                   name="<?= $urlKey ?>-max"
+                   value="<?= $currentMaxValue ?>"
+            >
+        </div>
+        <input type="hidden"
+               data-disabled-input="<?= $disabledSliderUrlInputValue ?>"
+               data-is-slider="true"
+            <?= ($sliderUrlInputValue === $disabledSliderUrlInputValue) ? 'disabled="disabled"' : '' ?>
+               id="<?= $block->getCssId() ?>"
+               class="slider-url-value"
+               name="<?= $urlKey ?>"
+               value="<?= $sliderUrlInputValue ?>"
+        >
+    </div>
+</div>

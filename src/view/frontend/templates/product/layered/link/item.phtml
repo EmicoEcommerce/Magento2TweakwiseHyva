@@ -1,0 +1,50 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Magento\Framework\Escaper;
+use Emico\Tweakwise\Block\LayeredNavigation\RenderLayered\LinkRenderer\ItemRenderer;
+
+/** @var Escaper $escaper */
+/** @var ItemRenderer $block */
+
+$item = $block->getItem();
+
+// TODO: migrate styling to Tailwind
+
+?>
+
+<li class="item">
+    <a href="<?= $escaper->escapeUrl($item->getUrl()) ?>" class="flex w-full py-1 mb-1 hover:text-black">
+        <?= $block->getItemPrefix() ?>
+        <?= $escaper->escapeHtml($item->getLabel()) ?>
+        <?= $block->getItemPostfix() ?>
+
+        <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
+            <span class="count block text-primary-lighter ml-auto">
+                <?= htmlentities((string)$item->getCount()) ?>
+                <span class="filter-count-label">
+                    <?php if ($item->getCount() == 1): ?>
+                        <?= __('item') ?>
+                    <?php else: ?>
+                        <?= __('items') ?>
+                    <?php endif; ?>
+                </span>
+            </span>
+        <?php endif; ?>
+    </a>
+
+    <?php if ($block->hasChildren()): ?>
+        <ol class="items child-items">
+            <?php foreach ($block->getChildren() as $child): ?>
+                <?= $block->renderLinkItem($child) ?>
+            <?php endforeach; ?>
+        </ol>
+    <?php endif; ?>
+</li>

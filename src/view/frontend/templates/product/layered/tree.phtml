@@ -1,0 +1,21 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Emico\Tweakwise\Block\LayeredNavigation\RenderLayered\TreeRenderer;
+
+/** @var TreeRenderer $block */
+
+// TODO: migrate styling to Tailwind
+?>
+<ol class="items tree-attribute">
+    <?php foreach ($block->getItems() as $item): ?>
+        <?= $block->renderTreeItem($item) ?>
+    <?php endforeach; ?>
+</ol>

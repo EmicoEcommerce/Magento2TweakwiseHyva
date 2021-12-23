@@ -1,0 +1,83 @@
+<?php
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+declare(strict_types = 1);
+
+use Magento\Framework\Escaper;
+use Emico\Tweakwise\Block\LayeredNavigation\RenderLayered\DefaultRenderer;
+
+/** @var Escaper $escaper */
+/** @var DefaultRenderer $block */
+
+$hasHiddenItems = $block->hasHiddenItems();
+$hasAlternateSortOrder = $block->hasAlternateSortOrder();
+?>
+<div x-data="initTweakwiseNavigationItems()" x-init='initSort(<?= (int)$hasAlternateSortOrder ?>)'>
+    <ol class="items" x-ref="items">
+        <?php foreach ($block->getItems() as $index => $item): ?>
+            <li class="item<?= $block->itemDefaultHidden($item) ? ' hidden' : '' ?>"
+                :class="{ '!block': moreItemsShow }"
+                <?php if ($hasAlternateSortOrder): ?>
+                    data-alternate-sort="<?= $item->getAlternateSortOrder(); ?>"
+                    data-original-sort="<?= $index; ?>"
+                <?php endif; ?>
+            >
+                <a <?= $block->renderAnchorHtmlTagAttributes($item); ?> class="flex w-full py-1 mb-1 hover:text-black">
+                    <?php $cssId = $item->getCssId(); ?>
+                    <?php if ($block->showCheckbox()): ?>
+                        <label for="<?= $cssId ?>" class="block m-0 font-normal flex w-full">
+                            <input id="<?= $cssId ?>"
+                                   name="<?= $item->getFilter()->getFacet()->getFacetSettings()->getUrlKey() ?>[]"
+                                   type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
+                                   value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
+                                   class="block w-4 h-4 mr-2 mt-1"
+                            >
+
+                            <?= $block->getItemPrefix() ?>
+                            <?= $escaper->escapeHtml($item->getLabel()) ?>
+                            <?= $block->getItemPostfix() ?>
+
+                            <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
+                                <span class="count block text-primary-lighter ml-auto">
+                                    <?= htmlentities((string)$item->getCount()) ?>
+                                    <span class="filter-count-label">
+                                        <?= ($item->getCount() === 1) ? __('item') : __('items') ?>
+                                    </span>
+                                </span>
+                            <?php endif; ?>
+                        </label>
+                    <?php else: ?>
+                        <?= $block->getItemPrefix() ?>
+                        <?= $escaper->escapeHtml($item->getLabel()) ?>
+                        <?= $block->getItemPostfix() ?>
+
+                        <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
+                            <span class="count block text-primary-lighter ml-auto">
+                                <?= htmlentities((string)$item->getCount()) ?>
+                                <span class="filter-count-label">
+                                    <?= ($item->getCount() === 1) ? __('item') : __('items') ?>
+                                </span>
+                            </span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ol>
+
+    <?php if ($hasHiddenItems): ?>
+        <a href="#" class="more-items underline cursor-pointer"
+           @click.prevent="moreItemsShow = !moreItemsShow"
+           :class="{ 'hidden': moreItemsShow }"
+        ><?= __($block->getMoreItemText()) ?></a>
+        <a href="#" class="less-items hidden underline cursor-pointer"
+           @click.prevent="moreItemsShow = !moreItemsShow"
+           :class="{ '!block': moreItemsShow }"
+        ><?= __($block->getLessItemText()) ?></a>
+    <?php endif; ?>
+</div>
