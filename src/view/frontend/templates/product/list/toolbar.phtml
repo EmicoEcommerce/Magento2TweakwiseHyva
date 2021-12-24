@@ -25,6 +25,8 @@ $additionalOptions = ['page' => 'p'];
 $hasTweakwiseAjaxFilters = true; //$tweakwiseNavigationConfig->isAjaxFilters();
 ?>
 <script>
+    'use strict';
+
     function tweakwiseNavigationToolbar() {
         return {
             options: <?= /* @noEscape */ $block->getWidgetOptionsJson($additionalOptions) ?>.productListToolbarForm || {},
@@ -67,7 +69,7 @@ $hasTweakwiseAjaxFilters = true; //$tweakwiseNavigationConfig->isAjaxFilters();
                 const filterForm = document.querySelector(this.filterFormSelector);
 
                 if (!this.ajaxFilters || !filterForm) {
-                    this.handleDefaultAction(paramName, paramValue, defaultValue)
+                    this.handleDefaultAction(paramName, paramValue, defaultValue);
                 }
 
                 const inputs = filterForm.querySelectorAll('input[name=' + paramName + ']');
@@ -133,7 +135,7 @@ $hasTweakwiseAjaxFilters = true; //$tweakwiseNavigationConfig->isAjaxFilters();
                         delete paramData[paramName];
                     }
                     paramData = Object.keys(paramData).length === 0 ? '' : '?' + (new URLSearchParams(paramData));
-                    location.href = baseUrl + paramData
+                    location.href = baseUrl + paramData;
                 }
             }
         }

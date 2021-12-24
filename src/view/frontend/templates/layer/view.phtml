@@ -6,7 +6,7 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Emico\Tweakwise\Model\Catalog\Layer\Filter;
 use Emico\Tweakwise\Model\NavigationConfig;
@@ -31,7 +31,7 @@ $hasFilters = count($filters) > 0;
 $filtered = count($block->getLayer()->getState()->getFilters());
 ?>
 
-    <div class="block filter border border-container bg-container p-2 md:p-0 md:border-0 md:bg-transparent my-6<?= (!$hasFilters ? ' filter-no-options' : '') ?>"
+    <div class="block filter border border-container bg-container p-2 md:p-0 md:border-0 md:bg-transparent my-6<?=(!$hasFilters ? ' filter-no-options' : '')?>"
          x-data="initLayeredNavigation()"
          x-init="checkIsMobileResolution()"
          @resize.window.debounce="checkIsMobileResolution()"
@@ -41,8 +41,8 @@ $filtered = count($block->getLayer()->getState()->getFilters());
              @click="blockOpen = !blockOpen"
         >
             <span class="text-primary text-md text-xl md:text-2xl font-semibold uppercase"
-                  data-count="<?= $filtered ?>">
-                <?= __('Shop By') ?>
+                  data-count="<?=$filtered?>">
+                <?=__('Shop By')?>
             </span>
             <span class="py-1 px-1 bg-container-lighter rounded border border-container-darker hidden"
                   :class="{ 'block' : isMobile, 'hidden': !isMobile }">
@@ -60,15 +60,15 @@ $filtered = count($block->getLayer()->getState()->getFilters());
             <form id="facet-filter-form"
                 <?php if ($jsFormConfig): ?>
                     x-data="tweakwiseNavigationForm()"
-                    x-init='init(<?= $jsFormConfig ?>)'
+                    x-init='init(<?=$jsFormConfig?>)'
                 <?php endif; ?>
             >
-                <?= $block->getChildHtml('state'); ?>
+                <?=$block->getChildHtml('state');?>
 
                 <?php if ($block->getLayer()->getState()->getFilters()): ?>
                     <div class="block-actions filter-actions">
-                        <a href="<?= $block->getClearUrl() ?>"
-                           class="action clear filter-clear text-xs text-primary underline hover:text-primary-darker"><span><?= __('Clear All') ?></span></a>
+                        <a href="<?=$block->getClearUrl()?>"
+                           class="action clear filter-clear text-xs text-primary underline hover:text-primary-darker"><span><?=__('Clear All')?></span></a>
                     </div>
                 <?php endif; ?>
 
@@ -76,7 +76,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                     <div class="filter-options" id="narrow-by-list">
                         <?php foreach ($tweakwiseNavigationConfig->getFilterFormInput() as $name => $value): ?>
                             <?php //These are tweakwise system parameters which are needed for ajax navigation?>
-                            <input type="hidden" name="<?= $name ?>" value="<?= $value ?>">
+                            <input type="hidden" name="<?=$name?>" value="<?=$value?>">
                         <?php endforeach; ?>
 
                         <?php foreach ($block->getFilters() as $filter): ?>
@@ -85,20 +85,20 @@ $filtered = count($block->getLayer()->getState()->getFilters());
 
                                     <?php $filterActive = $filter->isDefaultCollapsed() ? 'false' : 'true'; ?>
 
-                                    <div class="filter-option card my-4 pb-0 <?= $filter->getCssClass() ?>"
-                                         x-data="{ open: <?= $filterActive ?> }">
+                                    <div class="filter-option card my-4 pb-0 <?=$filter->getCssClass()?>"
+                                         x-data="{ open: <?=$filterActive?> }">
                                         <div class="filter-options-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container pb-2"
                                              :class="{ 'border-b': open }"
                                              @click="open = !open">
                                         <span class="title flex text-md md:text-lg font-semibold">
-                                            <?= __($filter->getName()) ?>
+                                            <?=__($filter->getName())?>
 
                                             <?php $tooltip = $filter->getTooltip(); ?>
                                             <?php if ($tooltip): ?>
                                                 <?php $tooltip = htmlentities($tooltip); ?>
                                                 <span class="tooltip ml-2 mt-1">
                                                     <span class="tooltip-toggle"></span>
-                                                    <span class="tooltip-content"><?= $tooltip ?></span>
+                                                    <span class="tooltip-content"><?=$tooltip?></span>
                                                 </span>
                                             <?php endif; ?>
                                         </span>
@@ -117,8 +117,8 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                         <div class="filter-options-content py-3 hidden"
                                              :class="{ '!block': open, 'hidden': !open }"
                                         >
-                                            <?= /* @noEscape */
-                                            $block->getChildBlock('renderer')->render($filter) ?>
+                                            <?=/* @noEscape */
+                                            $block->getChildBlock('renderer')->render($filter)?>
                                         </div>
                                     </div>
 
@@ -127,8 +127,8 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                             <button type="button"
                                                     class="btn btn-primary btn-block js-btn-filter"
                                             >
-                                                <?= __('Show <span>%1</span> items',
-                                                    $this->getLayer()->getProductCount()); ?>
+                                                <?=__('Show <span>%1</span> items',
+                                                    $this->getLayer()->getProductCount());?>
                                             </button>
                                         </div>
                                     <?php endif; ?>
@@ -138,12 +138,14 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                     </div>
                 <?php endif; ?>
 
-                <?= $block->getChildHtml('loading') ?>
+                <?=$block->getChildHtml('loading')?>
             </form>
         </div>
     </div>
 
     <script>
+        'use strict';
+
         function initLayeredNavigation() {
             return {
                 isMobile: false,
@@ -161,22 +163,26 @@ $filtered = count($block->getLayer()->getState()->getFilters());
         function initTweakwiseNavigationItems() {
             return {
                 moreItemsShow: false,
-                type: this.moreItemsShow ? 'alternateSort' : 'originalSort',
-                initSort(hasAlternateSort) {
+                sortItems(hasAlternateSort) {
                     if (!hasAlternateSort || this.$refs.items || this.$refs.items.children) {
-                        return;
+                        return
                     }
 
-                    const items = this.$refs.items;
+                    const items = this.$refs.items
+                    const sortType = this.moreItemsShow ? 'alternateSort' : 'originalSort'
 
-                    [].slice.call(items.children).sort((a, b) => a.dataset[this.type].localeCompare(b.dataset[this.type]))
+                    Array.from(items.children).sort((a, b) => a.dataset[sortType].localeCompare(b.dataset[sortType]))
                         .forEach((item) => {
                             items.appendChild(item);
                         });
+                },
+                toggleShowMore(moreItemsShow, hasAlternateSort) {
+                    this.moreItemsShow = moreItemsShow
+                    this.sortItems(hasAlternateSort)
                 }
             }
         }
     </script>
 
-<?= $block->getChildHtml('tweakwise.navigation.form'); ?>
-<?= $block->getChildHtml('tweakwise.navigation.slider'); ?>
+<?=$block->getChildHtml('tweakwise.navigation.form');?>
+<?=$block->getChildHtml('tweakwise.navigation.slider');?>
