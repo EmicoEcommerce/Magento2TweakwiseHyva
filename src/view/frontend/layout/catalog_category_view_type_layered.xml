@@ -1,9 +1,20 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<!--
+/**
+ * Tweakwise & Emico (https://www.tweakwise.com/ & https://www.emico.nl/) - All Rights Reserved
+ *
+ * @copyright Copyright (c) 2017-2022 Tweakwise.com B.V. (https://www.tweakwise.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="catalog.leftnav">
-            <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template" name="tweakwise.navigation.form" template="Emico_Tweakwise::layer/navigation-form.phtml"/>
-            <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template" name="tweakwise.navigation.slider" template="Emico_Tweakwise::layer/navigation-slider.phtml" />
+            <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template"
+                   name="tweakwise.navigation.form" template="Emico_Tweakwise::layer/navigation-form.phtml"/>
+            <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template"
+                   name="tweakwise.navigation.slider" template="Emico_Tweakwise::layer/navigation-slider.phtml"/>
             <block ifconfig="tweakwise/layered/enabled" name="loading" template="Hyva_Theme::ui/loading.phtml"/>
         </referenceBlock>
     </body>

@@ -18,11 +18,6 @@ use Magento\Framework\Escaper;
 /** @var Toolbar $block */
 
 $additionalOptions = ['page' => 'p'];
-
-// TODO: add tweakwise config value here
-/** @var NavigationConfig $tweakwiseNavigationConfig */
-//$tweakwiseNavigationConfig = $block->getData('tweakwise_navigation_config');
-$hasTweakwiseAjaxFilters = true; //$tweakwiseNavigationConfig->isAjaxFilters();
 ?>
 <script>
     'use strict';
@@ -30,14 +25,13 @@ $hasTweakwiseAjaxFilters = true; //$tweakwiseNavigationConfig->isAjaxFilters();
     function tweakwiseNavigationToolbar() {
         return {
             options: <?= /* @noEscape */ $block->getWidgetOptionsJson($additionalOptions) ?>.productListToolbarForm || {},
-            ajaxFilters: <?= $hasTweakwiseAjaxFilters ?>,
             filterFormSelector: '#facet-filter-form',
             pagerItemSelector: '.pages li.item a',
             init() {
                 const filterForm = document.querySelector(this.filterFormSelector);
                 const pagerLinks = this.$el.querySelectorAll(this.pagerItemSelector);
 
-                if (this.ajaxFilters && filterForm && pagerLinks.length) {
+                if (filterForm && pagerLinks.length) {
                     Array.from(pagerLinks).forEach((pagerLink) => {
                         pagerLink.addEventListener('click', (event) => this.handleTweakwisePagerClick(event));
                     });
@@ -68,7 +62,7 @@ $hasTweakwiseAjaxFilters = true; //$tweakwiseNavigationConfig->isAjaxFilters();
             changeUrl(paramName, paramValue, defaultValue) {
                 const filterForm = document.querySelector(this.filterFormSelector);
 
-                if (!this.ajaxFilters || !filterForm) {
+                if (!filterForm) {
                     this.handleDefaultAction(paramName, paramValue, defaultValue);
                 }
 
