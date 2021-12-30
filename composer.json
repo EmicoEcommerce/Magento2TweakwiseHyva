@@ -1,5 +1,6 @@
 {
     "name": "emico/tweakwise_hyva",
+    "license": "OSL-3.0",
     "description": "Hyvä Themes Compatibility module for Emico_Tweakwise",
     "type": "magento2-module",
     "require": {
@@ -11,7 +12,6 @@
         "name": "Emico B.V.",
         "email": "info@emico.nl"
     }],
-    "license": "see LICENSE.md",
     "autoload": {
         "files": [
             "src/registration.php"
