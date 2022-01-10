@@ -57,7 +57,7 @@ $jsSliderConfig = $block->getJsSliderConfig();
         </span>
     </div>
     <div class="slider-inputs w-full flex justify-between mt-2">
-        <div class="slider-min-wrapper w-2/5">
+        <div class="slider-min-wrapper w-2/5 mr-1">
             <label for="<?= $urlKey ?>-min" class="text-sm mb-0"><?= __('From') ?></label>
             <input type="text"
                    class="slider-min js-skip-submit w-full"
@@ -66,7 +66,7 @@ $jsSliderConfig = $block->getJsSliderConfig();
                    value="<?= $currentMinValue ?>"
             >
         </div>
-        <div class="slider-max-wrapper w-2/5">
+        <div class="slider-max-wrapper w-2/5 ml-1">
             <label for="<?= $urlKey ?>-max" class="text-sm mb-0"><?= __('To') ?></label>
             <input type="text"
                    class="slider-max js-skip-submit w-full"
