@@ -70,7 +70,7 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
         <?php endforeach; ?>
     </ol>
 
-    <?php //if ($hasHiddenItems): ?>
+    <?php if ($hasHiddenItems): ?>
         <a href="#" class="more-items underline cursor-pointer"
            @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'hidden': moreItemsShow }"
@@ -79,5 +79,5 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
            @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ '!block': moreItemsShow }"
         ><?= __($block->getLessItemText()) ?></a>
-    <?php //endif; ?>
+    <?php endif; ?>
 </div>
