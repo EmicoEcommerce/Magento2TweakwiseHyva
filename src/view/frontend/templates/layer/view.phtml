@@ -86,7 +86,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                     <?php $filterActive = $filter->isDefaultCollapsed() ? 'false' : 'true'; ?>
 
                                     <div class="filter-option card my-4 pb-0 <?=$filter->getCssClass()?>"
-                                         x-data="{ open: <?=$filterActive?> }">
+                                         x-data="{ open: <?=$filterActive?>, showTooltip: false }">
                                         <div class="filter-options-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container pb-2"
                                              :class="{ 'border-b': open }"
                                              @click="open = !open">
@@ -96,9 +96,20 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                             <?php $tooltip = $filter->getTooltip(); ?>
                                             <?php if ($tooltip): ?>
                                                 <?php $tooltip = htmlentities($tooltip); ?>
-                                                <span class="tooltip ml-2 mt-1">
-                                                    <span class="tooltip-toggle"></span>
-                                                    <span class="tooltip-content"><?=$tooltip?></span>
+                                                <span class="ml-2 mt-1 block relative tooltip">
+                                                    <span @mouseover="showTooltip = true"
+                                                          @mouseleave="showTooltip = false"
+                                                          class="flex justify-center items-center relative text-primary w-5 h-5 cursor-pointer tooltip-toggle">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                             viewBox="0 0 20 20" fill="currentColor">
+                                                          <path fill-rule="evenodd"
+                                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                                clip-rule="evenodd"/>
+                                                        </svg>
+                                                    </span>
+                                                    <span x-cloak
+                                                          x-show.transition.origin.top="showTooltip"
+                                                          class="absolute bottom-full mb-1 block text-xs font-normal bg-gray text-white p-2 absolute rounded-md w-48 z-10 text-left tooltip-content"><?=$tooltip?></span>
                                                 </span>
                                             <?php endif; ?>
                                         </span>
