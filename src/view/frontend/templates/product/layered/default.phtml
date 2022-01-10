@@ -75,9 +75,10 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
            @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'hidden': moreItemsShow }"
         ><?= __($block->getMoreItemText()) ?></a>
-        <a href="#" class="less-items hidden underline cursor-pointer"
+        <a href="#" class="less-items underline cursor-pointer"
+           x-cloak
            @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
-           :class="{ '!block': moreItemsShow }"
+           :class="{ 'block': moreItemsShow, 'hidden': !moreItemsShow }"
         ><?= __($block->getLessItemText()) ?></a>
     <?php endif; ?>
 </div>
