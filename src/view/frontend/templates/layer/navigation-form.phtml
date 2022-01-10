@@ -260,10 +260,10 @@ use Magento\Framework\View\Element\Template;
 
                 const newFilters = wrapper.querySelector(filterSelector);
                 const newProductList = wrapper.querySelector(productListSelector);
-                const newProductListJs = newProductList.getElementsByTagName('script');
+                const newProductListJs = newProductList ? newProductList.getElementsByTagName('script') : null;
 
                 const newToolbar = wrapper.querySelectorAll(toolbarSelector);
-                const newToolbarJs = this.getPreviousSibling(newToolbar[0], 'script');
+                const newToolbarJs = newToolbar[0] ? this.getPreviousSibling(newToolbar[0], 'script') : null;
 
                 if (newProductListJs || newToolbarJs) {
                     let oldJs = document.getElementById('updated-catalog-js');
