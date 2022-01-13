@@ -112,7 +112,7 @@ use Magento\Framework\View\Element\Template;
              * Navigate to the selected filter url
              */
             defaultHandler(event) {
-                const a = event.target.tagName === 'A' ? event.target : this.getParent(event.target, 'a');
+                const a = event.target.tagName === 'A' ? event.target : event.target.closest('a');
                 const href = this.findHref(a);
                 if (href) {
                     window.location.href = href;
@@ -166,7 +166,7 @@ use Magento\Framework\View\Element\Template;
                 if (event.target.dataset.isSlider || event.target.tagName === 'FORM') {
                     return false;
                 } else {
-                    return this.getParent(event.target, 'a').dataset.noAjax;
+                    return event.target.closest('a').dataset.noAjax;
                 }
             },
 
@@ -354,16 +354,6 @@ use Magento\Framework\View\Element\Template;
             // ------- End of handling for form filters
 
             // ------- Utility methods
-            getParent(elem, selector) {
-                let parent = elem.parentNode;
-
-                if (!selector) return parent;
-
-                while (parent) {
-                    if (parent.matches(selector)) return parent;
-                    parent = parent.parentNode
-                }
-            },
             getPreviousSibling(elem, selector) {
                 let sibling = elem.previousElementSibling;
 
