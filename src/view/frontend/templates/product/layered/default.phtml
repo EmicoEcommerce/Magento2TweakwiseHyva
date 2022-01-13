@@ -20,8 +20,8 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
 <div x-data="initTweakwiseNavigationItems()" x-init='sortItems(<?= (int)$hasAlternateSortOrder ?>)'>
     <ol class="items" x-ref="items">
         <?php foreach ($block->getItems() as $index => $item): ?>
-            <li class="item<?= $block->itemDefaultHidden($item) ? ' hidden' : '' ?>"
-                :class="{ '!block': moreItemsShow }"
+            <li class="item"
+                :class="{ 'block': moreItemsShow, 'hidden': '<?=$block->itemDefaultHidden($item)?>' && !moreItemsShow }"
                 <?php if ($hasAlternateSortOrder): ?>
                     data-alternate-sort="<?= $item->getAlternateSortOrder(); ?>"
                     data-original-sort="<?= $index; ?>"
@@ -75,9 +75,10 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
            @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'hidden': moreItemsShow }"
         ><?= __($block->getMoreItemText()) ?></a>
-        <a href="#" class="less-items hidden underline cursor-pointer"
+        <a href="#" class="less-items underline cursor-pointer"
+           x-cloak
            @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
-           :class="{ '!block': moreItemsShow }"
+           :class="{ 'block': moreItemsShow, 'hidden': !moreItemsShow }"
         ><?= __($block->getLessItemText()) ?></a>
     <?php endif; ?>
 </div>
