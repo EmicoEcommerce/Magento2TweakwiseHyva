@@ -25,15 +25,8 @@ $item = $block->getItem();
         <?= $block->getItemPostfix() ?>
 
         <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
-            <span class="count block text-primary-lighter ml-auto">
-                <?= htmlentities((string)$item->getCount()) ?>
-                <span class="filter-count-label">
-                    <?php if ($item->getCount() == 1): ?>
-                        <?= __('item') ?>
-                    <?php else: ?>
-                        <?= __('items') ?>
-                    <?php endif; ?>
-                </span>
+            <span class="count block text-primary ml-auto">
+                (<?= htmlentities((string)$item->getCount()) ?>)
             </span>
         <?php endif; ?>
     </a>
