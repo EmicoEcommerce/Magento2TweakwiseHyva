@@ -43,11 +43,8 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
                             <?= $block->getItemPostfix() ?>
 
                             <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
-                                <span class="count block text-primary-lighter ml-auto">
-                                    <?= htmlentities((string)$item->getCount()) ?>
-                                    <span class="filter-count-label">
-                                        <?= ($item->getCount() === 1) ? __('item') : __('items') ?>
-                                    </span>
+                                <span class="count block text-primary ml-auto">
+                                    (<?= htmlentities((string)$item->getCount()) ?>)
                                 </span>
                             <?php endif; ?>
                         </label>
