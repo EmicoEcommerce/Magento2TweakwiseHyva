@@ -73,7 +73,7 @@ $noUiSliderUrl = $block->getViewFileUrl('Emico_TweakwiseHyva::js/lib/nouislider.
                     }
                 });
 
-                slider.noUiSlider.on('update', (values) => {
+                slider.noUiSlider.on('slide', (values) => {
                     const minValue = values[0] * this.step;
                     const maxValue = values[1] * this.step;
                     this.updateLabels(minValue, maxValue);
