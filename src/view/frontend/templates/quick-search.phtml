@@ -11,10 +11,11 @@ use Magento\Framework\View\Element\Template;
 /** @var Template $block */
 ?>
 <template x-if="suggestions.length > 0">
-    <div class="w-full leading-normal transition appearance-none text-grey-800 flex flex-col mt-1 absolute max-h-96 overflow-y-auto"
-         style="z-index: 2;">
+    <div
+        class="w-full leading-normal transition appearance-none text-grey-800 flex flex-col border border-container absolute max-h-96 overflow-y-auto"
+        style="z-index: 2;">
         <template x-for="suggestion in suggestions">
-            <div class="flex justify-between p-2 bg-container-lighter even:bg-container cursor-pointer border border-container focus:bg-container-darker hover:bg-container-darker"
+            <div class="bg-container-lighter even:bg-container"
                  :class="suggestion.row_class ? suggestion.row_class : ''"
                  role="option"
                  tabindex="0"
@@ -25,7 +26,7 @@ use Magento\Framework\View\Element\Template;
                  @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
             >
                 <template x-if="suggestion.type === 'product'">
-                    <div class="product-item flex">
+                    <div class="product-item flex p-2 cursor-pointer border-b border-container focus:bg-container-darker hover:bg-container-darker">
                         <template x-if="suggestion.image">
                             <img class="qs-option-image mr-2" :src="suggestion.image ? suggestion.image: ''"
                                  :alt="suggestion.title ? suggestion.title : ''"/>
@@ -45,14 +46,14 @@ use Magento\Framework\View\Element\Template;
                                 <template x-if="hasSpecialPrice(suggestion)">
                                     <span class="price-container">
                                         <span class="old-price sly-old-price mr-1">
-                                            <span class="price-label hidden"><?= __('Regular Price') ?></span>
+                                            <span class="price-label hidden"><?=__('Regular Price')?></span>
                                             <span class="price-wrapper">
                                                 <span x-html="formatPrice(suggestion.price)"
                                                       class="price font-regular line-through text-gray-900"></span>
                                             </span>
                                         </span>
                                         <span class="special-price">
-                                            <span class="price-label hidden"><?= __('Special Price') ?></span>
+                                            <span class="price-label hidden"><?=__('Special Price')?></span>
                                             <span class="price-wrapper">
                                                 <span x-html="formatPrice(suggestion.final_price)" class="price"></span>
                                             </span>
@@ -65,23 +66,23 @@ use Magento\Framework\View\Element\Template;
                 </template>
 
                 <template x-if="suggestion.type === 'suggestion'">
-                    <div>
+                    <div class="w-full p-2 cursor-pointer border-b border-container focus:bg-container-darker hover:bg-container-darker">
                         <span class="qs-option-name" x-text="suggestion.title"></span>
                         <span aria-hidden="true" class="amount" x-text="suggestion.num_results"></span>
                     </div>
                 </template>
 
                 <template x-if="suggestion.type === 'suggestion_group'">
-                    <div class="flex justify-between p-2 bg-container-lighter even:bg-container cursor-pointer border border-container hover:bg-container-darker">
-                        <div class="qs-suggestion-heading font-bold mb-1">
+                    <div class="w-full cursor-pointer border-b border-container">
+                        <div class="qs-suggestion-heading font-bold p-2">
                             <span x-text="suggestion.title"></span>
-                            <span x-text="suggestion_group.num_results"></span>
+                            <span x-text="suggestion.num_results"></span>
                         </div>
 
-                        <template x-if="suggestion && suggestion.suggestions > 0">
-                            <div class="flex justify-between p-2 bg-container-lighter even:bg-container mb-1 cursor-pointer border border-container hover:bg-container-darker">
+                        <template x-if="suggestion.suggestions && suggestion.suggestions.length > 0">
+                            <div class="w-full">
                                 <template x-for="subSuggestion in suggestion.suggestions">
-                                    <div id="qs-option-"
+                                    <div class="qs-option w-full flex justify-between bg-container-lighter even:bg-container p-2 cursor-pointer border-t first-of-type:border-t-0 border-container hover:bg-container-darker"
                                          role="option"
                                          tabindex="0"
                                          @click="clickSuggestion(subSuggestion)"
