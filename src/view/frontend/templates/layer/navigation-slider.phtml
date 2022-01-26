@@ -150,9 +150,8 @@ $noUiSliderUrl = $block->getViewFileUrl('Emico_TweakwiseHyva::js/lib/nouislider.
                 this.formFilterChange(minValue, maxValue);
                 const sliderContainer = this.$el;
                 const sliderUrlInput = sliderContainer.querySelector(this.urlInputSelector);
-                const event = document.createEvent('HTMLEvents');
-                event.initEvent('change', true, false);
-                sliderUrlInput.dispatchEvent(event);
+                const changeEvent = new Event('change', {'bubbles': true});
+                sliderUrlInput.dispatchEvent(changeEvent);
             },
             formFilterChange(minValue, maxValue) {
                 const sliderContainer = this.$el;

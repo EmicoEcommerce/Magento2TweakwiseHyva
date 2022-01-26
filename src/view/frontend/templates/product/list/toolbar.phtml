@@ -80,9 +80,8 @@ $additionalOptions = ['page' => 'p'];
                     input.style.display = 'none';
                 }
 
-                const event = document.createEvent('HTMLEvents');
-                event.initEvent('change', true, false);
-                filterForm.dispatchEvent(event);
+                const changeEvent = new Event('change');
+                filterForm.dispatchEvent(changeEvent);
 
                 window.scrollTo({top: 0, behavior: 'smooth'});
             },

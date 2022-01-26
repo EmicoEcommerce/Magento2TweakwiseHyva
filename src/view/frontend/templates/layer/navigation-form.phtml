@@ -77,9 +77,8 @@ use Magento\Framework\View\Element\Template;
              */
             pmListReload(cookieName) {
                 if (hyva.getCookie(cookieName) !== null) {
-                    const event = document.createEvent('HTMLEvents');
-                    event.initEvent('change', true, false);
-                    this.$el.dispatchEvent(event);
+                    const changeEvent = new Event('change');
+                    this.$el.dispatchEvent(changeEvent);
                 }
             },
 
@@ -240,9 +239,8 @@ use Magento\Framework\View\Element\Template;
                         // Simulate click so that the form will be submitted
                         document.querySelector('.js-btn-filter').click();
                     } else {
-                        const event = document.createEvent('HTMLEvents');
-                        event.initEvent('change', true, false);
-                        filter.dispatchEvent(event);
+                        const changeEvent = new Event('change', {'bubbles': true});
+                        filter.dispatchEvent(changeEvent);
                     }
                 }
             },
