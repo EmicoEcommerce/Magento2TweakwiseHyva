@@ -85,8 +85,11 @@ use Magento\Framework\View\Element\Template;
                                     <div class="qs-option w-full flex justify-between bg-container-lighter even:bg-container p-2 cursor-pointer border-t first-of-type:border-t-0 border-container hover:bg-container-darker"
                                          role="option"
                                          tabindex="0"
+                                         :data-title="suggestion.title ? suggestion.title : ''"
                                          @click="clickSuggestion(subSuggestion)"
                                          @keydown.enter="clickSuggestion(subSuggestion)"
+                                         @keydown.arrow-up.prevent="focusElement($event.target.previousElementSibling)"
+                                         @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
                                     >
                                         <span class="qs-option-name" x-text="subSuggestion.title"></span>
                                         <span aria-hidden="true" class="amount"
