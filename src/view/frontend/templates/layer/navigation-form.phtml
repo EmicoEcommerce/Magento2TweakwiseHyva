@@ -30,6 +30,7 @@ use Magento\Framework\View\Element\Template;
             isLoading: false,
             currentXhr: null,
             fetchController: null,
+            ajaxCache: true,
             init(initialValues) {
                 const filterOptions = initialValues.tweakwiseNavigationForm;
 
@@ -200,9 +201,9 @@ use Magento\Framework\View\Element\Template;
                 this.fetchController = new AbortController();
                 const signal = this.fetchController.signal
 
-                const options = {
+                let options = {
                     signal: signal,
-                    cache: 'force-cache'
+                    cache: this.ajaxCache ? 'default' : 'no-cache'
                 }
 
                 this.currentXhr = fetch(fetchUrl, options)
