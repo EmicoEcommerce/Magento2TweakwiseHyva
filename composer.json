@@ -6,8 +6,8 @@
     "require": {
         "magento/framework": "*",
         "hyva-themes/magento2-compat-module-fallback": "*",
-        "emico/tweakwise": "*"
-    },
+        "emico/tweakwise": "*",
+        "php": "^7.4|^8.0|^8.1",
     "authors": [{
         "name": "Emico B.V.",
         "email": "info@emico.nl"
