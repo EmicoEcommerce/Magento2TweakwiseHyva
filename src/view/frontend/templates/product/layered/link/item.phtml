@@ -19,7 +19,7 @@ $item = $block->getItem();
 ?>
 
 <li class="item">
-    <a href="<?= $escaper->escapeUrl($item->getUrl()) ?>" class="flex w-full py-1 mb-1 hover:text-black">
+    <a href="<?= $block->getCategoryUrl($item) ?>" class="flex w-full py-1 mb-1 hover:text-black">
         <?= $block->getItemPrefix() ?>
         <?= $escaper->escapeHtml($item->getLabel()) ?>
         <?= $block->getItemPostfix() ?>
