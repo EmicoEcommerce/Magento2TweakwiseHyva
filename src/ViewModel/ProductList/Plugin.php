@@ -66,26 +66,23 @@ class Plugin extends AbstractRecommendationPlugin
      */
     protected function getCollection()
     {
-        if (!$this->collection) {
+        $requestFactory = new RequestFactory($this->objectManager, ProductRequest::class);
+        $request = $requestFactory->create();
 
-            $requestFactory = new RequestFactory($this->objectManager, ProductRequest::class);
-            $request = $requestFactory->create();
+        $featureRequestFactory = new RequestFactory($this->objectManager, FeaturedRequest::class);
+        $featureRequest = $featureRequestFactory->create();
+        $path = $featureRequest->getPath();
 
-            $featureRequestFactory = new RequestFactory($this->objectManager, FeaturedRequest::class);
-            $featureRequest = $featureRequestFactory->create();
-            $path = $featureRequest->getPath();
+        $request->setPath($path);
+        $request->setTemplate($this->templateId);
+        $this->context->setRequest($request);
 
-            $request->setPath($path);
-            $request->setTemplate($this->templateId);
-            $this->context->setRequest($request);
-
-            if (!$request instanceof ProductRequest) {
-                throw new InvalidArgumentException('Set context should contain ProductRequest');
-            }
-
-            $this->configureRequest($request);
-            $this->collection = $this->context->getCollection();
+        if (!$request instanceof ProductRequest) {
+            throw new InvalidArgumentException('Set context should contain ProductRequest');
         }
+
+        $this->configureRequest($request);
+        $this->collection = $this->context->getCollection();
 
         $this->collection->load();
 
