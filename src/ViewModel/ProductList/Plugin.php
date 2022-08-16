@@ -22,9 +22,23 @@ use Magento\Framework\Registry;
 
 class Plugin extends AbstractRecommendationPlugin
 {
+    /**
+     * @var String $type
+     */
     protected $type;
 
+    /**
+     * @var Integer $templateId
+     */
     protected $templateId;
+
+    /**
+     * @param Config $config
+     * @param Registry $registry
+     * @param Context $context
+     * @param TemplateFinder $templateFinder
+     * @param ObjectManagerInterface $objectManager
+     */
 
     public function __construct(Config $config, Registry $registry, Context $context, TemplateFinder $templateFinder, ObjectManagerInterface $objectManager)
     {
@@ -32,11 +46,24 @@ class Plugin extends AbstractRecommendationPlugin
         $this->objectManager = $objectManager;
     }
 
+    /**
+     * @return string
+     */
+
     protected function getType()
     {
         return $this->type;
     }
 
+    /**
+     * Overwrite Hyva function to get items for upsell/crossell
+     *
+     * @param ProductList $subject
+     * @param Closure $proceed
+     * @param string $linkType
+     * @param ...$items
+     * @return array|Collection
+     */
     public function aroundLoadLinkedItems(ProductList $subject, Closure $proceed, string $linkType, ...$items): array
     {
         $this->type = Config::RECOMMENDATION_TYPE_UPSELL;
