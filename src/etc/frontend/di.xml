@@ -19,4 +19,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="Hyva\Theme\ViewModel\ProductList">
+        <plugin name="emico-tweakwise-hyva" type="Emico\TweakwiseHyva\ViewModel\ProductList\Plugin" sortOrder="0" />
+    </type>
 </config>
