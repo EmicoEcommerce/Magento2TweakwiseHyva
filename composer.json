@@ -1,7 +1,7 @@
 {
     "name": "tweakwise/magento2-tweakwise-hyva",
     "license": "OSL-3.0",
-    "description": "Hyvä Themes Compatibility module for Emico_Tweakwise",
+    "description": "Hyvä Themes Compatibility module for Tweakwise_Magento2Tweakwise",
     "type": "magento2-module",
     "replace": {
         "emico/tweakwise-hyva": "1.1.0"
