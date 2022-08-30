@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
     <module name="Tweakwise_TweakwiseHyva" setup_version="0.1.0">
         <sequence>
-            <module name="Tweakwise_Tweakwise"/>
+            <module name="Tweakwise_Magento2Tweakwise"/>
         </sequence>
     </module>
 </config>

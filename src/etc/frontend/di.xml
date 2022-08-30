@@ -13,7 +13,7 @@
         <arguments>
             <argument name="compatModules" xsi:type="array">
                 <item name="hyva-magento2-tweakwise" xsi:type="array">
-                    <item name="original_module" xsi:type="string">Tweakwise_Tweakwise</item>
+                    <item name="original_module" xsi:type="string">Tweakwise_Magento2Tweakwise</item>
                     <item name="compat_module" xsi:type="string">Tweakwise_TweakwiseHyva</item>
                 </item>
             </argument>
