@@ -13,13 +13,13 @@
         <arguments>
             <argument name="compatModules" xsi:type="array">
                 <item name="hyva-magento2-tweakwise" xsi:type="array">
-                    <item name="original_module" xsi:type="string">Emico_Tweakwise</item>
-                    <item name="compat_module" xsi:type="string">Emico_TweakwiseHyva</item>
+                    <item name="original_module" xsi:type="string">Tweakwise_Tweakwise</item>
+                    <item name="compat_module" xsi:type="string">Tweakwise_TweakwiseHyva</item>
                 </item>
             </argument>
         </arguments>
     </type>
     <type name="Hyva\Theme\ViewModel\ProductList">
-        <plugin name="emico-tweakwise-hyva" type="Emico\TweakwiseHyva\ViewModel\ProductList\Plugin" sortOrder="0" />
+        <plugin name="tweakwise-hyva" type="Tweakwise\TweakwiseHyva\ViewModel\ProductList\Plugin" sortOrder="0" />
     </type>
 </config>

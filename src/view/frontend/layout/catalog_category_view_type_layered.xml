@@ -12,9 +12,9 @@
     <body>
         <referenceBlock name="catalog.leftnav">
             <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template"
-                   name="tweakwise.navigation.form" template="Emico_Tweakwise::layer/navigation-form.phtml"/>
+                   name="tweakwise.navigation.form" template="Tweakwise_Tweakwise::layer/navigation-form.phtml"/>
             <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template"
-                   name="tweakwise.navigation.slider" template="Emico_Tweakwise::layer/navigation-slider.phtml"/>
+                   name="tweakwise.navigation.slider" template="Tweakwise_Tweakwise::layer/navigation-slider.phtml"/>
             <block ifconfig="tweakwise/layered/enabled" name="loading" template="Hyva_Theme::ui/loading.phtml"/>
         </referenceBlock>
     </body>

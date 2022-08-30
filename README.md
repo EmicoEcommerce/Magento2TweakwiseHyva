@@ -3,5 +3,5 @@ Hyvä Themes Compatibility module for [Emico_Tweakwise](https://github.com/Emico
 
 ## Installation
 
-- `composer require emico/tweakwise-hyva`
+- `composer require tweakwise/magento2-tweakwise-hyva`
 - `bin/magento setup:upgrade`

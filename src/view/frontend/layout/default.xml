@@ -10,15 +10,15 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <remove src="Emico_Tweakwise::css/style.css"/>
+        <remove src="Tweakwise_Tweakwise::css/style.css"/>
     </head>
     <body>
-        <referenceBlock name="header-search" template="Emico_Tweakwise::html/header/search-form.phtml">
+        <referenceBlock name="header-search" template="Tweakwise_Tweakwise::html/header/search-form.phtml">
             <action method="setTemplate" ifconfig="tweakwise/autocomplete/enabled">
-                <argument name="template" xsi:type="string">Emico_Tweakwise::html/header/search-form.phtml</argument>
+                <argument name="template" xsi:type="string">Tweakwise_Tweakwise::html/header/search-form.phtml</argument>
             </action>
-            <block class="Emico\Tweakwise\Block\Autocomplete\FormMini" ifconfig="tweakwise/autocomplete/enabled"
-                   name="tweakwise.quick.search" template="Emico_Tweakwise::quick-search.phtml"/>
+            <block class="Tweakwise\Magento2Tweakwise\Block\Autocomplete\FormMini" ifconfig="tweakwise/autocomplete/enabled"
+                   name="tweakwise.quick.search" template="Tweakwise_Tweakwise::quick-search.phtml"/>
         </referenceBlock>
     </body>
 </page>

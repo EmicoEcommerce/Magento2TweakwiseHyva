@@ -1,18 +1,18 @@
 <?php
 
-namespace Emico\TweakwiseHyva\ViewModel\ProductList;
+namespace Tweakwise\TweakwiseHyva\ViewModel\ProductList;
 
 use Closure;
-use Emico\Tweakwise\Block\Catalog\Product\ProductList\AbstractRecommendationPlugin;
-use Emico\Tweakwise\Exception\ApiException;
-use Emico\Tweakwise\Exception\InvalidArgumentException;
-use Emico\Tweakwise\Model\Catalog\Product\Recommendation\Collection;
-use Emico\Tweakwise\Model\Catalog\Product\Recommendation\Context;
-use Emico\Tweakwise\Model\Client\Request\Recommendations\FeaturedRequest;
-use Emico\Tweakwise\Model\Client\Request\Recommendations\ProductRequest;
-use Emico\Tweakwise\Model\Client\RequestFactory;
-use Emico\Tweakwise\Model\Config;
-use Emico\Tweakwise\Model\Config\TemplateFinder;
+use Tweakwise\Magento2Tweakwise\Block\Catalog\Product\ProductList\AbstractRecommendationPlugin;
+use Tweakwise\Magento2Tweakwise\Exception\ApiException;
+use Tweakwise\Magento2Tweakwise\Exception\InvalidArgumentException;
+use Tweakwise\Magento2Tweakwise\Model\Catalog\Product\Recommendation\Collection;
+use Tweakwise\Magento2Tweakwise\Model\Catalog\Product\Recommendation\Context;
+use Tweakwise\Magento2Tweakwise\Model\Client\Request\Recommendations\FeaturedRequest;
+use Tweakwise\Magento2Tweakwise\Model\Client\Request\Recommendations\ProductRequest;
+use Tweakwise\Magento2Tweakwise\Model\Client\RequestFactory;
+use Tweakwise\Magento2Tweakwise\Model\Config;
+use Tweakwise\Magento2Tweakwise\Model\Config\TemplateFinder;
 use Hyva\Theme\ViewModel\ProductList;
 use Magento\Catalog\Block\Product\ProductList\Related;
 use Magento\Catalog\Model\Product;

@@ -2,6 +2,6 @@
 
 \Magento\Framework\Component\ComponentRegistrar::register(
     \Magento\Framework\Component\ComponentRegistrar::MODULE,
-    'Emico_TweakwiseHyva',
+    'Tweakwise_TweakwiseHyva',
     __DIR__
 );

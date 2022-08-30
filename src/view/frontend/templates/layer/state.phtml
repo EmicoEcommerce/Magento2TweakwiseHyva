@@ -9,12 +9,12 @@
 declare(strict_types=1);
 
 use Magento\Framework\Escaper;
-use Emico\Tweakwise\Block\LayeredNavigation\Navigation\State;
+use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\Navigation\State;
 
 /** @var Escaper $escaper */
 /** @var State $block */
 ?>
-<?php /** @var Emico\Tweakwise\Model\Catalog\Layer\Filter\Item[] $filters */ ?>
+<?php /** @var Tweakwise\Magento2Tweakwise\Model\Catalog\Layer\Filter\Item[] $filters */ ?>
 <?php $filters = $block->getActiveFilters() ?>
 <?php if (!empty($filters)) : ?>
     <div class="filter-current card my-4 pb-0"
