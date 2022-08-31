@@ -1,5 +1,5 @@
 # TweakwiseHyva
-Hyvä Themes Compatibility module for [Emico_Tweakwise](https://github.com/EmicoEcommerce/Magento2Tweakwise)
+Hyvä Themes Compatibility module for [Tweakwise_Magento2Tweakwise](https://github.com/Tweakwise/Magento2Tweakwise)
 
 ## Installation
 
