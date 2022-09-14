@@ -32,7 +32,7 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
             ajaxFilters: false,
             urlInputSelector: 'input.slider-url-value',
             init(initialValues) {
-                const sliderOptions = initialValues.tweakwiseNavigationSlider;
+                const sliderOptions = Object.values(initialValues)[0];
 
                 if (sliderOptions) {
                     this.ajaxFilters = sliderOptions.ajaxFilters;
