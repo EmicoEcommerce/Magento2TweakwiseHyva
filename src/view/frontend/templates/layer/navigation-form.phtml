@@ -39,6 +39,7 @@ use Magento\Framework\View\Element\Template;
                     this.ajaxFilters = filterOptions.ajaxFilters;
                     this.formFilters = filterOptions.formFilters;
                     this.seoEnabled = filterOptions.seoEnabled;
+                    this.ajaxCache = filterOptions.ajaxCache;
                 }
 
                 this.bindFilterClickEvents();
@@ -103,6 +104,12 @@ use Magento\Framework\View\Element\Template;
                         }
                     }
                 });
+
+                //prevent caching ajax request
+                if (!this.ajaxCache) {
+                    const ms = Date.now();
+                    data.set('_', ms);
+                }
 
                 return this.serialize(data);
             },
