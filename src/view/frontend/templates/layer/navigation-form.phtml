@@ -108,7 +108,7 @@ use Magento\Framework\View\Element\Template;
                 //prevent caching ajax request
                 if (!this.ajaxCache) {
                     const ms = Date.now();
-                    data.append('time', ms);
+                    data.set('_', ms);
                 }
 
                 return this.serialize(data);
