@@ -22,4 +22,5 @@
     <type name="Hyva\Theme\ViewModel\ProductList">
         <plugin name="tweakwise-hyva" type="Tweakwise\TweakwiseHyva\ViewModel\ProductList\Plugin" sortOrder="0" />
     </type>
+    <preference for="Hyva\Theme\ViewModel\SwatchRenderer" type="Tweakwise\TweakwiseHyva\ViewModel\SwatchRenderer" />
 </config>
