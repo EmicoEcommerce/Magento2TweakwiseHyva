@@ -15,7 +15,7 @@
                    name="tweakwise.navigation.form" template="Tweakwise_Magento2Tweakwise::layer/navigation-form.phtml"/>
             <block ifconfig="tweakwise/layered/enabled" class="Magento\Framework\View\Element\Template"
                    name="tweakwise.navigation.slider" template="Tweakwise_Magento2Tweakwise::layer/navigation-slider.phtml"/>
-            <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+            <block ifconfig="tweakwise/layered/enabled" name="loading" template="Hyva_Theme::ui/loading.phtml"/>
         </referenceBlock>
         <referenceBlock name="product_list_toolbar">
             <action method="setTemplate" ifconfig="tweakwise/layered/ajax_filters">
