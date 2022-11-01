@@ -10,6 +10,16 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <referenceContainer name="content">
+            <block class="Tweakwise\Magento2Tweakwise\Block\Catalog\Product\ProductList\Featured"
+                   name="tweakwise.catalog.product.featured.before"
+                   ifconfig="tweakwise/recommendations/featured_enabled"
+                   template="Magento_Catalog::product/slider/product-slider.phtml">
+                <arguments>
+                    <argument name="title" xsi:type="string">new</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
         <referenceBlock name="product_list_toolbar">
             <action method="setTemplate" ifconfig="tweakwise/layered/ajax_filters">
                 <argument name="template" xsi:type="string">Tweakwise_Magento2Tweakwise::product/list/toolbar.phtml</argument>
