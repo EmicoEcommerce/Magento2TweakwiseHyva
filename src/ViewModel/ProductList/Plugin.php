@@ -57,6 +57,19 @@ class Plugin extends AbstractRecommendationPlugin
 
     /**
      * Overwrite Hyva function to get items for upsell/crossell
+     * @param ProductList $subject
+     * @param Closure $proceed
+     * @param string $linkType
+     * @param Product|ProductInterface|QuoteItem ...$items
+     * @return ProductInterface[]
+     */
+    public function aroundGetLinkedItems(ProductList $subject, Closure $proceed, string $linkType, $items): array
+    {
+        return $this->loadLinkedTweakwiseItems($proceed, $linkType, $items);
+    }
+
+    /**
+     * Overwrite Hyva function to get items for upsell/crossell
      *
      * @param ProductList $subject
      * @param Closure $proceed
@@ -64,7 +77,7 @@ class Plugin extends AbstractRecommendationPlugin
      * @param ...$items
      * @return array|Collection
      */
-    public function aroundLoadLinkedItems(ProductList $subject, Closure $proceed, string $linkType, ...$items): array
+    private function loadLinkedTweakwiseItems(Closure $proceed, string $linkType, ...$items): array
     {
         $this->type = Config::RECOMMENDATION_TYPE_UPSELL;
         if ($linkType === 'crosssell' || $linkType === 'related') {
