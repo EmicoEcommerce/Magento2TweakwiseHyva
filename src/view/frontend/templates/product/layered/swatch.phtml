@@ -93,44 +93,46 @@ if (!$swatchData['swatches']) {
         <?php foreach ($swatchData['options'] as $option => $label): ?>
             <?php
             $item = $block->getItemForSwatch($option);
-            $value = $swatchData['swatches'][$option]['value'];
-            $type = $swatchData['swatches'][$option]['type'];
-            $swatchImage = $escaper->escapeUrl($block->getSwatchPath('swatch_image', $value));
-            $swatchThumb = $escaper->escapeUrl($block->getSwatchPath('swatch_thumb', $value));
-            ?>
+            if(isset($swatchData['swatches'][$option]['value']) && isset($swatchData['swatches'][$option]['type'])) {
+                $value = $swatchData['swatches'][$option]['value'];
+                $type = $swatchData['swatches'][$option]['type'];
+                $swatchImage = $escaper->escapeUrl($block->getSwatchPath('swatch_image', $value));
+                $swatchThumb = $escaper->escapeUrl($block->getSwatchPath('swatch_thumb', $value));
+                ?>
 
-            <a <?= $block->renderAnchorHtmlTagAttributes($item); ?>
-                    aria-label="<?= $label['label'] ?>"
-                    class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex border justify-center"
-            >
-                <?php $cssId = $item->getCssId(); ?>
-
-                <label for="<?= $cssId ?>"
-                       class="swatch-option-inner cursor-pointer relative block select-none m-0"
-                       :class="{ 'w-6 h-6' : getSwatchType('<?= (string)$type; ?>') !== 'text' }"
-                       :style="getSwatchBackgroundStyle('<?= (string)$type ?>', '<?= (string)$value ?>', '<?= (string)$swatchImage ?>')"
-                    <?php if ($configurableViewModel->getShowSwatchTooltip()): ?>
-                        @mouseenter.self="activeTooltipItem = {
-                            attribute: '<?= $escaper->escapeHtmlAttr($value) ?>',
-                            type: '<?= $escaper->escapeHtmlAttr($type) ?>',
-                            id: '<?= $escaper->escapeHtmlAttr($option) ?>',
-                            label: '<?= $escaper->escapeHtmlAttr($label['label']) ?>',
-                            thumb: '<?= $escaper->escapeUrl($swatchThumb) ?>',
-                            value: '<?= $escaper->escapeHtmlAttr($value) ?>'
-                        }; tooltipPositionElement = $event.target;"
-                        @mouseleave.self="activeTooltipItem = false"
-                    <?php endif; ?>
+                <a <?= $block->renderAnchorHtmlTagAttributes($item); ?>
+                        aria-label="<?= $label['label'] ?>"
+                        class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex border justify-center"
                 >
-                    <input id="<?= $cssId ?>" style="display: none"
-                           name="<?= $item->getFilter()->getFacet()->getFacetSettings()->getUrlKey() ?>[]"
-                           type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
-                           value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
+                    <?php $cssId = $item->getCssId(); ?>
+
+                    <label for="<?= $cssId ?>"
+                           class="swatch-option-inner cursor-pointer relative block select-none m-0"
+                           :class="{ 'w-6 h-6' : getSwatchType('<?= (string)$type; ?>') !== 'text' }"
+                           :style="getSwatchBackgroundStyle('<?= (string)$type ?>', '<?= (string)$value ?>', '<?= (string)$swatchImage ?>')"
+                        <?php if ($configurableViewModel->getShowSwatchTooltip()): ?>
+                            @mouseenter.self="activeTooltipItem = {
+                                attribute: '<?= $escaper->escapeHtmlAttr($value) ?>',
+                                type: '<?= $escaper->escapeHtmlAttr($type) ?>',
+                                id: '<?= $escaper->escapeHtmlAttr($option) ?>',
+                                label: '<?= $escaper->escapeHtmlAttr($label['label']) ?>',
+                                thumb: '<?= $escaper->escapeUrl($swatchThumb) ?>',
+                                value: '<?= $escaper->escapeHtmlAttr($value) ?>'
+                            }; tooltipPositionElement = $event.target;"
+                            @mouseleave.self="activeTooltipItem = false"
+                        <?php endif; ?>
                     >
-                    <?php if ((string)$type === "0"): ?>
-                        <?= $escaper->escapeHtml($value ?: $label['label']) ?>
-                    <?php endif; ?>
-                </label>
-            </a>
+                        <input id="<?= $cssId ?>" style="display: none"
+                               name="<?= $item->getFilter()->getFacet()->getFacetSettings()->getUrlKey() ?>[]"
+                               type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
+                               value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
+                        >
+                        <?php if ((string)$type === "0"): ?>
+                            <?= $escaper->escapeHtml($value ?: $label['label']) ?>
+                        <?php endif; ?>
+                    </label>
+                </a>
+            <?php } ?>
         <?php endforeach; ?>
     </div>
     <?php if ($configurableViewModel->getShowSwatchTooltip()): ?>
