@@ -3,6 +3,9 @@
 namespace Tweakwise\TweakwiseHyva\ViewModel\ProductList;
 
 use Closure;
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Framework\App\ObjectManager;
+use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Tweakwise\Magento2Tweakwise\Block\Catalog\Product\ProductList\AbstractRecommendationPlugin;
 use Tweakwise\Magento2Tweakwise\Exception\ApiException;
 use Tweakwise\Magento2Tweakwise\Exception\InvalidArgumentException;
@@ -19,6 +22,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
+use Tweakwise\Magento2Tweakwise\Model\Cart\Crosssell as TweakwiseCrosssell;
 
 class Plugin extends AbstractRecommendationPlugin
 {
@@ -53,6 +57,36 @@ class Plugin extends AbstractRecommendationPlugin
     protected function getType()
     {
         return $this->type;
+    }
+
+    public function aroundGetCrosssellItems(ProductList $subject, Closure $proceed, QuoteItem ...$cartItems): array
+    {
+        if (empty($cartItems)) {
+            return [];
+        }
+
+        $this->type = Config::RECCOMENDATION_TYPE_SHOPPINGCART;
+
+        if (!$this->config->isRecommendationsEnabled($this->getType())) {
+            return $proceed();
+        }
+
+        // return most recently added product crosssell items first
+        usort($cartItems, function (QuoteItem $itemA, QuoteItem $itemB) {
+            return ($itemA->getCreatedAt() <=> $itemB->getCreatedAt()) * -1;
+        });
+
+        $items = [];
+
+        foreach ($cartItems as $item) {
+            $items = $this->getShoppingcartTweakwiseItems($item->getProduct(), [], $cartItems);
+
+            if (!empty($items)) {
+                break;
+            }
+        }
+
+        return $items;
     }
 
     /**
@@ -127,5 +161,53 @@ class Plugin extends AbstractRecommendationPlugin
         $this->collection->load();
 
         return $this->collection->getItems();
+    }
+
+    private function getShoppingcartTweakwiseItems (ProductInterface $product, array $result, array $cartItems) {
+        $items = [];
+
+        $requestFactory = new RequestFactory(ObjectManager::getInstance(), ProductRequest::class);
+        $request = $requestFactory->create();
+        $request->setProduct($product);
+
+        if (!$this->templateFinder->forProduct($product, $this->getType())) {
+            return $result;
+        }
+
+        $request->setTemplate($this->templateFinder->forProduct($product, $this->getType()));
+        $this->context->setRequest($request);
+
+        try {
+            $collection = Parent::getCollection();
+        } catch (ApiException $e) {
+            return $result;
+        }
+
+        if (!empty($ninProductIds)) {
+            $collection = $this->removeCartItems($collection, $cartItems);
+        }
+
+        foreach ($collection as $item) {
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+
+    /**
+     * @param $collection
+     * @param $filteredProducts
+     * @return void
+     */
+    protected function removeCartItems($collection, $cartItems)
+    {
+        $items = $collection->getItems();
+
+        if(!empty($cartItems)) {
+            foreach ($cartItems as $cartItem) {
+                unset($items[$cartItem]);
+            }
+        }
+        return $items;
     }
 }
