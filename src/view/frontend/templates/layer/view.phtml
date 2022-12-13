@@ -67,7 +67,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
 
                 <?php if ($block->getLayer()->getState()->getFilters()): ?>
                     <div class="block-actions filter-actions">
-                        <a href="<?=$block->getClearUrl()?>"
+                        <a href="<?=$escaper->escapeUrl($block->getClearUrl())?>"
                            class="action clear filter-clear text-xs text-primary underline hover:text-primary-darker"><span><?=__('Clear All')?></span></a>
                     </div>
                 <?php endif; ?>
