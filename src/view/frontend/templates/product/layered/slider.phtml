@@ -27,7 +27,7 @@ $jsSliderConfig = $block->getJsSliderConfig();
 <div class="slider-attribute" id="attribute-slider-<?= $block->getCssId() ?>"
     <?php if ($jsSliderConfig): ?>
         x-data="tweakwiseNavigationSlider()"
-        x-init='init(<?= $jsSliderConfig ?>)'
+        x-init='initSlider(<?= $jsSliderConfig ?>)'
         data-is-price="<?= $urlKey === 'price' ?>"
     <?php endif; ?>
 >
