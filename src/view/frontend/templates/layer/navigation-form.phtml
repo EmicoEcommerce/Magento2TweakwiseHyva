@@ -31,7 +31,7 @@ use Magento\Framework\View\Element\Template;
             currentXhr: null,
             fetchController: null,
             ajaxCache: true,
-            init(initialValues) {
+            initForm(initialValues) {
                 const filterOptions = initialValues.tweakwiseNavigationForm;
 
                 if (filterOptions) {
@@ -80,7 +80,7 @@ use Magento\Framework\View\Element\Template;
             pmListReload(cookieName) {
                 if (hyva.getCookie(cookieName) !== null) {
                     const changeEvent = new Event('change');
-                    this.$el.dispatchEvent(changeEvent);
+                    this.$root.dispatchEvent(changeEvent);
                 }
             },
 

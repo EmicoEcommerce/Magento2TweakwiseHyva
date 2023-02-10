@@ -31,7 +31,7 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
             formFilters: false,
             ajaxFilters: false,
             urlInputSelector: 'input.slider-url-value',
-            init(initialValues) {
+            initSlider(initialValues) {
                 const sliderOptions = Object.values(initialValues)[0];
 
                 if (sliderOptions) {
@@ -86,7 +86,7 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
                 });
             },
             updateLabels(minValue, maxValue) {
-                const sliderContainer = this.$el;
+                const sliderContainer = this.$root;
                 const isPrice = sliderContainer.dataset.isPrice;
 
                 sliderContainer.querySelector('.current-min-value .value').innerHTML = isPrice ? hyva.formatPrice(minValue) : minValue;
@@ -101,12 +101,12 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
                 this.updateSliderDisabledAttribute(sliderUrlInput, sliderUrlValue);
             },
             bindInputChangeEvents() {
-                const sliderContainer = this.$el;
+                const sliderContainer = this.$root;
                 sliderContainer.querySelector('input.slider-min').addEventListener('change', () => this.updateSliderUrlInput());
                 sliderContainer.querySelector('input.slider-max').addEventListener('change', () => this.updateSliderUrlInput());
             },
             updateSliderUrlInput() {
-                const sliderContainer = this.$el;
+                const sliderContainer = this.$root;
                 const sliderUrlInput = sliderContainer.querySelector(this.urlInputSelector);
                 const minValue = sliderContainer.querySelector('input.slider-min').value;
                 const maxValue = sliderContainer.querySelector('input.slider-max').value;
@@ -148,13 +148,13 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
             },
             ajaxChange(minValue, maxValue) {
                 this.formFilterChange(minValue, maxValue);
-                const sliderContainer = this.$el;
+                const sliderContainer = this.$root;
                 const sliderUrlInput = sliderContainer.querySelector(this.urlInputSelector);
                 const changeEvent = new Event('change', {'bubbles': true});
                 sliderUrlInput.dispatchEvent(changeEvent);
             },
             formFilterChange(minValue, maxValue) {
-                const sliderContainer = this.$el;
+                const sliderContainer = this.$root;
                 sliderContainer.dataset.min = minValue;
                 sliderContainer.dataset.max = maxValue;
             }

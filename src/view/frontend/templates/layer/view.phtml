@@ -60,7 +60,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
             <form id="facet-filter-form"
                 <?php if ($jsFormConfig): ?>
                     x-data="tweakwiseNavigationForm()"
-                    x-init='init(<?=$jsFormConfig?>)'
+                    x-init='initForm(<?=$jsFormConfig?>)'
                 <?php endif; ?>
             >
                 <?=$block->getChildHtml('state');?>

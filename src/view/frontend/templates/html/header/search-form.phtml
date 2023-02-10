@@ -103,8 +103,8 @@ $helper = $this->helper(SearchHelper::class);
                 focus:outline-none focus:border-transparent lg:text-xl"
                @focus.once="suggest"
                @input.debounce.300="suggest"
-               @click.away="close"
-               @keydown.arrow-down.prevent="focusElement($el.querySelector('[tabindex]'))"
+               @click.outside="close"
+               @keydown.arrow-down.prevent="focusElement($root.querySelector('[tabindex]'))"
         />
         <?=$block->getChildHtml('tweakwise.quick.search');?>
         <button type="submit"

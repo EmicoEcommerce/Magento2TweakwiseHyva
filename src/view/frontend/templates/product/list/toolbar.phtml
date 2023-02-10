@@ -29,7 +29,7 @@ $additionalOptions = ['page' => 'p'];
             pagerItemSelector: '.pages li.item a',
             init() {
                 const filterForm = document.querySelector(this.filterFormSelector);
-                const pagerLinks = this.$el.querySelectorAll(this.pagerItemSelector);
+                const pagerLinks = this.$root.querySelectorAll(this.pagerItemSelector);
 
                 if (filterForm && pagerLinks.length) {
                     Array.from(pagerLinks).forEach((pagerLink) => {
@@ -137,7 +137,6 @@ $additionalOptions = ['page' => 'p'];
 
 <?php if ($block->getCollection()->getSize()): ?>
     <div x-data="tweakwiseNavigationToolbar()"
-         x-init="init()"
          class="toolbar toolbar-products grid grid-cols-4 sm:grid-cols-8 md:grid-cols-4
             lg:grid-cols-8  grid-flow-row gap-2 items-center">
         <?php if ($block->isExpanded()): ?>
