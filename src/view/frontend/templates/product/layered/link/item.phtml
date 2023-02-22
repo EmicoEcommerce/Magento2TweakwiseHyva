@@ -15,10 +15,17 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\RenderLayered\LinkRender
 /** @var ItemRenderer $block */
 
 $item = $block->getItem();
+$hasHiddenItems = $block->hasHiddenItems();
+$hasAlternateSortOrder = $block->hasAlternateSortOrder();
 
 ?>
 
-<li class="item">
+<li class="item<?=$block->itemDefaultHidden($item) ? ' default-hidden' : ''?>"
+    <?php if ($hasHiddenItems && $hasAlternateSortOrder):?>
+        data-alternate-sort="<?=$item->getAlternateSortOrder();?>"
+        data-original-sort="<?=$index;?>"
+    <?php endif;?>
+>
     <a href="<?= $block->getCategoryUrl($item) ?>" class="flex w-full py-1 mb-1 hover:text-black">
         <?= $block->getItemPrefix() ?>
         <?= $escaper->escapeHtml($item->getLabel()) ?>
