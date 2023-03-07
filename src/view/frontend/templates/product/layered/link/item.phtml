@@ -20,11 +20,12 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
 
 ?>
 
-<li class="item<?=$block->itemDefaultHidden($item) ? ' default-hidden' : ''?>"
-    <?php if ($hasHiddenItems && $hasAlternateSortOrder):?>
-        data-alternate-sort="<?=$item->getAlternateSortOrder();?>"
-        data-original-sort="<?=$index;?>"
-    <?php endif;?>
+<li class="item"
+    :class="{ 'block': moreItemsShow, 'hidden': '<?=$block->itemDefaultHidden($item)?>' && !moreItemsShow }"
+    <?php if ($hasAlternateSortOrder): ?>
+        data-alternate-sort="<?= $item->getAlternateSortOrder(); ?>"
+        data-original-sort="<?= $index; ?>"
+    <?php endif; ?>
 >
     <a href="<?= $block->getCategoryUrl($item) ?>" class="flex w-full py-1 mb-1 hover:text-black">
         <?= $block->getItemPrefix() ?>
