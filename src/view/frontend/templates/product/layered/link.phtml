@@ -11,10 +11,25 @@ declare(strict_types=1);
 use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\RenderLayered\LinkRenderer;
 
 /** @var LinkRenderer $block */
-
+$hasHiddenItems = $block->hasHiddenItems();
+$hasAlternateSortOrder = $block->hasAlternateSortOrder();
 ?>
-<ol class="items link-attribute">
-    <?php foreach ($block->getItems() as $item): ?>
-        <?= $block->renderLinkItem($item) ?>
-    <?php endforeach; ?>
-</ol>
+<div x-data="initTweakwiseNavigationItems()" x-init='sortItems(<?= (int)$hasAlternateSortOrder ?>)'>
+    <ol class="items" x-ref="items">
+        <?php foreach ($block->getItems() as $item): ?>
+            <?= $block->renderLinkItem($item) ?>
+        <?php endforeach; ?>
+    </ol>
+
+    <?php if ($hasHiddenItems): ?>
+        <a href="#" class="more-items underline cursor-pointer"
+           @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
+           :class="{ 'hidden': moreItemsShow }"
+        ><?= __($block->getMoreItemText()) ?></a>
+        <a href="#" class="less-items underline cursor-pointer"
+           x-cloak
+           @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
+           :class="{ 'block': moreItemsShow, 'hidden': !moreItemsShow }"
+        ><?= __($block->getLessItemText()) ?></a>
+    <?php endif; ?>
+</div>
