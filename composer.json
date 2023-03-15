@@ -10,7 +10,7 @@
         "magento/framework": "*",
         "hyva-themes/magento2-compat-module-fallback": "*",
         "hyva-themes/magento2-default-theme": "^1.2",
-        "php": "^7.4|^8.0|^8.1",
+        "php": ">=8.0 <8.3",
         "tweakwise/magento2-tweakwise": ">=5.2.0."
     },
     "autoload": {
