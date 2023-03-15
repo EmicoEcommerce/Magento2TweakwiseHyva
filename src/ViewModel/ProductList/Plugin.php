@@ -166,6 +166,12 @@ class Plugin extends AbstractRecommendationPlugin
     private function getShoppingcartTweakwiseItems (ProductInterface $product, array $result, array $cartItems) {
         $items = [];
 
+        //show featured products
+        if ($this->getType() === Config::RECCOMENDATION_TYPE_SHOPPINGCART_FEATURED) {
+            return $this->getFeaturedItems();
+        }
+
+        //show crosssell products
         $requestFactory = new RequestFactory(ObjectManager::getInstance(), ProductRequest::class);
         $request = $requestFactory->create();
         $request->setProduct($product);
@@ -208,6 +214,33 @@ class Plugin extends AbstractRecommendationPlugin
                 unset($items[$cartItem]);
             }
         }
+        return $items;
+    }
+
+    private function getFeaturedItems()
+    {
+        $requestFactory = new RequestFactory(ObjectManager::getInstance(), FeaturedRequest::class);
+        $request = $requestFactory->create();
+
+        $templateId = $this->config->getRecommendationsTemplate(Config::RECCOMENDATION_TYPE_SHOPPINGCART_FEATURED);
+        $request->setTemplate($templateId);
+
+        $this->recommendationsContext->setRequest($request);
+
+        try {
+            $collection = $this->recommendationsContext->getCollection();
+        } catch (ApiException $e) {
+            return [];
+        }
+
+        if (!empty($cartItems)) {
+            $collection = $this->removeCartItems($collection, $cartItems);
+        }
+
+        foreach ($collection as $item) {
+            $items[] = $item;
+        }
+
         return $items;
     }
 }
