@@ -37,6 +37,11 @@ class Plugin extends AbstractRecommendationPlugin
     protected $templateId;
 
     /**
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
+
+    /**
      * @param Config $config
      * @param Registry $registry
      * @param Context $context
