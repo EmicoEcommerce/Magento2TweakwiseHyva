@@ -68,7 +68,7 @@ class Plugin extends AbstractRecommendationPlugin
         $this->type = Config::RECCOMENDATION_TYPE_SHOPPINGCART;
 
         if (!$this->config->isRecommendationsEnabled($this->getType())) {
-            return $proceed();
+            return $proceed(...$cartItems);
         }
 
         // return most recently added product crosssell items first
