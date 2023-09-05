@@ -16,7 +16,7 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\Navigation\State;
 ?>
 <?php /** @var Tweakwise\Magento2Tweakwise\Model\Catalog\Layer\Filter\Item[] $filters */ ?>
 <?php $filters = $block->getActiveFilters() ?>
-<?php if (!empty($filters)) : ?>
+<?php if (!empty($filters) && $filters instanceof Tweakwise\Magento2Tweakwise\Model\Catalog\Layer\Filter\Item) : ?>
     <div class="filter-current card my-4 pb-0"
          x-data="{ open: true }">
         <div class="filter-options-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container pb-2"
