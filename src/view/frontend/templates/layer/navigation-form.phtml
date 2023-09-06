@@ -308,20 +308,6 @@ use Magento\Framework\View\Element\Template;
                 and we dont want to replace them all
                 */
                 if (newProductList && toolbars.length) {
-                    const forms = newProductList.querySelectorAll('form');
-                    const formKey = hyva.getFormKey();
-
-                    if (forms && formKey) {
-                        Array.from(forms).forEach((form) => {
-                            const formKeyInput = document.createElement('input');
-                            formKeyInput.type = 'hidden';
-                            formKeyInput.name = 'form_key';
-                            formKeyInput.value = formKey;
-
-                            form.appendChild(formKeyInput);
-                        });
-                    }
-
                     const oldProductList = this.getNextSibling(toolbars[0], productListSelector)
                     this.replaceNode(oldProductList, newProductList)
                 }
