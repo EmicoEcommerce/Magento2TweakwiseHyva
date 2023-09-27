@@ -15,4 +15,5 @@
         <container name="sidebar.main"/>
     </container>
     <update handle="hyva_catalogsearch_result_index"/>
+    <block class="Magento\Framework\View\Element\FormKey" name="formkey"/>
 </layout>
