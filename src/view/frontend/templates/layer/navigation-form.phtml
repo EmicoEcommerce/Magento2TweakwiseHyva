@@ -309,7 +309,8 @@ use Magento\Framework\View\Element\Template;
                 */
                 if (newProductList && toolbars.length) {
                     const oldProductList = this.getNextSibling(toolbars[0], productListSelector)
-                    this.replaceNode(oldProductList, newProductList)
+                    this.replaceNode(oldProductList, newProductList);
+                    hyva.initFormKey();
                 }
 
                 if (newToolbarFirst && toolbars) {
