@@ -175,7 +175,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
             return {
                 moreItemsShow: false,
                 sortItems(hasAlternateSort) {
-                    if (!hasAlternateSort || this.$refs.items || this.$refs.items.children) {
+                    if (!hasAlternateSort || !this.$refs.items || !this.$refs.items.children) {
                         return
                     }
 
