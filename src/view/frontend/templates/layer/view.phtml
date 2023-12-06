@@ -182,7 +182,8 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                     const items = this.$refs.items
                     const sortType = this.moreItemsShow ? 'alternateSort' : 'originalSort'
 
-                    Array.from(items.children).sort((a, b) => a.dataset[sortType].localeCompare(b.dataset[sortType]))
+                    Array.from(items.children)
+                        .sort((a, b) => a.dataset[sortType].localeCompare(b.dataset[sortType],undefined,{numeric: true}))
                         .forEach((item) => {
                             items.appendChild(item);
                         });
