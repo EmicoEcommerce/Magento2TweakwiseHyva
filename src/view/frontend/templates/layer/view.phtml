@@ -175,14 +175,15 @@ $filtered = count($block->getLayer()->getState()->getFilters());
             return {
                 moreItemsShow: false,
                 sortItems(hasAlternateSort) {
-                    if (!hasAlternateSort || this.$refs.items || this.$refs.items.children) {
+                    if (!hasAlternateSort || !this.$refs.items || !this.$refs.items.children) {
                         return
                     }
 
                     const items = this.$refs.items
                     const sortType = this.moreItemsShow ? 'alternateSort' : 'originalSort'
 
-                    Array.from(items.children).sort((a, b) => a.dataset[sortType].localeCompare(b.dataset[sortType]))
+                    Array.from(items.children)
+                        .sort((a, b) => a.dataset[sortType].localeCompare(b.dataset[sortType],undefined,{numeric: true}))
                         .forEach((item) => {
                             items.appendChild(item);
                         });
