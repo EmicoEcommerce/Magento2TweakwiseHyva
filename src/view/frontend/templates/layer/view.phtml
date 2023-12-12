@@ -81,15 +81,17 @@ $filtered = count($block->getLayer()->getState()->getFilters());
 
                         <?php foreach ($block->getFilters() as $filter): ?>
                             <?php if ($filter->getItemsCount()): ?>
-                                <?php if ($filter->isCollapsible()): ?>
 
-                                    <?php $filterActive = $filter->isDefaultCollapsed() ? 'false' : 'true'; ?>
+                                <?php $filterActive = ($filter->isCollapsible()
+                                    ? ($filter->isDefaultCollapsed() ? 'false' : 'true')
+                                    : 'true'
+                                ) ?>
 
-                                    <div class="filter-option card my-4 pb-0 <?=$filter->getCssClass()?>"
-                                         x-data="{ open: <?=$filterActive?>, showTooltip: false }">
-                                        <div class="filter-options-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container pb-2"
-                                             :class="{ 'border-b': open }"
-                                             @click="open = !open">
+                                <div class="filter-option card my-4 pb-0 <?=$filter->getCssClass()?>"
+                                     x-data="{ open: <?=$filterActive?>, showTooltip: false }">
+                                    <div class="filter-options-title flex justify-between items-center border-container pb-2 <?= $filter->isCollapsible() ? 'cursor-pointer hover:text-secondary-darker' : '' ?>"
+                                         :class="{ 'border-b': open }"
+                                         <?= $filter->isCollapsible() ? '@click="open = !open"' : ''?>>
                                         <span class="title flex text-md md:text-lg font-semibold">
                                             <?=__($filter->getName())?>
 
@@ -114,35 +116,36 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                             <?php endif; ?>
                                         </span>
 
+                                        <?php if ($filter->isCollapsible()): ?>
                                             <span class="py-1 px-1 rounded border border-container">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 class="transition-transform transform duration-300 ease-in-out text-primary"
-                                                 :class="open ? 'rotate-180' : ''">
-                                                <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2"
-                                                      stroke-linecap="round"
-                                                      stroke-linejoin="round"/>
-                                            </svg>
-                                        </span>
-                                        </div>
-                                        <div class="filter-options-content py-3 hidden"
-                                             :class="{ '!block': open, 'hidden': !open }"
-                                        >
-                                            <?=/* @noEscape */
-                                            $block->getChildBlock('renderer')->render($filter)?>
-                                        </div>
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="transition-transform transform duration-300 ease-in-out text-primary"
+                                                    :class="open ? 'rotate-180' : ''">
+                                                    <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"/>
+                                                </svg>
+                                            </span>
+                                        <?php endif; ?>
                                     </div>
+                                    <div class="filter-options-content py-3 hidden"
+                                         :class="{ '!block': open, 'hidden': !open }"
+                                    >
+                                        <?=/* @noEscape */
+                                        $block->getChildBlock('renderer')->render($filter)?>
+                                    </div>
+                                </div>
 
-                                    <?php if ($renderFilterButton): ?>
-                                        <div class="show-items-link">
-                                            <button type="button"
-                                                    class="btn btn-primary btn-block js-btn-filter"
-                                            >
-                                                <?=__('Show <span>%1</span> items',
-                                                    $this->getLayer()->getProductCount());?>
-                                            </button>
-                                        </div>
-                                    <?php endif; ?>
+                                <?php if ($renderFilterButton): ?>
+                                    <div class="show-items-link">
+                                        <button type="button"
+                                                class="btn btn-primary btn-block js-btn-filter"
+                                        >
+                                            <?=__('Show <span>%1</span> items',
+                                                $this->getLayer()->getProductCount());?>
+                                        </button>
+                                    </div>
                                 <?php endif; ?>
                             <?php endif; ?>
                         <?php endforeach; ?>
