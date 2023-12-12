@@ -89,6 +89,10 @@ if (!$swatchData['swatches']) {
      x-data="initLayeredSwatch_<?= $escaper->escapeJs($swatchData['attribute_code']) ?>()"
      data-attribute-code="<?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
      data-attribute-id="<?= $escaper->escapeHtmlAttr($swatchData['attribute_id']) ?>">
+    <?php if ($block->isSearchable()): ?>
+        <input data-max-visible="<?=  $block->getMaxItemsShown()?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $block->getSearchPlaceholder(); ?>" >
+        <div style="display: none" class="tw_search_no_results empty"><?= $block->getSearchNoResultsText(); ?></div>
+    <?php endif; ?>
     <div class="swatch-attribute-options clearfix flex flex-row flex-wrap">
         <?php foreach ($swatchData['options'] as $option => $label): ?>
             <?php

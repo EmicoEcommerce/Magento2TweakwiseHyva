@@ -16,8 +16,13 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\RenderLayered\DefaultRen
 
 $hasHiddenItems = $block->hasHiddenItems();
 $hasAlternateSortOrder = $block->hasAlternateSortOrder();
+
 ?>
 <div x-data="initTweakwiseNavigationItems()" x-init='sortItems(<?= (int)$hasAlternateSortOrder ?>)'>
+    <?php if ($block->isSearchable()): ?>
+        <input data-max-visible="<?=  $block->getMaxItemsShown()?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $block->getSearchPlaceholder(); ?>" >
+        <div style="display: none" class="tw_search_no_results empty"><?= $block->getSearchNoResultsText(); ?></div>
+    <?php endif; ?>
     <ol class="items" x-ref="items">
         <?php foreach ($block->getItems() as $index => $item): ?>
             <li class="item"
