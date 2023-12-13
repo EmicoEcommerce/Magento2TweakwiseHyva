@@ -79,6 +79,17 @@ use Magento\Framework\View\Element\Template;
              */
             pmListReload(cookieName) {
                 if (hyva.getCookie(cookieName) !== null) {
+                    const urlParams = new URLSearchParams(window.location.search);
+
+                    if (urlParams.get('p')) {
+                        const filterForm = document.querySelector(this.filterFormSelector);
+                        var pageParam = document.createElement('input');
+                        pageParam.setAttribute('type','hidden');
+                        pageParam.setAttribute('name','p');
+                        pageParam.value = parseInt(urlParams.get('p'));
+
+                        filterForm.querySelector('.filter-options').appendChild(newField);
+                    }
                     const changeEvent = new Event('change');
                     this.$root.dispatchEvent(changeEvent);
                 }
