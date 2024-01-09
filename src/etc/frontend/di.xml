@@ -16,6 +16,10 @@
                     <item name="original_module" xsi:type="string">Tweakwise_Magento2Tweakwise</item>
                     <item name="compat_module" xsi:type="string">Tweakwise_TweakwiseHyva</item>
                 </item>
+                <item name="hyva-emico_attributeLanding" xsi:type="array">
+                    <item name="original_module" xsi:type="string">Emico_AttributeLanding</item>
+                    <item name="compat_module" xsi:type="string">Tweakwise_TweakwiseHyva</item>
+                </item>
             </argument>
         </arguments>
     </type>
