@@ -14,9 +14,9 @@
             <block class="Tweakwise\Magento2Tweakwise\Block\Catalog\Product\ProductList\Featured"
                    name="tweakwise.catalog.product.featured.before"
                    ifconfig="tweakwise/recommendations/featured_enabled"
-                   template="Magento_Catalog::product/slider/product-slider.phtml">
+                   template="Tweakwise_Magento2Tweakwise::product/slider/product-slider.phtml">
                 <arguments>
-                    <argument name="title" xsi:type="string">new</argument>
+                    <argument name="type" xsi:type="string">new</argument>
                 </arguments>
             </block>
         </referenceContainer>
