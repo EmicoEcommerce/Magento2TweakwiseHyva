@@ -13,6 +13,13 @@
         "php": ">=8.0 <8.3",
         "tweakwise/magento2-tweakwise": ">=5.2.0."
     },
+    "require-dev": {
+        "symfony/finder": "^6.4.0",
+        "youwe/testing-suite": "^2.18",
+        "youwe/coding-standard-magento2": "^2.0.0",
+        "phpstan/extension-installer": "^1.3",
+        "bitexpert/phpstan-magento": "^0.30.1"
+    },
     "autoload": {
         "files": [
             "src/registration.php"
@@ -20,5 +27,36 @@
         "psr-4": {
             "Tweakwise\\TweakwiseHyva\\": "src/"
         }
+    },
+    "repositories": {
+        "magento": {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": true,
+            "youwe/coding-standard-phpstorm": true,
+            "phpro/grumphp-shim": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "youwe/testing-suite": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "archive": {
+        "exclude": [
+            "/.gitignore",
+            "/grumphp.yml",
+            "/pdepend.xml",
+            "/phpstan.neon",
+            "/phpunit.xml",
+            "/phpcs.xml",
+            "/phpmd.xml",
+            "/package.json",
+            "/.eslintrc.json",
+            "/.eslintignore"
+        ]
     }
 }
