@@ -20,8 +20,8 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
 ?>
 <div x-data="initTweakwiseNavigationItems()" x-init='sortItems(<?= (int)$hasAlternateSortOrder ?>)'>
     <?php if ($block->isSearchable()): ?>
-        <input data-max-visible="<?=  $block->getMaxItemsShown()?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $block->getSearchPlaceholder(); ?>" >
-        <div style="display: none" class="tw_search_no_results empty"><?= $block->getSearchNoResultsText(); ?></div>
+        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?=  $block->getMaxItemsShown()?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $block->getSearchPlaceholder(); ?>" >
+        <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $block->getSearchNoResultsText(); ?></div>
     <?php endif; ?>
     <ol class="items" x-ref="items">
         <?php foreach ($block->getItems() as $index => $item): ?>
@@ -29,6 +29,7 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
                 :class="{ 'block': moreItemsShow, 'hidden': '<?=$block->itemDefaultHidden($item)?>' && !moreItemsShow }"
                 <?php if ($hasAlternateSortOrder): ?>
                     data-alternate-sort="<?= $item->getAlternateSortOrder(); ?>"
+
                     data-original-sort="<?= $index; ?>"
                 <?php endif; ?>
             >
@@ -71,11 +72,13 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
         <a href="#" class="more-items underline cursor-pointer"
            @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'hidden': moreItemsShow }"
+           x-ref="moreItems"
         ><?= __($block->getMoreItemText()) ?></a>
         <a href="#" class="less-items underline cursor-pointer"
            x-cloak
            @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'block': moreItemsShow, 'hidden': !moreItemsShow }"
+           x-ref="lessItems"
         ><?= __($block->getLessItemText()) ?></a>
     <?php endif; ?>
 </div>

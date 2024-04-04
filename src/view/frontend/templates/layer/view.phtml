@@ -193,6 +193,55 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                 }
             }
         }
+
+        function initFilterSearch() {
+            return {
+                filterSearch() {
+                    let items = this.$refs.items;
+                    const filterSearch = this.$refs.tw_filtersearch;
+                    let value = filterSearch.value.toLowerCase().trim();
+                    let noItems = this.$refs.search_no_results;
+                    let moreItems = this.$refs.moreItems;
+                    let lessItems = this.$refs.lessItems;
+
+                    //swatch
+                    if (!items || !items.children) {
+                        items = this.$refs.swatch;
+                    }
+
+                    if (!items || !items.children) {
+                        return;
+                    }
+
+                    Array.from(items.children).forEach(function(item) {
+                        //find input element in item
+                        let input = item.querySelector('input');
+                        if (input.value.toLowerCase().trim().indexOf(value) === -1) {
+                            item.style.display = 'none';
+                        } else {
+                            item.style.display = '';
+                        }
+                    });
+
+                    let visibleItems = Array.from(items.children).filter(item => item.style.display !== 'none');
+                    if(visibleItems.length < 1) {
+                        noItems.style.display = '';
+                    } else {
+                        noItems.style.display = 'none';
+                    }
+
+                    if (moreItems) {
+                        if(value.length === 0) {
+                            moreItems.style.display = '';
+                            lessItems.style.display = '';
+                        } else {
+                            moreItems.style.display = 'none';
+                            lessItems.style.display = 'none';
+                        }
+                    }
+                }
+            }
+        }
     </script>
 
 <?=$block->getChildHtml('tweakwise.navigation.form');?>
