@@ -334,6 +334,7 @@ use Magento\Framework\View\Element\Template;
                     this.replaceNode(oldToolbarLast, newToolbarLast);
                 }
             },
+
             ajaxUpdateState(response) {
                 window.history.pushState({html: response.html}, '', response.url);
             },
