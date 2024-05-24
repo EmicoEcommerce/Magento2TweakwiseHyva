@@ -27,4 +27,8 @@
         <plugin name="tweakwise-hyva" type="Tweakwise\TweakwiseHyva\ViewModel\ProductList\Plugin" sortOrder="0" />
     </type>
     <preference for="Hyva\Theme\ViewModel\SwatchRenderer" type="Tweakwise\TweakwiseHyva\ViewModel\SwatchRenderer" />
+    <type name="Hyva\Theme\ViewModel\ProductListItem">
+        <plugin name="Tweakwise_TweakwiseHyva_Plugin_ViewModel_ProductListItem"
+                type="Tweakwise\TweakwiseHyva\Plugin\ViewModel\ProductListItem"/>
+    </type>
 </config>
