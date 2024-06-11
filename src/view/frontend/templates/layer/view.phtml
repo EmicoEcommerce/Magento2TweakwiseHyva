@@ -220,10 +220,13 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                     Array.from(items.children).forEach(function(item) {
                         //find input element in item
                         let input = item.querySelector('input');
-                        if (input.value.toLowerCase().trim().indexOf(value) === -1) {
+                        if (value.length === 0) {
+                            // Reset to initial state
+                            item.style.display = '';
+                        } else if (input.value.toLowerCase().trim().indexOf(value) === -1) {
                             item.style.display = 'none';
                         } else {
-                            item.style.display = '';
+                            item.style.display = 'block';
                         }
                     });
 
