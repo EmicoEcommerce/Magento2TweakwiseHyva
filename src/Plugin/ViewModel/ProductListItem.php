@@ -48,8 +48,7 @@ class ProductListItem
         bool $showDescription
     ) {
         if (
-            !$this->cacheHelper->isVarnishEnabled() ||
-            !$this->config->isPersonalMerchandisingActive() ||
+            !$this->cacheHelper->personalMerchandisingCanBeApplied() ||
             $this->cacheHelper->isTweakwiseAjaxRequest()
         ) {
             return $proceed($product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
