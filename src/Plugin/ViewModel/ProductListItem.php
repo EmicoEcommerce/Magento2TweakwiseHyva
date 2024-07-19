@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tweakwise\TweakwiseHyva\Plugin\ViewModel;
 
 use Hyva\Theme\ViewModel\ProductListItem as Subject;
-use Tweakwise\Magento2Tweakwise\Model\Config as TweakwiseConfig;
 use Tweakwise\Magento2Tweakwise\Helper\Cache;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
@@ -16,17 +15,16 @@ class ProductListItem
 {
     /**
      * @param Cache $cacheHelper
-     * @param TweakwiseConfig $config
      */
     public function __construct(
-        private readonly Cache $cacheHelper,
-        private readonly TweakwiseConfig $config,
+        private readonly Cache $cacheHelper
     ) {
     }
 
     /**
      * @param Subject $subject
      * @param callable $proceed
+     * @param AbstractBlock $itemRendererBlock
      * @param Product $product
      * @param AbstractBlock $parentBlock
      * @param string $viewMode
@@ -34,12 +32,13 @@ class ProductListItem
      * @param string $imageDisplayArea
      * @param bool $showDescription
      * @return string
-     * @throws NoSuchEntityException
      * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function aroundGetItemHtml(
+    public function aroundGetItemHtmlWithRenderer(
         Subject $subject,
         callable $proceed,
+        AbstractBlock $itemRendererBlock,
         Product $product,
         AbstractBlock $parentBlock,
         string $viewMode,
@@ -48,19 +47,20 @@ class ProductListItem
         bool $showDescription
     ) {
         if (
-            !$this->cacheHelper->isVarnishEnabled() ||
-            !$this->config->isPersonalMerchandisingActive() ||
+            !$this->cacheHelper->personalMerchandisingCanBeApplied() ||
             $this->cacheHelper->isTweakwiseAjaxRequest()
         ) {
-            return $proceed($product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
+            return $proceed($itemRendererBlock, $product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
         }
 
         $productId = (int) $product->getId();
-        if (!$this->cacheHelper->load($productId)) {
-            $itemHtml = $proceed($product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
-            $this->cacheHelper->save($itemHtml, $productId);
+        // TODO: Check why this is added
+        $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
+        if (!$this->cacheHelper->load($productId, $cardType)) {
+            $itemHtml = $proceed($itemRendererBlock, $product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
+            $this->cacheHelper->save($itemHtml, $productId, $cardType);
         }
 
-        return sprintf('<esi:include src="/%s?product_id=%s" />', Cache::PRODUCT_CARD_PATH, $productId);
+        return sprintf('<esi:include src="/%s?product_id=%s&card_type=%s" />', Cache::PRODUCT_CARD_PATH, $productId, $cardType);
     }
 }
