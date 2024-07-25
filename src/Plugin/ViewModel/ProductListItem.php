@@ -54,7 +54,6 @@ class ProductListItem
         }
 
         $productId = (int) $product->getId();
-        // TODO: Check why this is added
         $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
         if (!$this->cacheHelper->load($productId, $cardType)) {
             $itemHtml = $proceed($itemRendererBlock, $product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
