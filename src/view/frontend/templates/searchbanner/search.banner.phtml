@@ -3,12 +3,12 @@
 $banners = $block->getData('banners');
 $styling = !empty($banners[0]) && $banners[0]['location'] == 'ContainerTop' ? 'style="margin-right: auto; margin-left: auto; padding-left: 1.5rem; padding-right: 1.5rem;"' : '';
 ?>
-<div class="searchbanners" <?= $styling ?>>
+<div class="searchbanners" <?= /* @noEscape */ $styling ?>>
     <?php foreach ($banners as $banner) : ?>
         <?php if (!empty($banner['clickurl'])): ?>
-            <a href="<?=$banner['clickurl'];?>" type=<?=$banner['clicktarget'];?>">
+            <a href="<?= $escaper->escapeUrl($banner['clickurl']); ?>" type="<?= $escaper->escapeHtmlAttr($banner['clicktarget']); ?>">
         <?php endif; ?>
-                <img class="searchbanner <?=strtolower($banner['type']);?>" src="<?=$banner['imageurl'] ?>">
+        <img class="searchbanner <?= $escaper->escapeHtmlAttr(strtolower($banner['type'])); ?>" src="<?= $escaper->escapeUrl($banner['imageurl']); ?>">
         <?php if (!empty($banner['clickurl'])): ?>
             </a>
         <?php endif; ?>
