@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace Tweakwise\TweakwiseHyva\Plugin\ViewModel;
 
 use Hyva\Theme\ViewModel\ProductListItem as Subject;
+use Magento\Framework\View\LayoutInterface;
 use Tweakwise\Magento2Tweakwise\Helper\Cache;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\AbstractBlock;
+use Tweakwise\Magento2Tweakwise\Model\Visual;
 
 class ProductListItem
 {
     /**
      * @param Cache $cacheHelper
+     * @param LayoutInterface $layout
      */
     public function __construct(
-        private readonly Cache $cacheHelper
+        private readonly Cache $cacheHelper,
+        private readonly LayoutInterface $layout
     ) {
     }
 
@@ -46,20 +50,55 @@ class ProductListItem
         string $imageDisplayArea,
         bool $showDescription
     ) {
+        $isVisual = $product instanceof Visual;
         if (
             !$this->cacheHelper->personalMerchandisingCanBeApplied() ||
             $this->cacheHelper->isTweakwiseAjaxRequest()
         ) {
+            if ($isVisual) {
+                return $this->getVisualHtml($product);
+            }
             return $proceed($itemRendererBlock, $product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
         }
 
         $productId = (int) $product->getId();
         $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
         if (!$this->cacheHelper->load($productId, $cardType)) {
-            $itemHtml = $proceed($itemRendererBlock, $product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
+            if ($isVisual) {
+                $itemHtml = $this->getVisualHtml($product);
+            } else {
+                $itemHtml = $proceed(
+                    $itemRendererBlock,
+                    $product,
+                    $parentBlock,
+                    $viewMode,
+                    $templateType,
+                    $imageDisplayArea,
+                    $showDescription
+                );
+            }
+
             $this->cacheHelper->save($itemHtml, $productId, $cardType);
         }
 
         return sprintf('<esi:include src="/%s?product_id=%s&card_type=%s" />', Cache::PRODUCT_CARD_PATH, $productId, $cardType);
+    }
+
+    /**
+     * @param Visual $visual
+     * @return string
+     */
+    private function getVisualHtml(Visual $visual): string
+    {
+        /** @var AbstractBlock $visualRendererBlock */
+        $visualRendererBlock = $this->layout->getBlock('tweakwise.catalog.product.list.visual');
+
+        if (!$visualRendererBlock) {
+            return '';
+        }
+
+        $visualRendererBlock->setData('visual', $visual);
+
+        return $visualRendererBlock->toHtml();
     }
 }
