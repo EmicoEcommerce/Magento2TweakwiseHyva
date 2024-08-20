@@ -14,9 +14,17 @@ $visual = $block->getData('visual');
 if (!$visual) {
     return;
 }
+$hasUrl = !empty($visual->getUrl());
 ?>
-<a href="<?= $escaper->escapeUrl($visual->getUrl()) ?>">
-    <div style="background-image: url('<?= $escaper->escapeUrl($visual->getImageUrl()) ?>'); width: 100%; height:100%">
-    </div>
-</a>
+
+    <?php if ($hasUrl): ?>
+    <a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>">
+        <?php endif; ?>
+        <div class="visual">
+            <img class="visual-image" src="<?= $escaper->escapeUrl($visual->getImageUrl()) ?>" loading="lazy"/>
+        </div>
+        <?php if ($hasUrl): ?>
+    </a>
+<?php endif; ?>
+
 
