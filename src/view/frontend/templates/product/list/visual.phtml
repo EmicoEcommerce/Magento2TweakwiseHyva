@@ -17,14 +17,14 @@ if (!$visual) {
 $hasUrl = !empty($visual->getUrl());
 ?>
 
+<?php if ($hasUrl): ?>
+<a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>">
+    <?php endif; ?>
+    <div class="visual">
+        <img class="visual-image" src="<?= $escaper->escapeUrl($visual->getImageUrl()) ?>" loading="lazy"/>
+    </div>
     <?php if ($hasUrl): ?>
-    <a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>">
-        <?php endif; ?>
-        <div class="visual">
-            <img class="visual-image" src="<?= $escaper->escapeUrl($visual->getImageUrl()) ?>" loading="lazy"/>
-        </div>
-        <?php if ($hasUrl): ?>
-    </a>
+</a>
 <?php endif; ?>
 
 
