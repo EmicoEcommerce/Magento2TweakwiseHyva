@@ -61,9 +61,9 @@ class ProductListItem
             return $proceed($itemRendererBlock, $product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
         }
 
-        $productId = (int) $product->getId();
+        $itemId = (string) $product->getId();
         $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
-        if (!$this->cacheHelper->load($productId, $cardType)) {
+        if (!$this->cacheHelper->load($itemId, $cardType)) {
             if ($isVisual) {
                 $itemHtml = $this->getVisualHtml($product);
             } else {
@@ -78,10 +78,10 @@ class ProductListItem
                 );
             }
 
-            $this->cacheHelper->save($itemHtml, $productId, $cardType);
+            $this->cacheHelper->save($itemHtml, $itemId, $cardType);
         }
 
-        return sprintf('<esi:include src="/%s?product_id=%s&card_type=%s" />', Cache::PRODUCT_CARD_PATH, $productId, $cardType);
+        return sprintf('<esi:include src="/%s?item_id=%s&card_type=%s" />', Cache::PRODUCT_CARD_PATH, $itemId, $cardType);
     }
 
     /**
