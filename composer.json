@@ -13,6 +13,10 @@
         "php": "^8.0",
         "tweakwise/magento2-tweakwise": ">=8.0.0."
     },
+    "require-dev": {
+        "youwe/coding-standard-magento2": "^2.0.0",
+        "youwe/testing-suite": "^2.17"
+    },
     "autoload": {
         "files": [
             "src/registration.php"
