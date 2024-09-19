@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tweakwise\TweakwiseHyva\Plugin\ViewModel;
 
 use Hyva\Theme\ViewModel\ProductListItem as Subject;
+use Magento\Customer\Model\Session;
+use Magento\Store\Model\StoreManagerInterface;
 use Tweakwise\Magento2Tweakwise\Helper\Cache;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
@@ -17,7 +19,9 @@ class ProductListItem
      * @param Cache $cacheHelper
      */
     public function __construct(
-        private readonly Cache $cacheHelper
+        private readonly Cache $cacheHelper,
+        private readonly StoreManagerInterface $storeManager,
+        private readonly Session $customerSession
     ) {
     }
 
@@ -60,6 +64,16 @@ class ProductListItem
             $this->cacheHelper->save($itemHtml, $productId, $cardType);
         }
 
-        return sprintf('<esi:include src="/%s?product_id=%s&card_type=%s" />', Cache::PRODUCT_CARD_PATH, $productId, $cardType);
+        $storeId = $this->storeManager->getStore()->getId();
+        $customerGroupId = $this->customerSession->getCustomerGroupId();
+
+        return sprintf(
+            '<esi:include src="/%s?product_id=%s&store_id=%s&customer_group_id=%s&card_type=%s" />',
+            Cache::PRODUCT_CARD_PATH,
+            $productId,
+            $storeId,
+            $customerGroupId,
+            $cardType
+        );
     }
 }
