@@ -1,0 +1,30 @@
+<?php
+
+use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Framework\Escaper;
+use Tweakwise\Magento2Tweakwise\Model\Visual;
+
+/**
+ * @var AbstractProduct $block
+ * @var Escaper $escaper
+ */
+
+/** @var Visual $visual */
+$visual = $block->getData('visual');
+if (!$visual) {
+    return;
+}
+$hasUrl = !empty($visual->getUrl());
+?>
+
+<?php if ($hasUrl): ?>
+<a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>">
+    <?php endif; ?>
+    <div class="visual">
+        <img class="visual-image" src="<?= $escaper->escapeUrl($visual->getImageUrl()) ?>" loading="lazy"/>
+    </div>
+    <?php if ($hasUrl): ?>
+</a>
+<?php endif; ?>
+
+
