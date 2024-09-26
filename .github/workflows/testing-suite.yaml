@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Testing Suite
         run: |
-          composer install youwe/coding-standard-magento2
-          composer install youwe/testing-suite
+          composer require youwe/coding-standard-magento2
+          composer require youwe/testing-suite
           vendor/bin/grumphp run --no-interaction
         shell: bash
