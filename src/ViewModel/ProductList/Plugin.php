@@ -17,9 +17,7 @@ use Tweakwise\Magento2Tweakwise\Model\Client\RequestFactory;
 use Tweakwise\Magento2Tweakwise\Model\Config;
 use Tweakwise\Magento2Tweakwise\Model\Config\TemplateFinder;
 use Hyva\Theme\ViewModel\ProductList;
-use Magento\Catalog\Block\Product\ProductList\Related;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Tweakwise\Magento2Tweakwise\Model\Cart\Crosssell as TweakwiseCrosssell;
@@ -48,9 +46,13 @@ class Plugin extends AbstractRecommendationPlugin
      * @param TemplateFinder $templateFinder
      * @param ObjectManagerInterface $objectManager
      */
-
-    public function __construct(Config $config, Registry $registry, Context $context, TemplateFinder $templateFinder, ObjectManagerInterface $objectManager)
-    {
+    public function __construct(
+        Config $config,
+        Registry $registry,
+        Context $context,
+        TemplateFinder $templateFinder,
+        ObjectManagerInterface $objectManager
+    ) {
         parent::__construct($config, $registry, $context, $templateFinder);
         $this->objectManager = $objectManager;
     }
@@ -58,7 +60,6 @@ class Plugin extends AbstractRecommendationPlugin
     /**
      * @return string
      */
-
     protected function getType()
     {
         return $this->type;
@@ -77,9 +78,12 @@ class Plugin extends AbstractRecommendationPlugin
         }
 
         // return most recently added product crosssell items first
-        usort($cartItems, function (QuoteItem $itemA, QuoteItem $itemB) {
-            return ($itemA->getCreatedAt() <=> $itemB->getCreatedAt()) * -1;
-        });
+        usort(
+            $cartItems,
+            function (QuoteItem $itemA, QuoteItem $itemB) {
+                return ($itemA->getCreatedAt() <=> $itemB->getCreatedAt()) * -1;
+            }
+        );
 
         $items = [];
 
@@ -99,7 +103,8 @@ class Plugin extends AbstractRecommendationPlugin
      * @param ProductList $subject
      * @param Closure $proceed
      * @param string $linkType
-     * @param Product|ProductInterface|QuoteItem ...$items
+     * @param Product|ProductInterface|QuoteItem $items
+     *
      * @return ProductInterface[]
      */
     public function aroundGetLinkedItems(ProductList $subject, Closure $proceed, string $linkType, $items): array
@@ -109,14 +114,13 @@ class Plugin extends AbstractRecommendationPlugin
 
     /**
      * Overwrite Hyva function to get items for upsell/crossell
-     *
-     * @param ProductList $subject
      * @param Closure $proceed
      * @param string $linkType
-     * @param ...$items
+     * @param mixed ...$items
+     *
      * @return array|Collection
      */
-    private function loadLinkedTweakwiseItems(Closure $proceed, string $linkType, ...$items): array
+    private function loadLinkedTweakwiseItems(Closure $proceed, string $linkType, ...$items): array|Collection
     {
         $this->type = Config::RECOMMENDATION_TYPE_UPSELL;
         if ($linkType === 'crosssell' || $linkType === 'related') {
@@ -142,6 +146,8 @@ class Plugin extends AbstractRecommendationPlugin
 
     /**
      * @return Collection
+     * @throws ApiException
+     * @throws InvalidArgumentException
      */
     protected function getCollection()
     {
@@ -152,6 +158,7 @@ class Plugin extends AbstractRecommendationPlugin
         $featureRequest = $featureRequestFactory->create();
         $path = $featureRequest->getPath();
 
+		//TODO FIX THIS
         $request->setPath($path);
         $request->setTemplate($this->templateId);
         $this->context->setRequest($request);
@@ -168,7 +175,8 @@ class Plugin extends AbstractRecommendationPlugin
         return $this->collection->getItems();
     }
 
-    private function getShoppingcartTweakwiseItems (ProductInterface $product, array $result, array $cartItems) {
+    private function getShoppingcartTweakwiseItems(ProductInterface $product, array $result, array $cartItems)
+    {
         $items = [];
 
         //show featured products
@@ -189,11 +197,12 @@ class Plugin extends AbstractRecommendationPlugin
         $this->context->setRequest($request);
 
         try {
-            $collection = Parent::getCollection();
+            $collection = parent::getCollection();
         } catch (ApiException $e) {
             return $result;
         }
 
+		//TODO FIX THIS
         if (!empty($ninProductIds)) {
             $collection = $this->removeCartItems($collection, $cartItems);
         }
@@ -206,19 +215,21 @@ class Plugin extends AbstractRecommendationPlugin
     }
 
     /**
-     * @param $collection
-     * @param $filteredProducts
-     * @return void
+     * @param Collection $collection
+     * @param array $cartItems
+     *
+     * @return array
      */
-    protected function removeCartItems($collection, $cartItems)
+    protected function removeCartItems($collection, array $cartItems)
     {
         $items = $collection->getItems();
 
-        if(!empty($cartItems)) {
+        if (!empty($cartItems)) {
             foreach ($cartItems as $cartItem) {
                 unset($items[$cartItem]);
             }
         }
+
         return $items;
     }
 
@@ -238,6 +249,8 @@ class Plugin extends AbstractRecommendationPlugin
             return [];
         }
 
+
+		//TODO FIX THIS
         if (!empty($cartItems)) {
             $collection = $this->removeCartItems($collection, $cartItems);
         }

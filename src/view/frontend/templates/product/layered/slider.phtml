@@ -11,6 +11,7 @@ declare(strict_types=1);
 use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\RenderLayered\SliderRenderer;
 
 /** @var SliderRenderer $block */
+/** @var \Magento\Framework\Escaper $escaper */
 
 $itemPrefix = $block->getItemPrefix();
 $itemPostfix = $block->getItemPostfix();
@@ -24,65 +25,65 @@ $disabledSliderUrlInputValue = sprintf('%s-%s', $minValue, $maxValue);
 
 $jsSliderConfig = $block->getJsSliderConfig();
 ?>
-<div class="slider-attribute" id="attribute-slider-<?= $block->getCssId() ?>"
+<div class="slider-attribute" id="attribute-slider-<?= $escaper->escapeHtmlAttr($block->getCssId()) ?>"
     <?php if ($jsSliderConfig): ?>
         x-data="tweakwiseNavigationSlider()"
-        x-init='initSlider(<?= $jsSliderConfig ?>)'
-        data-is-price="<?= $urlKey === 'price' ?>"
+        x-init='initSlider(<?= /* @noEscape */ $jsSliderConfig ?>)'
+        data-is-price="<?= $escaper->escapeHtmlAttr($urlKey === 'price') ?>"
     <?php endif; ?>
 >
     <div class="labels flex justify-between">
         <span class="min-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($minValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
+            <span class="prefix"><?= $escaper->escapeHtml($itemPrefix) ?></span>
+            <span class="value"><?= $escaper->escapeHtml($block->renderValue($minValue)) ?></span>
+            <span class="postfix"><?= $escaper->escapeHtml($itemPostfix) ?></span>
         </span>
         <span class="max-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($maxValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
+            <span class="prefix"><?= $escaper->escapeHtml($itemPrefix) ?></span>
+            <span class="value"><?= $escaper->escapeHtml($block->renderValue($maxValue)) ?></span>
+            <span class="postfix"><?= $escaper->escapeHtml($itemPostfix) ?></span>
         </span>
     </div>
     <div class="tw-range-slider slider" x-ref="slider"></div>
     <div class="labels flex justify-between">
         <span class="current-min-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($currentMinValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
+            <span class="prefix"><?= $escaper->escapeHtml($itemPrefix) ?></span>
+            <span class="value"><?= $escaper->escapeHtml($block->renderValue($currentMinValue)) ?></span>
+            <span class="postfix"><?= $escaper->escapeHtml($itemPostfix) ?></span>
         </span>
         <span class="current-max-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($currentMaxValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
+            <span class="prefix"><?= $escaper->escapeHtml($itemPrefix) ?></span>
+            <span class="value"><?= $escaper->escapeHtml($block->renderValue($currentMaxValue)) ?></span>
+            <span class="postfix"><?= $escaper->escapeHtml($itemPostfix) ?></span>
         </span>
     </div>
     <div class="slider-inputs w-full flex justify-between mt-2">
         <div class="slider-min-wrapper w-2/5 mr-1">
-            <label for="<?= $urlKey ?>-min" class="text-sm mb-0"><?= __('From') ?></label>
+            <label for="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min" class="text-sm mb-0"><?=$escaper->escapeHtml(__('From')) ?></label>
             <input type="text"
                    class="slider-min js-skip-submit w-full"
-                   id="<?= $urlKey ?>-min"
-                   name="<?= $urlKey ?>-min"
-                   value="<?= $currentMinValue ?>"
+                   id="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min"
+                   name="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min"
+                   value="<?= $escaper->escapeHtmlAttr($currentMinValue) ?>"
             >
         </div>
         <div class="slider-max-wrapper w-2/5 ml-1">
-            <label for="<?= $urlKey ?>-max" class="text-sm mb-0"><?= __('To') ?></label>
+            <label for="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max" class="text-sm mb-0"><?= $escaper->escapeHtml(__('To')) ?></label>
             <input type="text"
                    class="slider-max js-skip-submit w-full"
-                   id="<?= $urlKey ?>-max"
-                   name="<?= $urlKey ?>-max"
-                   value="<?= $currentMaxValue ?>"
+                   id="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max"
+                   name="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max"
+                   value="<?= $escaper->escapeHtmlAttr($currentMaxValue) ?>"
             >
         </div>
         <input type="hidden"
-               data-disabled-input="<?= $disabledSliderUrlInputValue ?>"
+               data-disabled-input="<?= $escaper->escapeHtmlAttr($disabledSliderUrlInputValue) ?>"
                data-is-slider="true"
             <?= ($sliderUrlInputValue === $disabledSliderUrlInputValue) ? 'disabled="disabled"' : '' ?>
-               id="<?= $block->getCssId() ?>"
+               id="<?= $escaper->escapeHtmlAttr($block->getCssId()) ?>"
                class="slider-url-value"
-               name="<?= $urlKey ?>"
-               value="<?= $sliderUrlInputValue ?>"
+               name="<?= $escaper->escapeHtmlAttr($urlKey) ?>"
+               value="<?= $escaper->escapeHtmlAttr($sliderUrlInputValue) ?>"
         >
     </div>
 </div>

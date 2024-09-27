@@ -90,30 +90,30 @@ if (!$swatchData['swatches']) {
      data-attribute-code="<?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
      data-attribute-id="<?= $escaper->escapeHtmlAttr($swatchData['attribute_id']) ?>">
     <?php if ($block->isSearchable()): ?>
-        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?=  $block->getMaxItemsShown()?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $block->getSearchPlaceholder(); ?>" >
-        <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $block->getSearchNoResultsText(); ?></div>
+        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?=  $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
+        <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $escaper->escapeHtml($block->getSearchNoResultsText()); ?></div>
     <?php endif; ?>
     <div class="swatch-attribute-options clearfix flex flex-row flex-wrap" x-ref="swatch">
         <?php foreach ($swatchData['options'] as $option => $label): ?>
             <?php
             $item = $block->getItemForSwatch($option);
-            if(isset($swatchData['swatches'][$option]['value']) && isset($swatchData['swatches'][$option]['type'])) {
+            if (isset($swatchData['swatches'][$option]['value']) && isset($swatchData['swatches'][$option]['type'])) {
                 $value = $swatchData['swatches'][$option]['value'];
                 $type = $swatchData['swatches'][$option]['type'];
                 $swatchImage = $escaper->escapeUrl($block->getSwatchPath('swatch_image', $value));
                 $swatchThumb = $escaper->escapeUrl($block->getSwatchPath('swatch_thumb', $value));
                 ?>
 
-                <a <?= $block->renderAnchorHtmlTagAttributes($item); ?>
-                        aria-label="<?= $label['label'] ?>"
+                <a <?= $escaper->escapeHtmlAttr($block->renderAnchorHtmlTagAttributes($item)); ?>
+                        aria-label="<?= $escaper->escapeHtmlAttr($label['label']) ?>"
                         class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex border justify-center"
                 >
                     <?php $cssId = $item->getCssId(); ?>
 
-                    <label for="<?= $cssId ?>"
+                    <label for="<?= $escaper->escapeHtmlAttr($cssId) ?>"
                            class="swatch-option-inner cursor-pointer relative block select-none m-0"
-                           :class="{ 'w-6 h-6' : getSwatchType('<?= (string)$type; ?>') !== 'text' }"
-                           :style="getSwatchBackgroundStyle('<?= (string)$type ?>', '<?= (string)$value ?>', '<?= (string)$swatchImage ?>')"
+                           :class="{ 'w-6 h-6' : getSwatchType('<?= $escaper->escapeCss((string)$type); ?>') !== 'text' }"
+                           :style="getSwatchBackgroundStyle('<?= $escaper->escapeCss((string)$type) ?>', '<?= $escaper->escapeCss((string)$value) ?>', '<?= $escaper->escapeCss((string)$swatchImage) ?>')"
                         <?php if ($configurableViewModel->getShowSwatchTooltip()): ?>
                             @mouseenter.self="activeTooltipItem = {
                                 attribute: '<?= $escaper->escapeHtmlAttr($value) ?>',
@@ -126,9 +126,9 @@ if (!$swatchData['swatches']) {
                             @mouseleave.self="activeTooltipItem = false"
                         <?php endif; ?>
                     >
-                        <input id="<?= $cssId ?>" style="display: none"
-                               name="<?= $item->getFilter()->getFacet()->getFacetSettings()->getUrlKey() ?>[]"
-                               type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
+                        <input id="<?= $escaper->escapeHtmlAttr($cssId) ?>" style="display: none"
+                               name="<?= $escaper->escapeHtmlAttr($item->getFilter()->getFacet()->getFacetSettings()->getUrlKey()) ?>[]"
+                               type="checkbox" <?= $escaper->escapeHtmlAttr($item->isSelected() ? 'checked="checked"' : '') ?>
                                value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
                         >
                         <?php if ((string)$type === "0"): ?>

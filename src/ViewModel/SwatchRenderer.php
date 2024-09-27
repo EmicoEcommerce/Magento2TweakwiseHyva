@@ -13,6 +13,7 @@ use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Swatches\Helper\Data as SwatchHelper;
+
 use function array_map as map;
 use function array_keys as keys;
 
@@ -69,17 +70,24 @@ class SwatchRenderer implements ArgumentInterface
 
         $filterAttributes = $this->getUsedSwatchFilters($product);
         ksort($filterAttributes);
-        $swatchCacheKey = implode('', map(function (string $code) use ($filterAttributes): string {
-            if (is_array($filterAttributes[$code])) {
-                $codes = '';
-                foreach ($filterAttributes[$code] as $filterAttributesValues) {
-                    $codes .= $filterAttributesValues;
-                }
+        $swatchCacheKey = implode(
+            '',
+            map(
+                function (string $code) use ($filterAttributes): string {
+                    if (is_array($filterAttributes[$code])) {
+                        $codes = '';
+                        foreach ($filterAttributes[$code] as $filterAttributesValues) {
+                            $codes .= $filterAttributesValues;
+                        }
 
-                return "$code={$codes}";
-            }
-            return "$code={$filterAttributes[$code]}";
-        }, keys($filterAttributes)));
+                        return "$code={$codes}";
+                    }
+
+                    return "$code={$filterAttributes[$code]}";
+                },
+                keys($filterAttributes)
+            )
+        );
 
         if ($swatchCacheKey) {
             $newKey = $this->blockCache->hashCacheKeyInfo([$itemRendererBlock->getData('cache_key'), $swatchCacheKey]);
@@ -119,7 +127,8 @@ class SwatchRenderer implements ArgumentInterface
             $result = false;
         }
 
-        if (!$attribute->getUsedInProductListing()
+        if (
+            !$attribute->getUsedInProductListing()
             || !$attribute->getIsFilterable()
             || !$attribute->getData('update_product_preview_image')
         ) {

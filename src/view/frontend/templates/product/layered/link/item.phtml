@@ -21,19 +21,19 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
 ?>
 
 <li class="item"
-    :class="{ 'block': moreItemsShow, 'hidden': '<?=$block->itemDefaultHidden($item)?>' && !moreItemsShow }"
+    :class="{ 'block': moreItemsShow, 'hidden': '<?= $escaper->escapeCss($block->itemDefaultHidden($item))?>' && !moreItemsShow }"
     <?php if ($hasAlternateSortOrder): ?>
-        data-alternate-sort="<?= $item->getAlternateSortOrder(); ?>"
+        data-alternate-sort="<?= $escaper->escapeHtmlAttr($item->getAlternateSortOrder()); ?>"
     <?php endif; ?>
 >
-    <a href="<?= $block->getCategoryUrl($item) ?>" class="flex w-full py-1 mb-1 hover:text-black">
-        <?= $block->getItemPrefix() ?>
+    <a href="<?= $escaper->escapeUrl($block->getCategoryUrl($item)) ?>" class="flex w-full py-1 mb-1 hover:text-black">
+        <?= $escaper->escapeHtml($block->getItemPrefix()) ?>
         <?= $escaper->escapeHtml($item->getLabel()) ?>
-        <?= $block->getItemPostfix() ?>
+        <?= $escaper->escapeHtml($block->getItemPostfix()) ?>
 
         <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
             <span class="count block text-primary ml-auto">
-                (<?= htmlentities((string)$item->getCount()) ?>)
+                (<?= $escaper->escapeHtml($item->getCount()) ?>)
             </span>
         <?php endif; ?>
     </a>
@@ -41,7 +41,7 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
     <?php if ($block->hasChildren()): ?>
         <ol class="items child-items">
             <?php foreach ($block->getChildren() as $child): ?>
-                <?= $block->renderLinkItem($child) ?>
+                <?= /* @noEscape */$block->renderLinkItem($child) ?>
             <?php endforeach; ?>
         </ol>
     <?php endif; ?>

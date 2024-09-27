@@ -13,6 +13,7 @@ use Tweakwise\Magento2Tweakwise\Model\NavigationConfig;
 use Magento\LayeredNavigation\Block\Navigation;
 
 /** @var Navigation $block */
+/** @var \Magento\Framework\Escaper $escaper */
 
 if (!$block->canShowBlock()) {
     return;
@@ -41,8 +42,8 @@ $filtered = count($block->getLayer()->getState()->getFilters());
              @click="blockOpen = !blockOpen"
         >
             <span class="text-primary text-md text-xl md:text-2xl font-semibold uppercase"
-                  data-count="<?=$filtered?>">
-                <?=__('Shop By')?>
+                  data-count="<?= $escaper->escapeHtmlAttr($filtered)?>">
+                <?= $escaper->escapeHtml(__('Shop By'))?>
             </span>
             <span class="py-1 px-1 bg-container-lighter rounded border border-container-darker hidden"
                   :class="{ 'block' : isMobile, 'hidden': !isMobile }">
@@ -60,7 +61,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
             <form id="facet-filter-form"
                 <?php if ($jsFormConfig): ?>
                     x-data="tweakwiseNavigationForm()"
-                    x-init='initForm(<?=$jsFormConfig?>)'
+                    x-init='initForm(<?= $escaper->escapeJs($jsFormConfig) ?>)'
                 <?php endif; ?>
             >
                 <?=$block->getChildHtml('state');?>
@@ -68,7 +69,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                 <?php if ($block->getLayer()->getState()->getFilters()): ?>
                     <div class="block-actions filter-actions">
                         <a href="<?=$escaper->escapeUrl($block->getClearUrl())?>"
-                           class="action clear filter-clear text-xs text-primary underline hover:text-primary-darker"><span><?=__('Clear All')?></span></a>
+                           class="action clear filter-clear text-xs text-primary underline hover:text-primary-darker"><span><?= $escaper->escapeHtml(__('Clear All'))?></span></a>
                     </div>
                 <?php endif; ?>
 
@@ -76,7 +77,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                     <div class="filter-options" id="narrow-by-list">
                         <?php foreach ($tweakwiseNavigationConfig->getFilterFormInput() as $name => $value): ?>
                             <?php //These are tweakwise system parameters which are needed for ajax navigation?>
-                            <input type="hidden" name="<?=$name?>" value="<?=$value?>">
+                            <input type="hidden" name="<?= $escaper->escapeHtmlAttr($name)?>" value="<?= $escaper->escapeHtmlAttr($value)?>">
                         <?php endforeach; ?>
 
                         <?php foreach ($block->getFilters() as $filter): ?>
@@ -87,17 +88,16 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                     : 'true'
                                 ) ?>
 
-                                <div class="filter-option card my-4 pb-0 <?=$filter->getCssClass()?>"
-                                     x-data="{ open: <?=$filterActive?>, showTooltip: false }">
-                                    <div class="filter-options-title flex justify-between items-center border-container pb-2 <?= $filter->isCollapsible() ? 'cursor-pointer hover:text-secondary-darker' : '' ?>"
+                                <div class="filter-option card my-4 pb-0 <?= $escaper->escapeHtmlAttr($filter->getCssClass())?>"
+                                     x-data="{ open: <?= $escaper->escapeHtmlAttr($filterActive) ?>, showTooltip: false }">
+                                    <div class="filter-options-title flex justify-between items-center border-container pb-2 <?= $escaper->escapeHtmlAttr($filter->isCollapsible()) ? 'cursor-pointer hover:text-secondary-darker' : '' ?>"
                                          :class="{ 'border-b': open }"
                                          <?= $filter->isCollapsible() ? '@click="open = !open"' : ''?>>
                                         <span class="title flex text-md md:text-lg font-semibold">
-                                            <?=__($filter->getName())?>
+                                            <?= $escaper->escapeHtml(__($filter->getName()))?>
 
                                             <?php $tooltip = $filter->getTooltip(); ?>
                                             <?php if ($tooltip): ?>
-                                                <?php $tooltip = htmlentities($tooltip); ?>
                                                 <span class="ml-2 mt-1 block relative tooltip">
                                                     <span @mouseover="showTooltip = true"
                                                           @mouseleave="showTooltip = false"
@@ -111,7 +111,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                                     </span>
                                                     <span x-cloak
                                                           x-show.transition.origin.top="showTooltip"
-                                                          class="absolute bottom-0 mb-8 block bg-gray-900 bg-opacity-95 rounded p-2 text-white text-xs font-normal absolute w-32 z-10 text-left tooltip-content"><?=$tooltip?></span>
+                                                          class="absolute bottom-0 mb-8 block bg-gray-900 bg-opacity-95 rounded p-2 text-white text-xs font-normal absolute w-32 z-10 text-left tooltip-content"><?= $escaper->escapeHtml($tooltip)?></span>
                                                 </span>
                                             <?php endif; ?>
                                         </span>
@@ -142,8 +142,8 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                         <button type="button"
                                                 class="btn btn-primary btn-block js-btn-filter"
                                         >
-                                            <?=__('Show <span>%1</span> items',
-                                                $this->getLayer()->getProductCount());?>
+                                            <?= $escaper->escapeHtml(__('Show <span>%1</span> items',
+                                                $block->getLayer()->getProductCount()));?>
                                         </button>
                                     </div>
                                 <?php endif; ?>
@@ -152,7 +152,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                     </div>
                 <?php endif; ?>
 
-                <?=$block->getChildHtml('loading')?>
+                <?= $block->getChildHtml('loading')?>
             </form>
         </div>
     </div>

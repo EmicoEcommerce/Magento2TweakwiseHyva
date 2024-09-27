@@ -1,14 +1,15 @@
 <?php
-/** @var \Emico\AttributeLanding\Block\OverviewPage\View $this */
+/** @var \Emico\AttributeLanding\Block\OverviewPage\View $block */
+/** @var \Magento\Framework\Escaper $escaper */
 ?>
-<div><?=$this->getContentFirst()?></div>
+<div><?= /* @noEscape */ $block->getContentFirst()?></div>
 <div class="landingpages-grid grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
-    <?php foreach ($this->getLandingPages() as $landingPage): ?>
+    <?php foreach ($block->getLandingPages() as $landingPage): ?>
         <div class="m-2">
-            <a href="<?=$landingPage->getUrlPath()?>"><?=$landingPage->getHeading() ?: $landingPage->getName()?>
-                <img src="<?=$this->getLandingPageImage($landingPage)?>" />
+            <a href="<?= $escaper->escapeUrl($landingPage->getUrlPath()) ?>"><?= $escaper->escapeHtml($landingPage->getHeading() ?: $landingPage->getName()) ?>
+                <img src="<?= $escaper->escapeHtmlAttr($block->getLandingPageImage($landingPage))?>" />
             </a>
         </div>
     <?php endforeach; ?>
 </div>
-<div><?=$this->getContentLast()?></div>
+<div><?= /* @noEscape */ $block->getContentLast()?></div>
