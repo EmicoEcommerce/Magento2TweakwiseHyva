@@ -17,6 +17,9 @@
             <action method="setTemplate" ifconfig="tweakwise/autocomplete/enabled">
                 <argument name="template" xsi:type="string">Tweakwise_Magento2Tweakwise::html/header/search-form.phtml</argument>
             </action>
+            <arguments>
+                <argument name="tweakwiseSearchForm" xsi:type="object">Tweakwise\TweakwiseHyva\Plugin\ViewModel\SearchForm</argument>
+            </arguments>
             <block class="Tweakwise\Magento2Tweakwise\Block\Autocomplete\FormMini" ifconfig="tweakwise/autocomplete/enabled"
                    name="tweakwise.quick.search" template="Tweakwise_Magento2Tweakwise::quick-search.phtml"/>
         </referenceBlock>

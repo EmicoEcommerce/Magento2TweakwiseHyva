@@ -11,12 +11,14 @@ declare(strict_types=1);
 use Magento\Framework\Escaper;
 use Magento\Framework\View\Element\Template;
 use Magento\Search\Helper\Data as SearchHelper;
+use Tweakwise\TweakwiseHyva\Plugin\ViewModel\SearchForm;
 
 /** @var Escaper $escaper */
 /** @var Template $block */
 /** @var SearchHelper $helper */
+/** @var SearchForm $tweakwiseSearchForm */
 
-$helper = $block->helper(SearchHelper::class);
+$helper = $block->getData('tweakwiseSearchForm')->getSearchHelper();
 
 ?>
 <script>
