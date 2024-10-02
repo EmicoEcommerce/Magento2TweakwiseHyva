@@ -158,7 +158,6 @@ class Plugin extends AbstractRecommendationPlugin
         $featureRequest = $featureRequestFactory->create();
         $path = $featureRequest->getPath();
 
-		//TODO FIX THIS
         $request->setPath($path);
         $request->setTemplate($this->templateId);
         $this->context->setRequest($request);
@@ -202,11 +201,6 @@ class Plugin extends AbstractRecommendationPlugin
             return $result;
         }
 
-		//TODO FIX THIS
-        if (!empty($ninProductIds)) {
-            $collection = $this->removeCartItems($collection, $cartItems);
-        }
-
         foreach ($collection as $item) {
             $items[] = $item;
         }
@@ -247,11 +241,6 @@ class Plugin extends AbstractRecommendationPlugin
             $collection = $this->recommendationsContext->getCollection();
         } catch (ApiException $e) {
             return [];
-        }
-
-		//TODO FIX THIS
-        if (!empty($cartItems)) {
-            $collection = $this->removeCartItems($collection, $cartItems);
         }
 
         foreach ($collection as $item) {

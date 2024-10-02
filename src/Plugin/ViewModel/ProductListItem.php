@@ -77,7 +77,7 @@ class ProductListItem
             );
         }
 
-        $itemId = (int) $product->getId();
+        $itemId = (string) $product->getId();
         $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
         if (!$this->cacheHelper->load($itemId, $cardType)) {
             if ($isVisual) {
