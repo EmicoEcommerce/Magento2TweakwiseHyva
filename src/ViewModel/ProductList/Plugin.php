@@ -249,7 +249,6 @@ class Plugin extends AbstractRecommendationPlugin
             return [];
         }
 
-
 		//TODO FIX THIS
         if (!empty($cartItems)) {
             $collection = $this->removeCartItems($collection, $cartItems);
