@@ -11,78 +11,177 @@ declare(strict_types=1);
 use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\RenderLayered\SliderRenderer;
 
 /** @var SliderRenderer $block */
+/** @var \Magento\Framework\Escaper $escaper */
 
 $itemPrefix = $block->getItemPrefix();
 $itemPostfix = $block->getItemPostfix();
 $urlKey = $block->getUrlKey();
 $minValue = $block->getMinValue();
 $maxValue = $block->getMaxValue();
+$totalRange = $block->getTotalRange();
 $currentMinValue = $block->getCurrentMinValue();
 $currentMaxValue = $block->getCurrentMaxValue();
 $sliderUrlInputValue = sprintf('%s-%s', $currentMinValue, $currentMaxValue);
 $disabledSliderUrlInputValue = sprintf('%s-%s', $minValue, $maxValue);
+$cointainsBuckets = $block->containsBuckets();
+$cointainsClickpoints = $block->containsClickpoints();
+$clickpointCounter = 0;
 
 $jsSliderConfig = $block->getJsSliderConfig();
 ?>
-<div class="slider-attribute" id="attribute-slider-<?= $block->getCssId() ?>"
+<div class="slider-attribute" id="attribute-slider-<?= $escaper->escapeHtmlAttr($block->getCssId()) ?>"
     <?php if ($jsSliderConfig): ?>
         x-data="tweakwiseNavigationSlider()"
-        x-init='initSlider(<?= $jsSliderConfig ?>)'
-        data-is-price="<?= $urlKey === 'price' ?>"
+        x-init='initSlider(<?= /* @noEscape */ $jsSliderConfig ?>)'
+        data-is-price="<?= $escaper->escapeHtmlAttr($urlKey === 'price') ?>"
     <?php endif; ?>
 >
-    <div class="labels flex justify-between">
-        <span class="min-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($minValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
-        </span>
-        <span class="max-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($maxValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
-        </span>
-    </div>
+    <?php
+    if ($cointainsBuckets): ?>
+        <div class="buckets">
+            <?php
+            $bucketHightFactor = $block->getBucketHightFactor();
+            ?>
+            <?php foreach ($block->getBuckets() as $bucket): ?>
+                <?php
+                $rangeMin = floor((float)$bucket['rangemin']);
+                $rangeMax = ceil((float)$bucket['rangemax']);
+                $bucketHeight = floor((float)$bucket['relativeamount'] * $bucketHightFactor);
+                $bucketWidth = (($rangeMax - $rangeMin) / ($totalRange)) * 100;
+                ?>
+                <a href="javascript:void(0);" class="bucket-link" style="width: <?= $bucketWidth ?>%" data-rangemin="<?= $escaper->escapeHtmlAttr($rangeMin) ?>" data-rangemax="<?= $escaper->escapeHtmlAttr($rangeMax) ?>">
+                    <div class="bucket-range" style="height: <?= $escaper->escapeHtmlAttr($bucketHeight) ?>px;">
+                    </div>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($cointainsClickpoints): ?>
+        <?php
+        $totalClickpoints = count($block->getClickpoints());
+        $totalClickpointsRange = $totalRange + ($totalClickpoints * 2);
+        ?>
+        <div class="indicators">
+            <?php foreach ($block->getClickpoints() as $clickpoint): ?>
+                <?php
+                $clickpointWidth = 4 * $clickpointCounter;
+                $clickpointPosition = floor((($clickpoint['value'] - $minValue) / $totalClickpointsRange) * 100) + $clickpointWidth;
+                $clickpointCounter++;
+                ?>
+                <a>
+                    <div class="indicator" style="left: <?= $escaper->escapeHtmlAttr($clickpointPosition) ?>%">
+                        <div class="indicator-number"><?= $escaper->escapeHtml(ceil((float)$clickpoint['value'])) ?></div>
+                        <div class="indicator-arrow"></div>
+                    </div>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
     <div class="tw-range-slider slider" x-ref="slider"></div>
     <div class="labels flex justify-between">
         <span class="current-min-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($currentMinValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
+            <span class="prefix"><?= $escaper->escapeHtml($itemPrefix) ?></span>
+            <span class="value"><?= $escaper->escapeHtml($block->renderValue($currentMinValue)) ?></span>
+            <span class="postfix"><?= $escaper->escapeHtml($itemPostfix) ?></span>
         </span>
         <span class="current-max-value text-sm">
-            <span class="prefix"><?= $itemPrefix ?></span>
-            <span class="value"><?= $block->renderValue($currentMaxValue) ?></span>
-            <span class="postfix"><?= $itemPostfix ?></span>
+            <span class="prefix"><?= $escaper->escapeHtml($itemPrefix) ?></span>
+            <span class="value"><?= $escaper->escapeHtml($block->renderValue($currentMaxValue)) ?></span>
+            <span class="postfix"><?= $escaper->escapeHtml($itemPostfix) ?></span>
         </span>
     </div>
     <div class="slider-inputs w-full flex justify-between mt-2">
         <div class="slider-min-wrapper w-2/5 mr-1">
-            <label for="<?= $urlKey ?>-min" class="text-sm mb-0"><?= __('From') ?></label>
+            <label for="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min" class="text-sm mb-0"><?=$escaper->escapeHtml(__('From')) ?></label>
             <input type="text"
                    class="slider-min js-skip-submit w-full"
-                   id="<?= $urlKey ?>-min"
-                   name="<?= $urlKey ?>-min"
-                   value="<?= $currentMinValue ?>"
+                   id="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min"
+                   name="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min"
+                   value="<?= $escaper->escapeHtmlAttr($currentMinValue) ?>"
             >
         </div>
         <div class="slider-max-wrapper w-2/5 ml-1">
-            <label for="<?= $urlKey ?>-max" class="text-sm mb-0"><?= __('To') ?></label>
+            <label for="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max" class="text-sm mb-0"><?= $escaper->escapeHtml(__('To')) ?></label>
             <input type="text"
                    class="slider-max js-skip-submit w-full"
-                   id="<?= $urlKey ?>-max"
-                   name="<?= $urlKey ?>-max"
-                   value="<?= $currentMaxValue ?>"
+                   id="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max"
+                   name="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max"
+                   value="<?= $escaper->escapeHtmlAttr($currentMaxValue) ?>"
             >
         </div>
         <input type="hidden"
-               data-disabled-input="<?= $disabledSliderUrlInputValue ?>"
+               data-disabled-input="<?= $escaper->escapeHtmlAttr($disabledSliderUrlInputValue) ?>"
                data-is-slider="true"
             <?= ($sliderUrlInputValue === $disabledSliderUrlInputValue) ? 'disabled="disabled"' : '' ?>
-               id="<?= $block->getCssId() ?>"
+               id="<?= $escaper->escapeHtmlAttr($block->getCssId()) ?>"
                class="slider-url-value"
-               name="<?= $urlKey ?>"
-               value="<?= $sliderUrlInputValue ?>"
+               name="<?= $escaper->escapeHtmlAttr($urlKey) ?>"
+               value="<?= $escaper->escapeHtmlAttr($sliderUrlInputValue) ?>"
         >
     </div>
 </div>
+
+<style>
+    .buckets {
+        display: flex;
+        align-items: flex-end; /* Align children to the bottom */
+        width: calc(100% - 20px);
+        margin-left: 5px;
+        position: relative; /* Ensure clickpoints are positioned relative to this container */
+    }
+
+    .bucket-range {
+        background-color: #f1f1f1;
+        border: 1px solid #e0e0e0;
+        border-radius: 1px;
+        margin: 0 0px;
+        display: flex;
+        align-items: flex-end; /* Align the content to the bottom */
+    }
+
+    .bucket-link {
+        margin: 0 1px;
+        text-decoration: none !important; /* Remove underline from links */
+    }
+
+    .bucket-link:hover{
+        background-color: inherit !important;
+    }
+
+    .slider-attribute {
+        position: relative; /* Ensure the indicator is positioned relative to the slider-attribute container */
+    }
+
+    .indicators {
+        height: 20px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        width: 100%;
+        margin-left: 5px;
+    }
+
+    .indicators a:hover {
+        background-color: inherit;
+    }
+
+    .indicator {
+        width: 30px;
+        float: left;
+        position: absolute; /* Ensure the arrow is positioned relative to the indicator */
+    }
+
+    .indicator-arrow {
+        width: 0;
+        height: 0;
+        text-align: right;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 10px solid black; /* Change to border-top to point the arrow upwards */
+    }
+
+    .indicator-number {
+        text-align: left;
+        font-size: 12px;
+    }
+</style>
+

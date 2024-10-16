@@ -16,7 +16,7 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\Navigation\State;
 ?>
 <?php /** @var Tweakwise\Magento2Tweakwise\Model\Catalog\Layer\Filter\Item[] $filters */ ?>
 <?php $filters = $block->getActiveFilters() ?>
-<?php if (!empty($filters)) : ?>
+<?php if (!empty($filters)): ?>
     <div class="filter-current card my-4 pb-0"
          x-data="{ open: true }">
         <div class="filter-options-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container pb-2"
@@ -33,7 +33,7 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\Navigation\State;
         </span>
         </div>
         <div class="items pt-1 py-3" x-show="open">
-            <?php foreach ($filters as $filter) : ?>
+            <?php foreach ($filters as $filter): ?>
                 <div class="item flex justify-between items-center mb-1">
                     <span>
                         <span class="filter-label block"><?= $escaper->escapeHtml(__($filter->getName())) ?></span>
@@ -42,9 +42,8 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\Navigation\State;
                     <?php $currentFilterName = $escaper->escapeHtmlAttr(__($filter->getName()) . " " . $block->stripTags($filter->getLabel())); ?>
                     <a class="action remove text-center block py-1.5 px-1.5 rounded border border-container text-primary hover:text-primary-darker"
                        href="<?= $escaper->escapeUrl($filter->getRemoveUrl()) ?>"
-                       data-js-filter-id="<?= $block->getActiveFilterCssId($filter) ?>"
-                       title="<?= /* @noEscape */
-                       $escaper->escapeHtml(__('Remove')) . " " . $currentFilterName ?>">
+                       data-js-filter-id="<?= $escaper->escapeHtmlAttr($block->getActiveFilterCssId($filter)) ?>"
+                       title="<?= $escaper->escapeHtmlAttr(__('Remove') . " " . $currentFilterName) ?>">
                         <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd"

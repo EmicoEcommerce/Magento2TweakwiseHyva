@@ -103,7 +103,7 @@ class View extends MagentoView
         $request = $this->context->getRequest();
         $productId = $request->getParam('product_id');
 
-        if(
+        if (
             !$productId ||
             !$this->cacheHelper->isEsiRequest($request) ||
             !$this->cacheHelper->personalMerchandisingCanBeApplied()
@@ -120,6 +120,7 @@ class View extends MagentoView
     /**
      * @param string $route
      * @param array $params
+     *
      * @return string
      */
     public function getUrl($route = '', $params = [])

@@ -20,47 +20,47 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
 ?>
 <div x-data="initTweakwiseNavigationItems()" x-init='sortItems(<?= (int)$hasAlternateSortOrder ?>)'>
     <?php if ($block->isSearchable()): ?>
-        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?=  $block->getMaxItemsShown()?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $block->getSearchPlaceholder(); ?>" >
-        <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $block->getSearchNoResultsText(); ?></div>
+        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
+        <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $escaper->escapeHtml($block->getSearchNoResultsText()); ?></div>
     <?php endif; ?>
     <ol class="items" x-ref="items">
         <?php foreach ($block->getItems() as $index => $item): ?>
             <li class="item"
-                :class="{ 'block': moreItemsShow, 'hidden': '<?=$block->itemDefaultHidden($item)?>' && !moreItemsShow }"
+                :class="{ 'block': moreItemsShow, 'hidden': '<?= $escaper->escapeHtmlAttr($block->itemDefaultHidden($item))?>' && !moreItemsShow }"
                 <?php if ($hasAlternateSortOrder): ?>
-                    data-alternate-sort="<?= $item->getAlternateSortOrder(); ?>"
+                    data-alternate-sort="<?= $escaper->escapeHtmlAttr($item->getAlternateSortOrder()); ?>"
 
-                    data-original-sort="<?= $index; ?>"
+                    data-original-sort="<?= $escaper->escapeHtmlAttr($index); ?>"
                 <?php endif; ?>
             >
-                <a <?= $block->renderAnchorHtmlTagAttributes($item); ?> class="flex w-full py-1 mb-1 hover:text-black">
+                <a <?= $escaper->escapeHtmlAttr($block->renderAnchorHtmlTagAttributes($item)); ?> class="flex w-full py-1 mb-1 hover:text-black">
                     <?php $cssId = $item->getCssId(); ?>
                     <?php if ($block->showCheckbox()): ?>
-                        <label for="<?= $cssId ?>" class="block m-0 font-normal flex w-full">
-                            <input id="<?= $cssId ?>"
-                                   name="<?= $item->getFilter()->getFacet()->getFacetSettings()->getUrlKey() ?>[]"
+                        <label for="<?= $escaper->escapeHtmlAttr($cssId) ?>" class="block m-0 font-normal flex w-full">
+                            <input id="<?= $escaper->escapeHtmlAttr($cssId) ?>"
+                                   name="<?= $escaper->escapeHtmlAttr($item->getFilter()->getFacet()->getFacetSettings()->getUrlKey()) ?>[]"
                                    type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
                                    value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
                                    class="block w-4 h-4 mr-2 mt-1"
                             >
 
-                            <?= $block->getItemPrefix() ?>
+                            <?= $escaper->escapeHtml($block->getItemPrefix()) ?>
                             <?= $escaper->escapeHtml($item->getLabel()) ?>
-                            <?= $block->getItemPostfix() ?>
+                            <?= $escaper->escapeHtml($block->getItemPostfix()) ?>
 
                             <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
                                 <span class="count block text-primary ml-auto">
-                                    (<?= htmlentities((string)$item->getCount()) ?>)
+                                    (<?= $escaper->escapeHtml($item->getCount()) ?>)
                                 </span>
                             <?php endif; ?>
                         </label>
                     <?php else: ?>
-                        <?= $block->getItemPrefix() ?>
+                        <?= $escaper->escapeHtml($block->getItemPrefix()) ?>
                         <?= $escaper->escapeHtml($item->getLabel()) ?>
-                        <?= $block->getItemPostfix() ?>
+                        <?= $escaper->escapeHtml($block->getItemPostfix()) ?>
 
                         <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
-                            <span class="count block text-primary ml-auto">(<?= htmlentities((string)$item->getCount()) ?>)</span>
+                            <span class="count block text-primary ml-auto">(<?= $escaper->escapeHtml($item->getCount()) ?>)</span>
                         <?php endif; ?>
                     <?php endif; ?>
                 </a>
@@ -73,12 +73,12 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
            @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'hidden': moreItemsShow }"
            x-ref="moreItems"
-        ><?= __($block->getMoreItemText()) ?></a>
+        ><?= $escaper->escapeHtml(__($block->getMoreItemText())) ?></a>
         <a href="#" class="less-items underline cursor-pointer"
            x-cloak
            @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'block': moreItemsShow, 'hidden': !moreItemsShow }"
            x-ref="lessItems"
-        ><?= __($block->getLessItemText()) ?></a>
+        ><?= $escaper->escapeHtml(__($block->getLessItemText())) ?></a>
     <?php endif; ?>
 </div>

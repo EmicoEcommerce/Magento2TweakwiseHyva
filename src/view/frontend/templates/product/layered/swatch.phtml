@@ -29,7 +29,7 @@ if (!$swatchData['swatches']) {
 ?>
 
 <script>
-    function initLayeredSwatch_<?= $escaper->escapeJs($swatchData['attribute_code']) ?>() {
+    function initLayeredSwatch_<?= /*@noEscapee */ $swatchData['attribute_code'] ?>() {
         return {
             getSwatchType(typeNumber) {
                 switch (typeNumber) {
@@ -86,12 +86,12 @@ if (!$swatchData['swatches']) {
 </script>
 
 <div class="swatch-attribute swatch-layered <?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
-     x-data="initLayeredSwatch_<?= $escaper->escapeJs($swatchData['attribute_code']) ?>()"
+     x-data="initLayeredSwatch_<?= /*@noEscape */ $swatchData['attribute_code'] ?>()"
      data-attribute-code="<?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
      data-attribute-id="<?= $escaper->escapeHtmlAttr($swatchData['attribute_id']) ?>">
     <?php if ($block->isSearchable()): ?>
-        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?=  $block->getMaxItemsShown()?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $block->getSearchPlaceholder(); ?>" >
-        <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $block->getSearchNoResultsText(); ?></div>
+        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
+        <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $escaper->escapeHtml($block->getSearchNoResultsText()); ?></div>
     <?php endif; ?>
     <div class="swatch-attribute-options clearfix flex flex-row flex-wrap" x-ref="swatch">
         <?php foreach ($swatchData['options'] as $option => $label): ?>
@@ -104,13 +104,13 @@ if (!$swatchData['swatches']) {
                 $swatchThumb = $escaper->escapeUrl($block->getSwatchPath('swatch_thumb', $value));
                 ?>
 
-                <a <?= $block->renderAnchorHtmlTagAttributes($item); ?>
+                <a <?= /* @noEscape */$block->renderAnchorHtmlTagAttributes($item); ?>
                         aria-label="<?= $label['label'] ?>"
                         class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex border justify-center"
                 >
                     <?php $cssId = $item->getCssId(); ?>
 
-                    <label for="<?= $cssId ?>"
+                    <label for="<?= $escaper->escapeHtmlAttr($cssId) ?>"
                            class="swatch-option-inner cursor-pointer relative block select-none m-0"
                            :class="{ 'w-6 h-6' : getSwatchType('<?= (string)$type; ?>') !== 'text' }"
                            :style="getSwatchBackgroundStyle('<?= (string)$type ?>', '<?= (string)$value ?>', '<?= (string)$swatchImage ?>')"
@@ -126,9 +126,9 @@ if (!$swatchData['swatches']) {
                             @mouseleave.self="activeTooltipItem = false"
                         <?php endif; ?>
                     >
-                        <input id="<?= $cssId ?>" style="display: none"
-                               name="<?= $item->getFilter()->getFacet()->getFacetSettings()->getUrlKey() ?>[]"
-                               type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
+                        <input id="<?= $escaper->escapeHtmlAttr($cssId) ?>" style="display: none"
+                               name="<?= $escaper->escapeHtmlAttr($item->getFilter()->getFacet()->getFacetSettings()->getUrlKey()) ?>[]"
+                               type="checkbox" <?= $escaper->escapeHtmlAttr($item->isSelected() ? 'checked="checked"' : '') ?>
                                value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
                         >
                         <?php if ((string)$type === "0"): ?>

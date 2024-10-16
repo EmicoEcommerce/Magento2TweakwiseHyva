@@ -15,6 +15,6 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\RenderLayered\TreeRender
 ?>
 <ol class="items tree-attribute">
     <?php foreach ($block->getItems() as $item): ?>
-        <?= $block->renderTreeItem($item) ?>
+        <?= /* @noEscape */ $block->renderTreeItem($item) ?>
     <?php endforeach; ?>
 </ol>

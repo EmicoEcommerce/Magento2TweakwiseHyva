@@ -31,6 +31,8 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
             formFilters: false,
             ajaxFilters: false,
             urlInputSelector: 'input.slider-url-value',
+            containsBuckets: false,
+            containsClickpoints: false,
             initSlider(initialValues) {
                 const sliderOptions = Object.values(initialValues)[0];
 
@@ -43,6 +45,8 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
                     this.formFilters = sliderOptions.formFilters;
                     this.max = sliderOptions.max;
                     this.min = sliderOptions.min;
+                    this.containsBuckets = sliderOptions.containsBuckets;
+                    this.containsClickpoints = sliderOptions.containsClickpoints;
                 }
 
                 const script = document.createElement('script');
@@ -104,6 +108,12 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
                 const sliderContainer = this.$root;
                 sliderContainer.querySelector('input.slider-min').addEventListener('change', () => this.updateSliderUrlInput());
                 sliderContainer.querySelector('input.slider-max').addEventListener('change', () => this.updateSliderUrlInput());
+                if (this.containsBuckets) {
+                    const bucketLinks = sliderContainer.querySelectorAll('div.buckets a.bucket-link');
+                    bucketLinks.forEach(bucketLink => {
+                        bucketLink.addEventListener('click', () => this.clickBucketSlider());
+                    });
+                }
             },
             updateSliderUrlInput() {
                 const sliderContainer = this.$root;
@@ -157,6 +167,15 @@ $noUiSliderUrl = $block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/lib/nouisli
                 const sliderContainer = this.$root;
                 sliderContainer.dataset.min = minValue;
                 sliderContainer.dataset.max = maxValue;
+            },
+            clickBucketSlider() {
+                const sliderContainer = this.$root;
+                const sliderUrlInput = sliderContainer.querySelector(this.urlInputSelector);
+                const bucket = event.target.parentElement;
+                const minValue = bucket.getAttribute('data-rangemin');
+                const maxValue = bucket.getAttribute('data-rangemax');
+                this.updateLabels(minValue, maxValue);
+                this.filterChange(minValue, maxValue);
             }
         }
     }

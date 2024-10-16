@@ -41,6 +41,7 @@ class ProductListItem
      * @param string $templateType
      * @param string $imageDisplayArea
      * @param bool $showDescription
+     *
      * @return string
      * @throws LocalizedException
      * @throws NoSuchEntityException
@@ -64,7 +65,16 @@ class ProductListItem
             if ($isVisual) {
                 return $this->getVisualHtml($product);
             }
-            return $proceed($itemRendererBlock, $product, $parentBlock, $viewMode, $templateType, $imageDisplayArea, $showDescription);
+
+            return $proceed(
+                $itemRendererBlock,
+                $product,
+                $parentBlock,
+                $viewMode,
+                $templateType,
+                $imageDisplayArea,
+                $showDescription
+            );
         }
 
         $itemId = (string) $product->getId();
@@ -102,6 +112,7 @@ class ProductListItem
 
     /**
      * @param Visual $visual
+     *
      * @return string
      */
     private function getVisualHtml(Visual $visual): string
