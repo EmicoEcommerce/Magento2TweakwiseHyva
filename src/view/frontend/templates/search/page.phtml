@@ -1,0 +1,29 @@
+<?php
+
+/** @var \Tweakwise\Magento2Tweakwise\Block\Catalog\PersonalMerchandisingAnalytics $block */
+/** @var  Escaper $escaper */
+
+use Magento\Framework\Escaper;
+
+$tweakwiseCookieName = $block->getCookieName();
+$apiUrl              = $block->getApiUrl();
+$searchQuery         = $block->getSearchQuery();
+$instanceKey         = $block->getInstanceKey();
+?>
+
+<div x-data="{
+    apiUrl: '<?= $escaper->escapeUrl($apiUrl); ?>/search',
+    tweakwiseCookieName: '<?= $escaper->escapeHtmlAttr($tweakwiseCookieName); ?>',
+    searchQuery: '<?= $escaper->escapeHtmlAttr($searchQuery); ?>',
+    instanceKey: '<?= $escaper->escapeHtmlAttr($instanceKey); ?>'
+}" x-init="() => {
+    Tweakwise_Hyva_SearchPage({
+        apiUrl: apiUrl,
+        tweakwiseCookieName: tweakwiseCookieName,
+        searchQuery: searchQuery,
+        instanceKey: instanceKey
+    }).init();
+}">
+</div>
+
+<script src="<?= $escaper->escapeHtmlAttr($block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/search-page.js')); ?>"></script>

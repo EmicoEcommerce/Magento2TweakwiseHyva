@@ -1,0 +1,32 @@
+<?php
+
+/** @var \Tweakwise\Magento2Tweakwise\Block\Catalog\PersonalMerchandisingAnalytics $block */
+/** @var  Escaper $escaper */
+
+use Magento\Framework\Escaper;
+
+$tweakwiseCookieName = $block->getCookieName();
+$apiUrl              = $block->getApiUrl();
+$productKey          = $block->getProductKey();
+$instanceKey         = $block->getInstanceKey();
+?>
+
+<div>TEEEEEEEEEEEST</div>
+
+<div x-data="{
+    apiUrl: '<?= $escaper->escapeUrl($apiUrl); ?>pageview',
+    tweakwiseCookieName: '<?= $escaper->escapeHtmlAttr($tweakwiseCookieName); ?>',
+    productKey: '<?= $escaper->escapeHtmlAttr($productKey); ?>',
+    instanceKey: '<?= $escaper->escapeHtmlAttr($instanceKey); ?>'
+}" x-init="() => {
+    // Initialize your JavaScript logic here
+    Tweakwise_TweakwiseHyva_Pageview({
+        apiUrl: apiUrl,
+        tweakwiseCookieName: tweakwiseCookieName,
+        productKey: productKey,
+        instanceKey: instanceKey
+    }).init();
+}">
+</div>
+
+<script src="<?= $escaper->escapeHtmlAttr($block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/product-page.js')); ?>"></script>
