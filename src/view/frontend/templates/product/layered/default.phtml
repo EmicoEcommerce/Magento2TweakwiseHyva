@@ -33,7 +33,7 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
                     data-original-sort="<?= $escaper->escapeHtmlAttr($index); ?>"
                 <?php endif; ?>
             >
-                <a <?= $escaper->escapeHtmlAttr($block->renderAnchorHtmlTagAttributes($item)); ?> class="flex w-full py-1 mb-1 hover:text-black">
+                <a <?= /* @noEscape */ $block->renderAnchorHtmlTagAttributes($item); ?> class="flex w-full py-1 mb-1 hover:text-black">
                     <?php $cssId = $item->getCssId(); ?>
                     <?php if ($block->showCheckbox()): ?>
                         <label for="<?= $escaper->escapeHtmlAttr($cssId) ?>" class="block m-0 font-normal flex w-full">

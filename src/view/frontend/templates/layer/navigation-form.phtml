@@ -145,10 +145,13 @@ use Magento\Framework\View\Element\Template;
                 const href = aElement.getAttribute('href');
                 if (this.seoEnabled) {
                     const seoHref = aElement.dataset.seoHref;
-                    return seoHref ? seoHref : href;
+                    href = seoHref ? seoHref : href;
                 }
 
-                return href;
+                let url = new URL(href, window.location.origin);
+                url.search = this.getFilterParameters();
+
+                return url.toString();
             },
             // ------- End of default filter handling
 
