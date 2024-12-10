@@ -5,23 +5,14 @@
 
 use Magento\Framework\Escaper;
 
-$tweakwiseCookieName = $block->getCookieName();
-$apiUrl              = $block->getApiUrl();
 $searchQuery         = $block->getSearchQuery();
-$instanceKey         = $block->getInstanceKey();
 ?>
 
 <div x-data="{
-    apiUrl: '<?= $escaper->escapeUrl($apiUrl); ?>/search',
-    tweakwiseCookieName: '<?= $escaper->escapeHtmlAttr($tweakwiseCookieName); ?>',
-    searchQuery: '<?= $escaper->escapeHtmlAttr($searchQuery); ?>',
-    instanceKey: '<?= $escaper->escapeHtmlAttr($instanceKey); ?>'
+    searchQuery: '<?= $escaper->escapeHtmlAttr($searchQuery); ?>'
 }" x-init="() => {
     Tweakwise_Hyva_SearchPage({
-        apiUrl: apiUrl,
-        tweakwiseCookieName: tweakwiseCookieName,
-        searchQuery: searchQuery,
-        instanceKey: instanceKey
+        searchQuery: searchQuery
     }).init();
 }">
 </div>

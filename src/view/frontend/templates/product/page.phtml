@@ -5,26 +5,17 @@
 
 use Magento\Framework\Escaper;
 
-$tweakwiseCookieName = $block->getCookieName();
-$apiUrl              = $block->getApiUrl();
 $productKey          = $block->getProductKey();
-$instanceKey         = $block->getInstanceKey();
 ?>
 
 <div>TEEEEEEEEEEEST</div>
 
 <div x-data="{
-    apiUrl: '<?= $escaper->escapeUrl($apiUrl); ?>pageview',
-    tweakwiseCookieName: '<?= $escaper->escapeHtmlAttr($tweakwiseCookieName); ?>',
-    productKey: '<?= $escaper->escapeHtmlAttr($productKey); ?>',
-    instanceKey: '<?= $escaper->escapeHtmlAttr($instanceKey); ?>'
+    productKey: '<?= $escaper->escapeHtmlAttr($productKey); ?>'
 }" x-init="() => {
     // Initialize your JavaScript logic here
     Tweakwise_TweakwiseHyva_Pageview({
-        apiUrl: apiUrl,
-        tweakwiseCookieName: tweakwiseCookieName,
-        productKey: productKey,
-        instanceKey: instanceKey
+        productKey: productKey
     }).init();
 }">
 </div>
