@@ -31,6 +31,7 @@ use Magento\Framework\View\Element\Template;
             currentXhr: null,
             fetchController: null,
             ajaxCache: true,
+            urlStategy: null,
             initForm(initialValues) {
                 const filterOptions = initialValues.tweakwiseNavigationForm;
 
@@ -148,10 +149,14 @@ use Magento\Framework\View\Element\Template;
                     href = seoHref ? seoHref : href;
                 }
 
-                let url = new URL(href, window.location.origin);
-                url.search = this.getFilterParameters();
+                if (this.urlStategy === 'queryparameter') {
+                    let url = new URL(href, window.location.origin);
+                    url.search = this.getFilterParameters();
 
-                return url.toString();
+                    return url.toString();
+                }
+
+                return href;
             },
             // ------- End of default filter handling
 
