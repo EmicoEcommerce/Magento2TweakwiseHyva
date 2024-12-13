@@ -5,19 +5,20 @@
 
 use Magento\Framework\Escaper;
 
-$productKey          = $block->getProductKey();
+/** @var \Tweakwise\Magento2Tweakwise\ViewModel\PersonalMerchandisingAnalytics $viewModel */
+$viewModel = $block->getData('viewModel');
 ?>
 
-<div>TEEEEEEEEEEEST</div>
-
 <div x-data="{
-    productKey: '<?= $escaper->escapeHtmlAttr($productKey); ?>'
+    productKey: '<?= $escaper->escapeHtmlAttr($viewModel->getProductKey()); ?>',
+    type: 'product'
 }" x-init="() => {
     // Initialize your JavaScript logic here
     Tweakwise_TweakwiseHyva_Pageview({
-        productKey: productKey
+        productKey: productKey,
+        type: type
     }).init();
 }">
 </div>
 
-<script src="<?= $escaper->escapeHtmlAttr($block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/product-page.js')); ?>"></script>
+<script src="<?= $escaper->escapeHtmlAttr($block->getViewFileUrl('Tweakwise_TweakwiseHyva::js/analytics.js')); ?>"></script>

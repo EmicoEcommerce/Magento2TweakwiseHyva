@@ -11,7 +11,11 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 <body>
     <referenceContainer name="content">
-        <block class="Tweakwise\Magento2Tweakwise\Block\Catalog\PersonalMerchandisingAnalytics" name="magento2tweakwise.productpage" template="Tweakwise_TweakwiseHyva::product/page.phtml" ifconfig="tweakwise/personal_merchandising/analytics_enabled"/>
+        <block class="Magento\Framework\View\Element\Template" name="magento2tweakwise.productpage" template="Tweakwise_Magento2Tweakwise::product/page.phtml" ifconfig="tweakwise/personal_merchandising/analytics_enabled">
+            <arguments>
+                <argument name="viewModel" xsi:type="object">Tweakwise\Magento2Tweakwise\ViewModel\PersonalMerchandisingAnalytics</argument>
+            </arguments>
+        </block>
     </referenceContainer>
 </body>
 </page>
