@@ -1,16 +1,10 @@
 function Tweakwise_Hyva_Analytics(config) {
     return {
-        searchQuery: config.searchQuery,
-        productKey: config.productKey,
+        value: config.value,
         type: config.type,
         init() {
             let bodyData = { type: this.type };
-
-            if (this.type === 'search') {
-                bodyData.searchTerm = this.searchQuery;
-            } else if (this.type === 'product') {
-                bodyData.productKey = this.productKey;
-            }
+            bodyData.value = this.value;
 
             fetch('/tweakwise/ajax/analytics', {
                 method: 'POST',

@@ -22,12 +22,5 @@
                 <argument name="template" xsi:type="string">Tweakwise_Magento2Tweakwise::product/list/toolbar.phtml</argument>
             </action>
         </referenceBlock>
-        <referenceBlock name="content">
-            <block class="Magento\Framework\View\Element\Template" name="magento2tweakwise.searchpage" template="Tweakwise_Magento2Tweakwise::search/page.phtml" ifconfig="tweakwise/personal_merchandising/analytics_enabled">
-                <arguments>
-                    <argument name="viewModel" xsi:type="object">Tweakwise\Magento2Tweakwise\ViewModel\PersonalMerchandisingAnalytics</argument>
-                </arguments>
-            </block>
-        </referenceBlock>
     </body>
 </page>
