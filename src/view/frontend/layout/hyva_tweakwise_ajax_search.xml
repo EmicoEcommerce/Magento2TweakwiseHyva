@@ -15,5 +15,6 @@
         <container name="sidebar.main"/>
     </container>
     <update handle="hyva_catalogsearch_result_index"/>
+    <move element="catalogsearch.leftnav" destination="sidebar.main" before="-"/>
     <block class="Magento\Framework\View\Element\FormKey" name="formkey"/>
 </layout>
