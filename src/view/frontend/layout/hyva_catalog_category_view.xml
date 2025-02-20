@@ -26,7 +26,7 @@
             </action>
         </referenceBlock>
         <referenceBlock name="tweakwise.catalog.product.list.visual">
-            <action method="setTemplate" ifconfig="tweakwise/personal_merchandising/enabled">
+            <action method="setTemplate">
                 <argument name="template" xsi:type="string">Tweakwise_TweakwiseHyva::product/list/visual.phtml</argument>
             </action>
         </referenceBlock>
