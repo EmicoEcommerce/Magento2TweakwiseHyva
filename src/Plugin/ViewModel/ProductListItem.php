@@ -77,7 +77,7 @@ class ProductListItem
             );
         }
 
-        $itemId = (int)$product->getId();
+        $itemId = (string)$product->getId();
         $storeId = (int)$this->storeManager->getStore()->getId();
         $customerGroupId = (int)$this->customerSession->getCustomerGroupId();
         $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
@@ -92,6 +92,7 @@ class ProductListItem
         if (!$this->cacheHelper->load($hashedCacheKeyInfo)) {
             if ($isVisual) {
                 $itemHtml = $this->getVisualHtml($product);
+                $this->cacheHelper->save($itemHtml, $hashedCacheKeyInfo);
             } else {
                 $itemHtml = $proceed(
                     $itemRendererBlock,
@@ -102,14 +103,18 @@ class ProductListItem
                     $imageDisplayArea,
                     $showDescription
                 );
+                $this->cacheHelper->save(
+                    $itemHtml,
+                    $hashedCacheKeyInfo,
+                    [Product::CACHE_TAG, sprintf('%s_%s', Product::CACHE_TAG, $itemId)]
+                );
             }
-
-            $this->cacheHelper->save($itemHtml, $hashedCacheKeyInfo);
         }
 
         return sprintf(
-            '<esi:include src="/%s?cache_key_info=%s" />',
+            '<esi:include src="/%s?item_id=%s&cache_key_info=%s" />',
             Cache::PRODUCT_CARD_PATH,
+            $itemId,
             $hashedCacheKeyInfo
         );
     }
