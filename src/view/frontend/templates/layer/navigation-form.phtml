@@ -31,7 +31,7 @@ use Magento\Framework\View\Element\Template;
             currentXhr: null,
             fetchController: null,
             ajaxCache: true,
-            urlStategy: null,
+            urlStrategy: null,
             initForm(initialValues) {
                 const filterOptions = initialValues.tweakwiseNavigationForm;
 
@@ -41,6 +41,7 @@ use Magento\Framework\View\Element\Template;
                     this.formFilters = filterOptions.formFilters;
                     this.seoEnabled = filterOptions.seoEnabled;
                     this.ajaxCache = filterOptions.ajaxCache;
+                    this.urlStrategy = filterOptions.urlStrategy;
                 }
 
                 this.bindFilterClickEvents();
@@ -149,7 +150,7 @@ use Magento\Framework\View\Element\Template;
                     href = seoHref ? seoHref : href;
                 }
 
-                if (this.urlStategy === 'queryparameter') {
+                if (this.urlStrategy === 'queryparameter') {
                     let url = new URL(href, window.location.origin);
                     url.search = this.getFilterParameters();
 
