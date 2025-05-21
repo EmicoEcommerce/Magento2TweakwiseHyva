@@ -125,10 +125,9 @@ if (!$swatchData['swatches']) {
                             }; tooltipPositionElement = $event.target;"
                             @mouseleave.self="activeTooltipItem = false"
                         <?php endif; ?>
-                    >
                         <input id="<?= $escaper->escapeHtmlAttr($cssId) ?>" style="display: none"
                                name="<?= $escaper->escapeHtmlAttr($item->getFilter()->getFacet()->getFacetSettings()->getUrlKey()) ?>[]"
-                               type="checkbox" <?= $escaper->escapeHtmlAttr($item->isSelected() ? 'checked="checked"' : '') ?>
+                               type="checkbox" <?= /* @noEscape */ $item->isSelected() ? 'checked="checked"' : '' ?>
                                value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
                         >
                         <?php if ((string)$type === "0"): ?>
