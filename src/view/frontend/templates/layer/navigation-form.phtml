@@ -102,8 +102,6 @@ use Magento\Framework\View\Element\Template;
                         const product = event.target.closest(this.productSelector);
                         let productId;
 
-                        console.info('product', product);
-
                         if (product) {
                             //productId is the closest input with the name product of the product var
                             productId = product.querySelector('input[name="product"]')?.value;
