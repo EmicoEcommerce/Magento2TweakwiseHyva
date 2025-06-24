@@ -34,13 +34,11 @@ use Magento\Framework\View\Element\Template;
             urlStrategy: null,
             twRequestId: '',
             analyticsEvents: false,
-            productSelector: '.product-item-info',
+            productSelector: '.product-item',
             analyticsEndpoint: '/tweakwise/ajax/analytics',
 
             initForm(initialValues) {
                 const filterOptions = initialValues.tweakwiseNavigationForm;
-
-                console.log('tweakwiseNavigationForm init', initialValues);
 
                 if (filterOptions) {
                     this.ajaxEndpoint = filterOptions.ajaxEndpoint;
@@ -87,13 +85,11 @@ use Magento\Framework\View\Element\Template;
             },
             _bindItemClickEvents() {
                 if (!this.analyticsEvents) {
-                    console.warn('Tweakwise Hyva: Analytics events are not enabled. No item click events will be bound.');
                     return;
                 }
 
                 const productList = document.querySelector(this.productListSelector);
                 if (!productList) {
-                    console.warn('Tweakwise Hyva: Product list not found. No item click events will be bound.');
                     return;
                 }
 
@@ -103,8 +99,10 @@ use Magento\Framework\View\Element\Template;
                             return;
                         }
 
-                        let product = event.target.closest(this.productSelector);
+                        const product = event.target.closest(this.productSelector);
                         let productId;
+
+                        console.info('product', product);
 
                         if (product) {
                             //productId is the closest input with the name product of the product var
