@@ -8,7 +8,7 @@ use Magento\Framework\Escaper;
 /** @var \Tweakwise\Magento2Tweakwise\ViewModel\PersonalMerchandisingAnalytics $viewModel */
 $viewModel = $block->getData('viewModel');
 $analyticsType = $block->getData('analyticsType');
-$value = $analyticsType === 'product' ? $viewModel->getProductKey() : $viewModel->getSearchQuery();
+$value = $viewModel->getValue($analyticsType);
 ?>
 
 <div x-data="{

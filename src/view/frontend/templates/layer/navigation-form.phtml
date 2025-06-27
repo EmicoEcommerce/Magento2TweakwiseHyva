@@ -32,6 +32,11 @@ use Magento\Framework\View\Element\Template;
             fetchController: null,
             ajaxCache: true,
             urlStrategy: null,
+            twRequestId: '',
+            analyticsEvents: false,
+            productSelector: '.product-item',
+            analyticsEndpoint: '/tweakwise/ajax/analytics',
+
             initForm(initialValues) {
                 const filterOptions = initialValues.tweakwiseNavigationForm;
 
@@ -42,9 +47,12 @@ use Magento\Framework\View\Element\Template;
                     this.seoEnabled = filterOptions.seoEnabled;
                     this.ajaxCache = filterOptions.ajaxCache;
                     this.urlStrategy = filterOptions.urlStrategy;
+                    this.twRequestId = filterOptions.twRequestId;
+                    this.analyticsEvents = filterOptions.analyticsEvents;
                 }
 
                 this.bindFilterClickEvents();
+                this._bindItemClickEvents();
 
                 if (this.ajaxFilters) {
                     this.bindAjaxFilterRemoveEvents();
@@ -74,6 +82,65 @@ use Magento\Framework\View\Element\Template;
                 } else {
                     filterForm.addEventListener('change', (event) => this.defaultHandler(event));
                 }
+            },
+            _bindItemClickEvents() {
+                if (!this.analyticsEvents) {
+                    return;
+                }
+
+                const productList = document.querySelector(this.productListSelector);
+                if (!productList) {
+                    return;
+                }
+
+                productList.addEventListener('click', (event) => {
+                    try {
+                        if (!this.twRequestId) {
+                            return;
+                        }
+
+                        const product = event.target.closest(this.productSelector);
+                        let productId;
+
+                        if (product) {
+                            //productId is the closest input with the name product of the product var
+                            productId = product.querySelector('input[name="product"]')?.value;
+                        } else {
+                            let visual = event.target.closest('.visual');
+                            if (!visual) {
+                                let link = event.target.closest('a');
+                                if (link) {
+                                    visual = link.querySelector('.visual');
+                                }
+                            }
+                            if (visual) {
+                                productId = visual.getAttribute('id');
+                            }
+                        }
+
+                        if (!productId) {
+                            return;
+                        }
+
+                        // Send async fetch request to the analytics endpoint
+                        fetch(this.analyticsEndpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                type: 'itemclick',
+                                value: productId,
+                                requestId: this.twRequestId
+                            })
+                        }).catch((error) => {
+                            console.error('Error sending analytics event', error);
+                        });
+                    } catch (error) {
+                        console.error('Error handling product click event', error);
+                    }
+                });
             },
 
             /**
