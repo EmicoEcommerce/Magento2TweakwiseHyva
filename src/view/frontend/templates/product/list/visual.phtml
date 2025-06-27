@@ -20,11 +20,9 @@ $hasUrl = !empty($visual->getUrl());
 <?php if ($hasUrl): ?>
 <a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>">
     <?php endif; ?>
-    <div class="visual">
-        <img class="visual-image" src="<?= $escaper->escapeUrl($visual->getImageUrl()) ?>" loading="lazy"/>
+    <div class="visual" id="<?= $escaper->escapeHtmlAttr($visual->getId()) ?>">
+        <img class="visual-image" src="<?= $escaper->escapeUrl($visual->getImageUrl()) ?>" loading="lazy" alt="<?= $escaper->escapeHtmlAttr($visual->getName()) ?>"/>
     </div>
     <?php if ($hasUrl): ?>
 </a>
 <?php endif; ?>
-
-
