@@ -94,7 +94,7 @@ class ProductListItem
                 );
             }
 
-            $this->cacheHelper->save($itemHtml, $itemId, $cardType);
+            $this->cacheHelper->save($itemHtml, $itemId, [$cardType]);
         }
 
         $storeId = $this->storeManager->getStore()->getId();
