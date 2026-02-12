@@ -33,51 +33,56 @@ use Magento\Framework\View\Element\Template;
                             <span x-text="suggestion.block.name"></span>
                         </div>
 
-                        <template x-for="(item, index) in suggestion.block.items">
-                            <div
-                                class="product-item flex p-2 cursor-pointer border-b border-container focus:bg-container-darker hover:bg-container-darker"
-                                :class="item.row_class"
-                                :data-url="item.url"
-                                role="option">
-                                <template x-if="item.image">
-                                    <img class="qs-option-image mr-2" :src="item.image" :alt="item.title"/>
-                                </template>
-
-                                <div class="qs-option-info-container">
-                                    <template x-if="item.type !== 'visual'">
-                                        <div class="qs-option-name" x-text="item.title"></div>
-                                    </template>
-
-                                    <div class="price-box">
-                                        <template x-if="Math.abs(item.final_price - item.price) < 0.0001">
-                                            <span class="price-container">
-                                                <span class="price-wrapper">
-                                                    <span x-html="formatPrice(item.price)" class="price"></span>
-                                                </span>
-                                            </span>
+                        <template x-for="(row, rowIndex) in groupItemsIntoRows(suggestion.block.items, 3)">
+                            <div class="qs-row">
+                                <template x-for="item in row">
+                                    <div
+                                        class="product-item flex p-2 cursor-pointer border-b border-container focus:bg-container-darker hover:bg-container-darker"
+                                        :class="item.row_class"
+                                        :data-url="item.url"
+                                        role="option"
+                                        :style="`grid-column: span ${(item.visualproperties?.colspan || 1)}; grid-row: span ${(item.visualproperties?.rowspan || 1)}; max-height: ${(item.visualproperties?.rowspan || 1) * 100}px;`">
+                                        <template x-if="item.image">
+                                            <img class="qs-option-image mr-2" :src="item.image" :alt="item.title"/>
                                         </template>
 
-                                        <template x-if="Math.abs(item.final_price - item.price) >= 0.0001">
-                                            <span class="special-price">
-                                                <span class="price-container">
-                                                    <span class="price-label hidden"><?= $escaper->escapeHtml(__('Special Price'))?></span>
-                                                    <span class="price-wrapper">
-                                                        <span x-html="formatPrice(item.final_price)" class="price"></span>
-                                                    </span>
-                                                </span>
-                                            </span>
+                                        <div class="qs-option-info-container">
+                                            <template x-if="item.type !== 'visual'">
+                                                <div class="qs-option-name" x-text="item.title"></div>
+                                            </template>
 
-                                            <span class="old-price sly-old-price">
-                                                <span class="price-container">
-                                                    <span class="price-label hidden"><?= $escaper->escapeHtml(__('Regular Price'))?></span>
-                                                    <span class="price-wrapper">
-                                                        <span x-html="formatPrice(item.price)" class="price"></span>
+                                            <div class="price-box">
+                                                <template x-if="Math.abs(item.final_price - item.price) < 0.0001">
+                                                    <span class="price-container">
+                                                        <span class="price-wrapper">
+                                                            <span x-html="formatPrice(item.price)" class="price"></span>
+                                                        </span>
                                                     </span>
-                                                </span>
-                                            </span>
-                                        </template>
+                                                </template>
+
+                                                <template x-if="Math.abs(item.final_price - item.price) >= 0.0001">
+                                                    <span class="special-price">
+                                                        <span class="price-container">
+                                                            <span class="price-label hidden"><?= $escaper->escapeHtml(__('Special Price'))?></span>
+                                                            <span class="price-wrapper">
+                                                                <span x-html="formatPrice(item.final_price)" class="price"></span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+
+                                                    <span class="old-price sly-old-price">
+                                                        <span class="price-container">
+                                                            <span class="price-label hidden"><?= $escaper->escapeHtml(__('Regular Price'))?></span>
+                                                            <span class="price-wrapper">
+                                                                <span x-html="formatPrice(item.price)" class="price"></span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </template>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                </template>
                             </div>
                         </template>
                     </div>
@@ -122,3 +127,44 @@ use Magento\Framework\View\Element\Template;
         </template>
     </div>
 </template>
+
+<style>
+.qs-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Ensure 3 columns per row */
+    gap: 10px; /* Add spacing between items */
+}
+
+.product-item {
+    grid-column: span 1; /* Default column span */
+}
+
+.qs-option-image {
+    width: auto;
+    height: 100%;
+}
+</style>
+
+<script>
+function groupItemsIntoRows(items, itemsPerRow) {
+    if (!items || items.length === 0) return [];
+
+    // Normalize items to always be a flat array
+    let normalizedItems;
+    if (items.item && Array.isArray(items.item)) {
+        normalizedItems = items.item;
+    } else if (items.item && typeof items.item === 'object') {
+        normalizedItems = [items.item]; // Wrap single object in an array
+    } else if (Array.isArray(items)) {
+        normalizedItems = Array.isArray(items[0]) ? items.flat() : items;
+    } else {
+        normalizedItems = [items];
+    }
+
+    const rows = [];
+    for (let i = 0; i < normalizedItems.length; i += itemsPerRow) {
+        rows.push(normalizedItems.slice(i, i + itemsPerRow));
+    }
+    return rows;
+}
+</script>
