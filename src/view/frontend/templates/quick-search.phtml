@@ -27,43 +27,59 @@ use Magento\Framework\View\Element\Template;
                  @keydown.arrow-up.prevent="focusElement($event.target.previousElementSibling) || $refs.searchInput.focus()"
                  @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
             >
-                <template x-if="suggestion.type === 'product'">
-                    <div class="product-item flex p-2 cursor-pointer border-b border-container focus:bg-container-darker hover:bg-container-darker">
-                        <template x-if="suggestion.image">
-                            <img class="qs-option-image mr-2" :src="suggestion.image ? suggestion.image: ''"
-                                 :alt="suggestion.title ? suggestion.title : ''"/>
-                        </template>
-
-                        <div class="qs-option-info-container">
-                            <div class="qs-option-name" x-text="suggestion.title"></div>
-                            <div class="price-box">
-                                <template x-if="!hasSpecialPrice(suggestion)">
-                                    <span class="price-container">
-                                        <span class="price-wrapper">
-                                            <span x-html="formatPrice(suggestion.price)" class="price"></span>
-                                        </span>
-                                    </span>
-                                </template>
-
-                                <template x-if="hasSpecialPrice(suggestion)">
-                                    <span class="price-container">
-                                        <span class="old-price sly-old-price mr-1">
-                                            <span class="price-label hidden"><?= $escaper->escapeHtml(__('Regular Price'))?></span>
-                                            <span class="price-wrapper">
-                                                <span x-html="formatPrice(suggestion.price)"
-                                                      class="price font-regular line-through text-gray-900"></span>
-                                            </span>
-                                        </span>
-                                        <span class="special-price">
-                                            <span class="price-label hidden"><?= $escaper->escapeHtml(__('Special Price'))?></span>
-                                            <span class="price-wrapper">
-                                                <span x-html="formatPrice(suggestion.final_price)" class="price"></span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </template>
-                            </div>
+                <template x-if="suggestion.block && suggestion.block.nrofitems > 0">
+                    <div>
+                        <div class="qs-suggestion-heading font-bold p-2">
+                            <span x-text="suggestion.block.name"></span>
                         </div>
+
+                        <template x-for="(item, index) in suggestion.block.items">
+                            <div
+                                class="product-item flex p-2 cursor-pointer border-b border-container focus:bg-container-darker hover:bg-container-darker"
+                                :class="item.row_class"
+                                :data-url="item.url"
+                                role="option">
+                                <template x-if="item.image">
+                                    <img class="qs-option-image mr-2" :src="item.image" :alt="item.title"/>
+                                </template>
+
+                                <div class="qs-option-info-container">
+                                    <template x-if="item.type !== 'visual'">
+                                        <div class="qs-option-name" x-text="item.title"></div>
+                                    </template>
+
+                                    <div class="price-box">
+                                        <template x-if="Math.abs(item.final_price - item.price) < 0.0001">
+                                            <span class="price-container">
+                                                <span class="price-wrapper">
+                                                    <span x-html="formatPrice(item.price)" class="price"></span>
+                                                </span>
+                                            </span>
+                                        </template>
+
+                                        <template x-if="Math.abs(item.final_price - item.price) >= 0.0001">
+                                            <span class="special-price">
+                                                <span class="price-container">
+                                                    <span class="price-label hidden"><?= $escaper->escapeHtml(__('Special Price'))?></span>
+                                                    <span class="price-wrapper">
+                                                        <span x-html="formatPrice(item.final_price)" class="price"></span>
+                                                    </span>
+                                                </span>
+                                            </span>
+
+                                            <span class="old-price sly-old-price">
+                                                <span class="price-container">
+                                                    <span class="price-label hidden"><?= $escaper->escapeHtml(__('Regular Price'))?></span>
+                                                    <span class="price-wrapper">
+                                                        <span x-html="formatPrice(item.price)" class="price"></span>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </template>
 
