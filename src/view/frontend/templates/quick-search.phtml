@@ -22,10 +22,6 @@ use Magento\Framework\View\Element\Template;
                  role="option"
                  tabindex="0"
                  :data-title="suggestion.title ? suggestion.title : ''"
-                 @click="clickSuggestion(suggestion)"
-                 @keydown.enter="clickSuggestion(suggestion)"
-                 @keydown.arrow-up.prevent="focusElement($event.target.previousElementSibling) || $refs.searchInput.focus()"
-                 @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
             >
                 <template x-if="suggestion.block && suggestion.block.nrofitems > 0">
                     <div>
@@ -41,6 +37,10 @@ use Magento\Framework\View\Element\Template;
                                         :class="item.row_class"
                                         :data-url="item.url"
                                         role="option"
+                                        @click="clickSuggestion(item)"
+                                        @keydown.enter="clickSuggestion(item)"
+                                        @keydown.arrow-up.prevent="focusElement($event.target.previousElementSibling) || $refs.searchInput.focus()"
+                                        @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
                                         :style="`grid-column: span ${(item.visualproperties?.colspan || 1)}; grid-row: span ${(item.visualproperties?.rowspan || 1)}; max-height: ${(item.visualproperties?.rowspan || 1) * 100}px;`">
                                         <template x-if="item.image">
                                             <img class="qs-option-image mr-2" :src="item.image" :alt="item.title"/>
