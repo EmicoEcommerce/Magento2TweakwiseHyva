@@ -20,7 +20,7 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
 ?>
 <div x-data="initTweakwiseNavigationItems()" x-init='sortItems(<?= (int)$hasAlternateSortOrder ?>)'>
     <?php if ($block->isSearchable()): ?>
-        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
+        <input aria-hidden="true" tabindex="-1" @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
         <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $escaper->escapeHtml($block->getSearchNoResultsText()); ?></div>
     <?php endif; ?>
     <ol class="items" x-ref="items">
@@ -33,15 +33,17 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
                     data-original-sort="<?= $escaper->escapeHtmlAttr($index); ?>"
                 <?php endif; ?>
             >
-                <a <?= /* @noEscape */ $block->renderAnchorHtmlTagAttributes($item); ?> class="flex w-full py-1 mb-1 hover:text-black">
+                <a aria-hidden="true" tabindex="-1" <?= /* @noEscape */ $block->renderAnchorHtmlTagAttributes($item); ?> class="flex w-full py-1 mb-1 hover:text-black">
                     <?php $cssId = $item->getCssId(); ?>
                     <?php if ($block->showCheckbox()): ?>
                         <label for="<?= $escaper->escapeHtmlAttr($cssId) ?>" class="block m-0 font-normal flex w-full">
                             <input id="<?= $escaper->escapeHtmlAttr($cssId) ?>"
-                                   name="<?= $escaper->escapeHtmlAttr($item->getFilter()->getFacet()->getFacetSettings()->getUrlKey()) ?>[]"
+                                   name="<?= $escaper->escapeHtmlAttr($item->getFilter()->getUrlKey()) ?>[]"
                                    type="checkbox" <?= ($item->isSelected() ? 'checked="checked"' : '') ?>
                                    value="<?= $escaper->escapeHtmlAttr($item->getLabel()) ?>"
                                    class="block w-4 h-4 mr-2 mt-1"
+                                   tabindex="0"
+                                   aria-labelledby="<?= $escaper->escapeHtmlAttr($item->getFilter()->getUrlKey()) ?> <?= $escaper->escapeHtmlAttr($cssId) ?>"
                             >
 
                             <?= $escaper->escapeHtml($block->getItemPrefix()) ?>
@@ -73,12 +75,16 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
            @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'hidden': moreItemsShow }"
            x-ref="moreItems"
+           role="button"
+           tabindex="0"
         ><?= $escaper->escapeHtml(__($block->getMoreItemText())) ?></a>
         <a href="#" class="less-items underline cursor-pointer"
            x-cloak
            @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'block': moreItemsShow, 'hidden': !moreItemsShow }"
            x-ref="lessItems"
+           role="button"
+           tabindex="0"
         ><?= $escaper->escapeHtml(__($block->getLessItemText())) ?></a>
     <?php endif; ?>
 </div>

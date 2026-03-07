@@ -96,7 +96,7 @@ if (!$swatchData['swatches']) {
      data-attribute-code="<?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
      data-attribute-id="<?= $escaper->escapeHtmlAttr($swatchData['attribute_id']) ?>">
     <?php if ($block->isSearchable()): ?>
-        <input @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
+        <input tabindex="-1" @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
         <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $escaper->escapeHtml($block->getSearchNoResultsText()); ?></div>
     <?php endif; ?>
     <div class="swatch-attribute-options clearfix flex flex-row flex-wrap" x-ref="swatch">
@@ -111,13 +111,15 @@ if (!$swatchData['swatches']) {
                 ?>
 
                 <a <?= /* @noEscape */$block->renderAnchorHtmlTagAttributes($item); ?>
-                        aria-label="<?= $label['label'] ?>"
                         class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex border justify-center"
                         :class="{ 'block': moreItemsShow, 'hidden': '<?= $escaper->escapeHtmlAttr($block->itemDefaultHidden($item))?>' && !moreItemsShow }"
+                        tabindex="0"
+                        role="button"
+                        aria-labelledby="<?= $escaper->escapeHtmlAttr($item->getFilter()->getUrlKey()) ?> <?= $escaper->escapeHtmlAttr($item->getCssId()) ?>"
                 >
                     <?php $cssId = $item->getCssId(); ?>
 
-                    <label for="<?= $escaper->escapeHtmlAttr($cssId) ?>"
+                    <label aria-label="<?= $escaper->escapeHtmlAttr($label['label']); ?>" for="<?= $escaper->escapeHtmlAttr($cssId) ?>"
                            class="swatch-option-inner cursor-pointer relative block select-none m-0"
                            :class="{ 'w-6 h-6' : getSwatchType('<?= (string)$type; ?>') !== 'text' }"
                            :style="getSwatchBackgroundStyle('<?= (string)$type ?>', '<?= (string)$value ?>', '<?= (string)$swatchImage ?>')"

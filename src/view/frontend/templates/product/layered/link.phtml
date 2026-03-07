@@ -26,11 +26,15 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
         <a href="#" class="more-items underline cursor-pointer"
            @click.prevent="toggleShowMore(true, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'hidden': moreItemsShow }"
+           tabindex="0"
+           role="button"
         ><?= $escaper->escapeHtml(__($block->getMoreItemText())) ?></a>
         <a href="#" class="less-items underline cursor-pointer"
            x-cloak
            @click.prevent="toggleShowMore(false, <?= (int)$hasAlternateSortOrder ?>)"
            :class="{ 'block': moreItemsShow, 'hidden': !moreItemsShow }"
+           tabindex="0"
+           role="button"
         ><?= $escaper->escapeHtml(__($block->getLessItemText())) ?></a>
     <?php endif; ?>
 </div>

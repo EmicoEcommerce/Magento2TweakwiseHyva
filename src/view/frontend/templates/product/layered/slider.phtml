@@ -49,7 +49,7 @@ $jsSliderConfig = $block->getJsSliderConfig();
                 $bucketHeight = floor((float)$bucket['relativeamount'] * $bucketHightFactor);
                 $bucketWidth = (($rangeMax - $rangeMin) / ($totalRange)) * 100;
                 ?>
-                <a href="javascript:void(0);" class="bucket-link" style="width: <?= $bucketWidth ?>%" data-rangemin="<?= $escaper->escapeHtmlAttr($rangeMin) ?>" data-rangemax="<?= $escaper->escapeHtmlAttr($rangeMax) ?>">
+                <a tabindex="-1" href="javascript:void(0);" class="bucket-link" style="width: <?= $bucketWidth ?>%" data-rangemin="<?= $escaper->escapeHtmlAttr($rangeMin) ?>" data-rangemax="<?= $escaper->escapeHtmlAttr($rangeMax) ?>">
                     <div class="bucket-range" style="height: <?= $escaper->escapeHtmlAttr($bucketHeight) ?>px;">
                     </div>
                 </a>
@@ -98,6 +98,7 @@ $jsSliderConfig = $block->getJsSliderConfig();
                    id="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min"
                    name="<?= $escaper->escapeHtmlAttr($urlKey) ?>-min"
                    value="<?= $escaper->escapeHtmlAttr($currentMinValue) ?>"
+                   aria-label="<?= $escaper->escapeHtmlAttr(__('Minimum value')) ?>"
             >
         </div>
         <div class="slider-max-wrapper w-2/5 ml-1">
@@ -107,6 +108,7 @@ $jsSliderConfig = $block->getJsSliderConfig();
                    id="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max"
                    name="<?= $escaper->escapeHtmlAttr($urlKey) ?>-max"
                    value="<?= $escaper->escapeHtmlAttr($currentMaxValue) ?>"
+                     aria-label="<?= $escaper->escapeHtmlAttr(__('Maximum value')) ?>"
             >
         </div>
         <input type="hidden"

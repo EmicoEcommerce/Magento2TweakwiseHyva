@@ -69,6 +69,8 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                 <?php if ($block->getLayer()->getState()->getFilters()): ?>
                     <div class="block-actions filter-actions">
                         <a href="<?=$escaper->escapeUrl($block->getClearUrl())?>"
+                           tabindex="0"
+                           role="button"
                            class="action clear filter-clear text-xs text-primary underline hover:text-primary-darker"><span><?= $escaper->escapeHtml(__('Clear All'))?></span></a>
                     </div>
                 <?php endif; ?>
@@ -88,8 +90,9 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                     : 'true'
                                 ) ?>
 
-                                <div class="filter-option card my-4 pb-0 <?= $escaper->escapeHtmlAttr($filter->getCssClass())?>"
+                                <fieldset class="filter-option card my-4 pb-0 <?= $escaper->escapeHtmlAttr($filter->getCssClass())?>"
                                      x-data="{ open: <?= $escaper->escapeHtmlAttr($filterActive) ?>, showTooltip: false }">
+                                    <legend id="<?= $escaper->escapeHtmlAttr($filter->getUrlKey()) ?>" class="sr-only"><?= $escaper->escapeHtml($filter->getName())?></legend>
                                     <div class="filter-options-title flex justify-between items-center border-container pb-2 <?= $escaper->escapeHtmlAttr($filter->isCollapsible()) ? 'cursor-pointer hover:text-secondary-darker' : '' ?>"
                                          :class="{ 'border-b': open }"
                                          <?= $filter->isCollapsible() ? '@click="open = !open"' : ''?>>
@@ -101,6 +104,9 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                                 <span class="ml-2 mt-1 block relative tooltip">
                                                     <span @mouseover="showTooltip = true"
                                                           @mouseleave="showTooltip = false"
+                                                          tabindex="0"
+                                                          aria-label="<?= $escaper->escapeHtmlAttr(__('More info')) ?>"
+                                                          aria-describedby="<?= $escaper->escapeHtmlAttr($filter->getUrlKey()) ?>-tooltip"
                                                           class="flex justify-center items-center relative text-blue-900 w-5 h-5 cursor-pointer tooltip-toggle">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                              viewBox="0 0 18 18" fill="currentColor">
@@ -111,13 +117,20 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                                     </span>
                                                     <span x-cloak
                                                           x-show.transition.origin.top="showTooltip"
+                                                            id="<?= $escaper->escapeHtmlAttr($filter->getUrlKey()) ?>-tooltip"
                                                           class="absolute bottom-0 mb-8 block bg-gray-900 bg-opacity-95 rounded p-2 text-white text-xs font-normal absolute w-32 z-10 text-left tooltip-content"><?= $escaper->escapeHtml($tooltip)?></span>
                                                 </span>
                                             <?php endif; ?>
                                         </span>
 
                                         <?php if ($filter->isCollapsible()): ?>
-                                            <span class="py-1 px-1 rounded border border-container">
+                                            <span
+                                                class="py-1 px-1 rounded border border-container"
+                                                :tabindex="!open ? '0' : '-1'"
+                                                role="button"
+                                                @keydown.enter.prevent="open = !open"
+                                                aria-label="<?= $escaper->escapeHtmlAttr(__('Expand filter options for %1', $filter->getName())) ?>"
+                                            >
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     class="transition-transform transform duration-300 ease-in-out text-primary"
@@ -135,15 +148,16 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                                         <?=/* @noEscape */
                                         $block->getChildBlock('renderer')->render($filter)?>
                                     </div>
-                                </div>
+                                </fieldset>
 
                                 <?php if ($renderFilterButton): ?>
                                     <div class="show-items-link">
                                         <button type="button"
                                                 class="btn btn-primary btn-block js-btn-filter"
+                                                aria-label="<?= $escaper->escapeHtmlAttr(__('Apply filters')) ?>"
                                         >
-                                            <?= $escaper->escapeHtml(__('Show <span>%1</span> items',
-                                                $block->getLayer()->getProductCount()));?>
+                                            <?= $escaper->escapeHtml(__('Show items')); ?>
+
                                         </button>
                                     </div>
                                 <?php endif; ?>
@@ -189,11 +203,27 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                         .sort((a, b) => a.dataset[sortType].localeCompare(b.dataset[sortType],undefined,{numeric: true}))
                         .forEach((item) => {
                             items.appendChild(item);
+                            item.focus();
                         });
                 },
                 toggleShowMore(moreItemsShow, hasAlternateSort) {
                     this.moreItemsShow = moreItemsShow
                     this.sortItems(hasAlternateSort)
+
+                    // Focus the first visible item
+                    this.$nextTick(() => {
+                        const items = this.$refs.items;
+                        if (!items) return;
+                        const firstVisible = Array.from(items.children).find(
+                            item => item.style.display !== 'none'
+                        );
+
+                        if (firstVisible) {
+                            // Try to focus input or anchor
+                            const input = firstVisible.querySelector('input, a, button');
+                            if (input) input.focus();
+                        }
+                    });
                 }
             }
         }
@@ -242,6 +272,7 @@ $filtered = count($block->getLayer()->getState()->getFilters());
                         if(value.length === 0) {
                             moreItems.style.display = '';
                             lessItems.style.display = '';
+
                         } else {
                             moreItems.style.display = 'none';
                             lessItems.style.display = 'none';

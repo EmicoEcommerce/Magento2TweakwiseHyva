@@ -43,6 +43,9 @@ use Tweakwise\Magento2Tweakwise\Block\LayeredNavigation\Navigation\State;
                     <a class="action remove text-center block py-1.5 px-1.5 rounded border border-container text-primary hover:text-primary-darker"
                        href="<?= $escaper->escapeUrl($filter->getRemoveUrl()) ?>"
                        data-js-filter-id="<?= $escaper->escapeHtmlAttr($block->getActiveFilterCssId($filter)) ?>"
+                       tabindex="0"
+                       aria-label="<?= $escaper->escapeHtmlAttr(__('Remove') . " " . $currentFilterName) ?>"
+                       role="button"
                        title="<?= $escaper->escapeHtmlAttr(__('Remove') . " " . $currentFilterName) ?>">
                         <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
