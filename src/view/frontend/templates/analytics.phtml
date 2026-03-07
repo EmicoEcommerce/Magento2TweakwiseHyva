@@ -8,12 +8,14 @@ use Tweakwise\Magento2Tweakwise\Model\NavigationConfig;
 
 /** @var \Tweakwise\Magento2Tweakwise\ViewModel\PersonalMerchandisingAnalytics $viewModel */
 $viewModel = $block->getData('viewModel');
-$analyticsTypes = $block->getData('analyticsTypes');
-$eventsData = $viewModel->getEventsData($analyticsTypes);
 
 /** @var NavigationConfig $tweakwiseNavigationConfig */
 $tweakwiseNavigationConfig = $block->getData('tweakwise_navigation_config');
 $jsFormConfig = $tweakwiseNavigationConfig ? json_decode($tweakwiseNavigationConfig->getJsFormConfig()) : [];
+$twRequestId = $jsFormConfig->tweakwiseNavigationForm->twRequestId ?? '';
+
+$analyticsTypes = $block->getData('analyticsTypes');
+$eventsData = $viewModel->getEventsData($analyticsTypes, $twRequestId);
 ?>
 
 <div x-data='{
@@ -22,7 +24,7 @@ $jsFormConfig = $tweakwiseNavigationConfig ? json_decode($tweakwiseNavigationCon
         productListSelector: ".products.wrapper",
         productSelector: ".product-item",
         analyticsEndpoint: "<?= /* @noEscape */ $jsFormConfig->tweakwiseNavigationForm->analyticsEndpoint ?? ''; ?>",
-        twRequestId: "<?= $escaper->escapeHtmlAttr($jsFormConfig->tweakwiseNavigationForm->twRequestId ?? ''); ?>"
+        twRequestId: "<?= $escaper->escapeHtmlAttr($twRequestId); ?>"
     }
 }' x-init='() => {
     Tweakwise_Hyva_Analytics({
