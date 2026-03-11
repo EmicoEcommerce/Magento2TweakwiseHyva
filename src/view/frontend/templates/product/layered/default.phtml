@@ -20,7 +20,7 @@ $hasAlternateSortOrder = $block->hasAlternateSortOrder();
 ?>
 <div x-data="initTweakwiseNavigationItems()" x-init='sortItems(<?= (int)$hasAlternateSortOrder ?>)'>
     <?php if ($block->isSearchable()): ?>
-        <input aria-hidden="true" tabindex="-1" @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
+        <input aria-hidden="true" tabindex="-1" @keyup="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
         <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $escaper->escapeHtml($block->getSearchNoResultsText()); ?></div>
     <?php endif; ?>
     <ol class="items" x-ref="items">
