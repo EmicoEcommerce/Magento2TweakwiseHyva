@@ -38,8 +38,8 @@ use Magento\Framework\View\Element\Template;
                                 @click="clickSuggestion(item)"
                                 @keydown.enter="clickSuggestion(item)"
                                 @keydown.arrow-up.prevent="focusElement($event.target.previousElementSibling) || $refs.searchInput.focus()"
-                                @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
-                                <template x-if="item.image">
+                                @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)">
+                                 <template x-if="item.image">
                                     <img class="qs-option-image mr-2" :src="item.image" :alt="item.title"/>
                                 </template>
 
