@@ -96,7 +96,7 @@ if (!$swatchData['swatches']) {
      data-attribute-code="<?= $escaper->escapeHtmlAttr($swatchData['attribute_code']) ?>"
      data-attribute-id="<?= $escaper->escapeHtmlAttr($swatchData['attribute_id']) ?>">
     <?php if ($block->isSearchable()): ?>
-        <input tabindex="-1" @keyUp="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
+        <input tabindex="-1" @keyup="filterSearch()" x-ref="tw_filtersearch" x-data="initFilterSearch()" data-max-visible="<?= $escaper->escapeHtmlAttr($block->getMaxItemsShown())?>" type="text" class="tw_filtersearch js-skip-submit" name="tw_filtersearch" placeholder="<?= $escaper->escapeHtmlAttr($block->getSearchPlaceholder()); ?>" >
         <div x-ref="search_no_results" style="display: none" class="search_no_results empty"><?= $escaper->escapeHtml($block->getSearchNoResultsText()); ?></div>
     <?php endif; ?>
     <div class="swatch-attribute-options clearfix flex flex-row flex-wrap" x-ref="swatch">
