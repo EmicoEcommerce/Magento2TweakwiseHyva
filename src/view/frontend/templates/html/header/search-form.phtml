@@ -41,7 +41,7 @@ $helper = $block->getData('tweakwiseSearchForm')->getSearchHelper();
             },
             fetchSuggestions(term) {
                 fetch(
-                    window.BASE_URL + 'search/ajax/suggest?' + new URLSearchParams({q: term}),
+                    window.BASE_URL + 'search/ajax/suggest/blocks/1?' + new URLSearchParams({q: term}),
                     {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
