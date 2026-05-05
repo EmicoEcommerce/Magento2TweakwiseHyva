@@ -22,5 +22,10 @@
                 <argument name="template" xsi:type="string">Tweakwise_Magento2Tweakwise::product/list/toolbar.phtml</argument>
             </action>
         </referenceBlock>
+        <referenceBlock name="search_result_list">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Tweakwise_TweakwiseHyva::product/list.phtml</argument>
+            </action>
+        </referenceBlock>
     </body>
 </page>

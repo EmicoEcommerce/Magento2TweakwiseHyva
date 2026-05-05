@@ -1,0 +1,107 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentCategory;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Block\Product\ListProduct;
+use Magento\Framework\Escaper;
+use Tweakwise\Magento2Tweakwise\Model\Client\Type\ItemType;
+
+/** @var ListProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var ProductPage $productViewModel */
+/** @var CurrentCategory $currentCategoryViewModel */
+
+$productViewModel         = $viewModels->require(ProductPage::class);
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+$currentCategoryViewModel = $viewModels->require(CurrentCategory::class);
+
+$eagerLoadImagesCount = (int) ($block->getData('eager_load_images_count') ?? 3);
+$productCollection = $block->getLoadedProductCollection();
+
+?>
+<?php if (!$productCollection->count()): ?>
+    <div class="message info empty">
+        <div>
+            <?= $escaper->escapeHtml(__('We can\'t find products matching the selection.')) ?>
+        </div>
+    </div>
+<?php else: ?>
+    <section class="py-8" id="product-list" aria-label="<?= $escaper->escapeHtmlAttr(__('Product list')) ?>" tabindex="-1">
+        <?= $block->getToolbarHtml() ?>
+        <?= $block->getAdditionalHtml() ?>
+        <?php
+        if ($block->getMode() == 'grid') {
+            $viewMode         = 'grid';
+            $imageDisplayArea = 'category_page_grid';
+            $showDescription  = false;
+            $templateType     = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+        } else {
+            $viewMode         = 'list';
+            $imageDisplayArea = 'category_page_list';
+            $showDescription  = true;
+            $templateType     = \Magento\Catalog\Block\Product\ReviewRendererInterface::FULL_VIEW;
+        }
+        ?>
+        <div class="products wrapper mode-<?= /* @noEscape */$viewMode ?> products-<?= /* @noEscape */$viewMode ?>">
+            <ul
+                role="list"
+                class="mx-auto pt-4 pb-12 grid gap-4 grid-cols-1 <?= /* @noEscape */$viewMode === 'grid'
+                    ? 'sm:grid-cols-2 xl:grid-cols-3'
+                    : '' ?>"
+            >
+                <?php
+                /** @var \Magento\Catalog\Model\Product $product */
+                foreach (array_values($productCollection->getItems()) as $i => $product):
+                    if ($i < $eagerLoadImagesCount) {
+                        $product->setData('image_custom_attributes', ['loading' => 'eager', 'fetchpriority' => 'high']);
+                    }
+
+                    $colspan = (int) ($product->getData(ItemType::COLSPAN) ?? 0);
+                    $rowspan = (int) ($product->getData(ItemType::ROWSPAN) ?? 0);
+
+                    $visualProperties = $product->getData(ItemType::VISUAL_PROPERTIES);
+                    if (is_array($visualProperties)) {
+                        $colspan = max($colspan, (int) ($visualProperties[ItemType::COLSPAN] ?? 0));
+                        $rowspan = max($rowspan, (int) ($visualProperties[ItemType::ROWSPAN] ?? 0));
+                    }
+
+                    if (method_exists($product, 'getColspan')) {
+                        $colspan = max($colspan, (int) $product->getColspan());
+                    }
+                    if (method_exists($product, 'getRowspan')) {
+                        $rowspan = max($rowspan, (int) $product->getRowspan());
+                    }
+
+                    $gridStyle = '';
+                    if ($colspan > 1) {
+                        $gridStyle .= 'grid-column: span ' . $colspan . ';';
+                    }
+                    if ($rowspan > 1) {
+                        $gridStyle .= 'grid-row: span ' . $rowspan . ';';
+                    }
+                    ?>
+                    <li<?= $gridStyle ? ' style="' . $escaper->escapeHtmlAttr($gridStyle) . '"' : '' ?>>
+                        <?= $productListItemViewModel->getItemHtml(
+                            $product,
+                            $block,
+                            $viewMode,
+                            $templateType,
+                            $imageDisplayArea,
+                            $showDescription
+                        ); ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?= $block->getChildBlock('toolbar')->setIsBottom(true)->toHtml() ?>
+    </section>
+<?php endif; ?>
