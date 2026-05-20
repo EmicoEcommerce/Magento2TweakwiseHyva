@@ -32,10 +32,9 @@ $hasFilters = count($filters) > 0;
 $filtered = count($block->getLayer()->getState()->getFilters());
 
 if ($renderFilterButton) {
-    /** @var \Magento\Framework\Phrase $showItemsLabel */
-    $showItemsLabel = __('Show %count% items');
+    $showItemsLabel = __('Show %count% items')->render();
     $productCount = $block->getLayer()->getProductCollection()->getSize();
-    $showItemsText = __('Show %1 items', $productCount);
+    $showItemsText = __('Show %1 items', $productCount)->render();
 }
 ?>
 
@@ -161,10 +160,10 @@ if ($renderFilterButton) {
                                     <div class="show-items-link">
                                         <button type="button"
                                                 class="btn btn-primary btn-block js-btn-filter"
-                                                data-count-label="<?= $escaper->escapeHtmlAttr((string) $showItemsLabel) ?>"
-                                                aria-label="<?= $escaper->escapeHtmlAttr((string) $showItemsText) ?>"
+                                                 data-count-label="<?= $escaper->escapeHtmlAttr($showItemsLabel) ?>"
+                                                aria-label="<?= $escaper->escapeHtmlAttr($showItemsText) ?>"
                                         >
-                                            <?= $escaper->escapeHtml((string) $showItemsText); ?>
+                                            <?= $escaper->escapeHtml($showItemsText); ?>
                                         </button>
                                     </div>
                                 <?php endif; ?>
