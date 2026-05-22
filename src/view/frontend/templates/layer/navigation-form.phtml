@@ -246,6 +246,7 @@ use Magento\Framework\View\Element\Template;
                     .then(response => {
                         this.ajaxUpdateBlocks(response.html);
                         this.ajaxUpdateState(response);
+                        this.ajaxUpdateCanonical(response.canonical);
                     })
                     .catch((error) => {
                         if (error.name !== 'AbortError') {
@@ -354,6 +355,15 @@ use Magento\Framework\View\Element\Template;
 
             ajaxUpdateState(response) {
                 window.history.pushState({html: response.html}, '', response.url);
+            },
+            ajaxUpdateCanonical(canonical) {
+                if (!canonical) {
+                    return;
+                }
+                const canonicalTag = document.querySelector('link[rel="canonical"]');
+                if (canonicalTag) {
+                    canonicalTag.setAttribute('href', canonical);
+                }
             },
             ajaxStartLoader() {
                 this.isLoading = true;
