@@ -129,6 +129,7 @@ class ProductListItem
         /** @var AbstractBlock $visualRendererBlock */
         $visualRendererBlock = $this->layout->getBlock('tweakwise.catalog.product.list.visual');
 
+        // @phpstan-ignore-next-line
         if (!$visualRendererBlock) {
             return '';
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tweakwise\TweakwiseHyva\Plugin\ViewModel;
 
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -9,10 +11,9 @@ class SearchForm implements ArgumentInterface
 {
     public function __construct(private readonly SearchHelper $searchHelper)
     {
-
     }
 
-    public function getSearchHelper()
+    public function getSearchHelper(): SearchHelper
     {
         return $this->searchHelper;
     }

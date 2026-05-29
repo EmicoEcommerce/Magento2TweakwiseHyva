@@ -62,6 +62,12 @@ class SwatchRenderer implements ArgumentInterface
         return $this->swatchHelper->isSwatchAttribute($attribute);
     }
 
+    /**
+     * @param AbstractBlock $itemRendererBlock
+     * @param Product $product
+     * @return void
+     * phpcs:disable Squiz.Strings.DoubleQuoteUsage.ContainsVar
+     */
     public function beforeListItemToHtml(AbstractBlock $itemRendererBlock, Product $product): void
     {
         if ($product->getTypeId() !== Configurable::TYPE_CODE) {
@@ -89,10 +95,12 @@ class SwatchRenderer implements ArgumentInterface
             )
         );
 
-        if ($swatchCacheKey) {
-            $newKey = $this->blockCache->hashCacheKeyInfo([$itemRendererBlock->getData('cache_key'), $swatchCacheKey]);
-            $itemRendererBlock->setData('cache_key', $newKey);
+        if (!$swatchCacheKey) {
+            return;
         }
+
+        $newKey = $this->blockCache->hashCacheKeyInfo([$itemRendererBlock->getData('cache_key'), $swatchCacheKey]);
+        $itemRendererBlock->setData('cache_key', $newKey);
     }
 
     /**
@@ -104,12 +112,16 @@ class SwatchRenderer implements ArgumentInterface
         $allAttributes = $this->eavConfig->getEntityAttributes(Product::ENTITY, $product);
         $usedFilterAttributes = [];
         foreach ($requestParams as $code => $value) {
-            if (isset($allAttributes[$code])) {
-                $attribute = $allAttributes[$code];
-                if ($this->canReplaceImageWithSwatch($attribute)) {
-                    $usedFilterAttributes[$code] = $value;
-                }
+            if (!isset($allAttributes[$code])) {
+                continue;
             }
+
+            $attribute = $allAttributes[$code];
+            if (!$this->canReplaceImageWithSwatch($attribute)) {
+                continue;
+            }
+
+            $usedFilterAttributes[$code] = $value;
         }
 
         return $usedFilterAttributes;
@@ -120,7 +132,7 @@ class SwatchRenderer implements ArgumentInterface
      *
      * @see \Magento\Swatches\Model\Plugin\ProductImage::canReplaceImageWithSwatch
      */
-    private function canReplaceImageWithSwatch($attribute)
+    private function canReplaceImageWithSwatch($attribute) // @phpstan-ignore-line
     {
         $result = true;
         if (!$this->isSwatchAttribute($attribute)) {

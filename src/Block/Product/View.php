@@ -41,6 +41,7 @@ class View extends MagentoView
      * @param PriceCurrencyInterface $priceCurrency
      * @param Cache $cacheHelper
      * @param array $data
+     * @SuppressWarnings("PHPMD.ExcessiveParameterList")
      */
     public function __construct(
         private readonly Context $context,
@@ -96,10 +97,12 @@ class View extends MagentoView
     {
         $product = parent::getProduct();
 
+        // @phpstan-ignore-next-line
         if ($product) {
             return $product;
         }
 
+        // @phpstan-ignore-next-line
         $request = $this->context->getRequest();
         $productId = $request->getParam('product_id');
 
