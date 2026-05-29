@@ -33,7 +33,7 @@
         },
         "hyva-themes": {
             "type": "composer",
-            "url": "https://hyva-themes.repo.packagist.com/zitmaxx-nl-6t9lma7qe/",
+            "url": "https://hyva-themes.repo.packagist.com/TWEAKWISE_PLACEHOLDER/",
             "only": ["hyva-themes/*"]
         }
     },
