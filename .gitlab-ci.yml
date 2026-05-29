@@ -25,6 +25,7 @@ variables:
 magento-module/test/functional:
   variables:
     MIN_PHP_VERSION: '8.1'
+    MIN_MAGENTO_VERSION: 2.4.7
 
 release:
   rules:
