@@ -49,10 +49,6 @@ function handleItemClick(event, config) {
                 return;
             }
 
-            if (event.target.nodeName !== 'IMG' && event.target.nodeName !== 'A') {
-                return;
-            }
-
             const product = event.target.closest(config.productSelector);
             let productId;
 
