@@ -1,8 +1,7 @@
 function pushTweakwiseEvent(event, data) {
     window.tweakwiseLayer = window.tweakwiseLayer || [];
 
-    // Prevent the same event (e.g. addtocart/addtowishlist/purchase) from being pushed twice when
-    // it arrives via more than one delivery path (customer-data section AND a later full page render).
+    // Prevents an event from being pushed twice if it arrives via more than one delivery path.
     window.TWEAKWISE_PAST_EVENTS = window.TWEAKWISE_PAST_EVENTS || [];
     const eventHash = btoa(encodeURIComponent(JSON.stringify({ event: event, data: data })));
     if (window.TWEAKWISE_PAST_EVENTS.indexOf(eventHash) !== -1) {
@@ -13,14 +12,7 @@ function pushTweakwiseEvent(event, data) {
     window.tweakwiseLayer.push({ event: event, data: data });
 }
 
-// Mirrors the simple (non-grouped) part of Tweakwise\Magento2TweakwiseExport\Model\Helper::getTweakwiseId()
-// for the raw Magento entity ids exposed by Hyva's native product grid template (which doesn't render the
-// Tweakwise-mapped id used by the base module's own item.phtml). Deliberately does NOT attempt to send a
-// group code for grouped/configurable products here: the real group code (the parent product's own
-// Tweakwise id) can only be resolved with a database lookup, unavailable client-side. Sending a
-// self-referencing "id-id" pair looked plausible but was actively wrong data; omitting the group code
-// still tracks the click correctly at the item level, just without the "these are variants of the same
-// product" signal - the safer choice given the alternative was silently corrupting Tweakwise's grouping.
+// Simple (non-grouped) id mapping only - a group code needs a DB lookup unavailable client-side.
 function getTweakwiseProductKey(rawId, storeId) {
     if (!storeId) {
         return rawId;
@@ -56,14 +48,7 @@ function pushTweakwiseEventsData(eventsData) {
     });
 }
 
-// Pending addtocart/addtowishlist events get attached to the "cart"/generic "customer" customer-data
-// sections respectively (see Plugin\CustomerData\AddPendingEventsToCartSection/
-// AddPendingEventsToCustomerSection) rather than rendered into any page's HTML, because that HTML can be
-// full-page-cached and shared across visitors. Hyva's own private-content bootstrap (see
-// Hyva_Theme::page/js/private-content.phtml) already fetches/dispatches section data on every page load
-// and after its own AJAX cart/wishlist actions via the native "private-content-loaded" event, both from a
-// fresh server fetch and from its cached copy in browser storage - listening to that single event covers
-// both cases without an extra request of our own.
+// Pending events arrive via the cart/customer sections; private-content-loaded covers both.
 function handlePrivateContentLoaded(event) {
     const sectionsData = (event.detail && event.detail.data) || {};
     let mutated = false;
@@ -76,8 +61,7 @@ function handlePrivateContentLoaded(event) {
 
         pushTweakwiseEventsData(sectionData.tweakwise_events);
 
-        // Remove the consumed events from Hyva's own cached private content, so a later page load
-        // reading this same cached copy can't push them again.
+        // Clear consumed events from Hyva's cached private content so a later load can't repush them.
         delete sectionData.tweakwise_events;
         mutated = true;
     });
@@ -112,9 +96,7 @@ function Tweakwise_Hyva_Analytics(config) {
                 pushTweakwiseEventsData(this.eventsData);
             }
 
-            // Hyva dispatches this on every page load (from its cached private content or a fresh
-            // fetch) and again after its own AJAX cart/wishlist actions - covers both add-to-cart, which
-            // on Hyva is a plain (non-AJAX) form POST + redirect, and reactive AJAX flows.
+            // Covers both the plain form-POST add-to-cart flow and reactive AJAX cart/wishlist actions.
             window.addEventListener('private-content-loaded', handlePrivateContentLoaded);
 
             // bindItemClickEvents
@@ -170,8 +152,7 @@ function handleItemClick(event, config) {
             }
         }
 
-        // Hyva's native product grid template doesn't render the Tweakwise-mapped id at all,
-        // only Magento's own raw entity id via the add-to-cart hidden input - map it here instead.
+        // Hyva's grid only exposes the raw Magento id (via the add-to-cart input); map it here.
         if (!productId && product) {
             const productInput = product.querySelector('input[name="product"]');
             const rawId = productInput ? productInput.value : null;
