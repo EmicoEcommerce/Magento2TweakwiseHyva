@@ -63,7 +63,7 @@ function pushTweakwiseEventsData(eventsData) {
 // Hyva_Theme::page/js/private-content.phtml) already fetches/dispatches section data on every page load
 // and after its own AJAX cart/wishlist actions via the native "private-content-loaded" event, both from a
 // fresh server fetch and from its cached copy in browser storage - listening to that single event covers
-// both cases without an extra request of our own. Mirrors Yireo_GoogleTagManager2's hyva/script-additions.phtml.
+// both cases without an extra request of our own.
 function handlePrivateContentLoaded(event) {
     const sectionsData = (event.detail && event.detail.data) || {};
     let mutated = false;
