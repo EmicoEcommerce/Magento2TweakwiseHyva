@@ -30,11 +30,6 @@
         "magento": {
             "type": "composer",
             "url": "https://repo.magento.com/"
-        },
-        "hyva-themes": {
-            "type": "composer",
-            "url": "https://hyva-themes.repo.packagist.com/HYVA_PACKAGIST_ORG_TOKEN/",
-            "only": ["hyva-themes/*"]
         }
     },
     "config": {
