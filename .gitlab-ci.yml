@@ -23,9 +23,9 @@ variables:
   MAGENTO_PHP_VERSION: '8.1'
 
 magento-module/prepare/dev:
-  before_script:
-    - !reference [magento-module/prepare/dev, before_script]
+  script:
     - sed -i "s|HYVA_PACKAGIST_ORG_TOKEN|$HYVA_PACKAGIST_ORG_TOKEN|" composer.json
+    - !reference [.composer.install, script]
 
 magento-module/test/functional:
   variables:
