@@ -189,6 +189,7 @@ use Magento\Framework\View\Element\Template;
                 window.onpopstate = (event) => {
                     if (event.state && event.state.html) {
                         this.ajaxUpdateBlocks(event.state.html);
+                        this.ajaxUpdateCanonical(event.state.canonical);
                     }
                 };
             },
@@ -246,6 +247,7 @@ use Magento\Framework\View\Element\Template;
                     .then(response => {
                         this.ajaxUpdateBlocks(response.html);
                         this.ajaxUpdateState(response);
+                        this.ajaxUpdateCanonical(response.canonical);
                     })
                     .catch((error) => {
                         if (error.name !== 'AbortError') {
@@ -353,7 +355,16 @@ use Magento\Framework\View\Element\Template;
             },
 
             ajaxUpdateState(response) {
-                window.history.pushState({html: response.html}, '', response.url);
+                window.history.pushState({html: response.html, canonical: response.canonical}, '', response.url);
+            },
+            ajaxUpdateCanonical(canonical) {
+                if (!canonical) {
+                    return;
+                }
+                const canonicalTag = document.querySelector('link[rel="canonical"]');
+                if (canonicalTag) {
+                    canonicalTag.setAttribute('href', canonical);
+                }
             },
             ajaxStartLoader() {
                 this.isLoading = true;
