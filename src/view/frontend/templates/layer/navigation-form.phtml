@@ -189,6 +189,7 @@ use Magento\Framework\View\Element\Template;
                 window.onpopstate = (event) => {
                     if (event.state && event.state.html) {
                         this.ajaxUpdateBlocks(event.state.html);
+                        this.ajaxUpdateCanonical(event.state.canonical);
                     }
                 };
             },
@@ -354,7 +355,7 @@ use Magento\Framework\View\Element\Template;
             },
 
             ajaxUpdateState(response) {
-                window.history.pushState({html: response.html}, '', response.url);
+                window.history.pushState({html: response.html, canonical: response.canonical}, '', response.url);
             },
             ajaxUpdateCanonical(canonical) {
                 if (!canonical) {
