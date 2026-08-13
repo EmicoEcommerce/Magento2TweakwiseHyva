@@ -111,7 +111,7 @@ if (!$swatchData['swatches']) {
                 ?>
 
                 <a <?= /* @noEscape */$block->renderAnchorHtmlTagAttributes($item); ?>
-                        class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex border justify-center"
+                        class="swatch-option-link-layered swatch-option cursor-pointer select-none m-1 flex flex-col items-center border justify-center"
                         :class="{ 'block': moreItemsShow, 'hidden': '<?= $escaper->escapeHtmlAttr($block->itemDefaultHidden($item))?>' && !moreItemsShow }"
                         tabindex="0"
                         role="button"
@@ -144,6 +144,11 @@ if (!$swatchData['swatches']) {
                             <?= $escaper->escapeHtml($value ?: $label['label']) ?>
                         <?php endif; ?>
                     </label>
+                    <?php if ($block->shouldDisplayProductCountOnLayer()): ?>
+                        <span class="count text-xs text-primary">
+                            (<?= $escaper->escapeHtml($item->getCount()) ?>)
+                        </span>
+                    <?php endif; ?>
                 </a>
             <?php } ?>
         <?php endforeach; ?>

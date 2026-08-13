@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tweakwise\TweakwiseHyva\ViewModel\ProductList;
 
 use Closure;
@@ -20,7 +22,6 @@ use Hyva\Theme\ViewModel\ProductList;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
-use Tweakwise\Magento2Tweakwise\Model\Cart\Crosssell as TweakwiseCrosssell;
 
 class Plugin extends AbstractRecommendationPlugin
 {
@@ -65,6 +66,13 @@ class Plugin extends AbstractRecommendationPlugin
         return $this->type;
     }
 
+    /**
+     * @param ProductList $subject
+     * @param Closure $proceed
+     * @param QuoteItem ...$cartItems
+     * @return array
+     * phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClassBeforeLastUsed
+     */
     public function aroundGetCrosssellItems(ProductList $subject, Closure $proceed, QuoteItem ...$cartItems): array
     {
         if (empty($cartItems)) {
@@ -88,7 +96,7 @@ class Plugin extends AbstractRecommendationPlugin
         $items = [];
 
         foreach ($cartItems as $item) {
-            $items = $this->getShoppingcartTweakwiseItems($item->getProduct(), [], $cartItems);
+            $items = $this->getShoppingcartTweakwiseItems($item->getProduct(), []);
 
             if (!empty($items)) {
                 break;
@@ -106,9 +114,11 @@ class Plugin extends AbstractRecommendationPlugin
      * @param Product|ProductInterface|QuoteItem $items
      *
      * @return ProductInterface[]
+     * phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClassBeforeLastUsed
      */
     public function aroundGetLinkedItems(ProductList $subject, Closure $proceed, string $linkType, $items): array
     {
+        // @phpstan-ignore-next-line
         return $this->loadLinkedTweakwiseItems($proceed, $linkType, $items);
     }
 
@@ -135,21 +145,21 @@ class Plugin extends AbstractRecommendationPlugin
             return $proceed($linkType, ...$items);
         }
 
-        $this->templateId = $this->templateFinder->forProduct($items[0], $this->getType());
+        $this->templateId = (int)$this->templateFinder->forProduct($items[0], $this->getType());
 
         try {
-            return $this->getCollection();
+            return $this->getRecommendationProductItems();
         } catch (ApiException $e) {
             return $proceed($linkType, ...$items);
         }
     }
 
     /**
-     * @return Collection
+     * @return Product[]
      * @throws ApiException
      * @throws InvalidArgumentException
      */
-    protected function getCollection()
+    protected function getRecommendationProductItems()
     {
         $requestFactory = new RequestFactory($this->objectManager, ProductRequest::class);
         $request = $requestFactory->create();
@@ -159,7 +169,9 @@ class Plugin extends AbstractRecommendationPlugin
         $path = $featureRequest->getPath();
 
         $request->setPath($path);
+        // @phpstan-ignore-next-line
         $request->setTemplate($this->templateId);
+        // @phpstan-ignore-next-line
         $this->context->setRequest($request);
 
         if (!$request instanceof ProductRequest) {
@@ -167,14 +179,14 @@ class Plugin extends AbstractRecommendationPlugin
         }
 
         $this->configureRequest($request);
-        $this->collection = $this->context->getCollection();
+        $collection = $this->context->getCollection();
 
-        $this->collection->load();
+        $collection->load();
 
-        return $this->collection->getItems();
+        return $collection->getItems();
     }
 
-    private function getShoppingcartTweakwiseItems(ProductInterface $product, array $result, array $cartItems)
+    private function getShoppingcartTweakwiseItems(ProductInterface $product, array $result) // @phpstan-ignore-line
     {
         $items = [];
 
@@ -186,13 +198,17 @@ class Plugin extends AbstractRecommendationPlugin
         //show crosssell products
         $requestFactory = new RequestFactory(ObjectManager::getInstance(), ProductRequest::class);
         $request = $requestFactory->create();
+        // @phpstan-ignore-next-line
         $request->setProduct($product);
 
+        // @phpstan-ignore-next-line
         if (!$this->templateFinder->forProduct($product, $this->getType())) {
             return $result;
         }
 
+        // @phpstan-ignore-next-line
         $request->setTemplate($this->templateFinder->forProduct($product, $this->getType()));
+        // @phpstan-ignore-next-line
         $this->context->setRequest($request);
 
         try {
@@ -227,22 +243,26 @@ class Plugin extends AbstractRecommendationPlugin
         return $items;
     }
 
-    private function getFeaturedItems()
+    private function getFeaturedItems() // @phpstan-ignore-line
     {
         $requestFactory = new RequestFactory(ObjectManager::getInstance(), FeaturedRequest::class);
         $request = $requestFactory->create();
 
         $templateId = $this->config->getRecommendationsTemplate(Config::RECCOMENDATION_TYPE_SHOPPINGCART_FEATURED);
+        // @phpstan-ignore-next-line
         $request->setTemplate($templateId);
 
+        // @phpstan-ignore-next-line
         $this->recommendationsContext->setRequest($request);
 
         try {
+            // @phpstan-ignore-next-line
             $collection = $this->recommendationsContext->getCollection();
         } catch (ApiException $e) {
             return [];
         }
 
+        $items = [];
         foreach ($collection as $item) {
             $items[] = $item;
         }
