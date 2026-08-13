@@ -7,7 +7,7 @@
         "emico/tweakwise-hyva": "1.1.0"
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "hyva-themes/magento2-compat-module-fallback": "*",
         "hyva-themes/magento2-default-theme": "^1.3.15",
         "tweakwise/magento2-tweakwise": ">=8.11.0",
@@ -30,17 +30,13 @@
         "magento": {
             "type": "composer",
             "url": "https://repo.magento.com/"
-        },
-        "hyva-themes": {
-            "type": "composer",
-            "url": "https://hyva-themes.repo.packagist.com/TWEAKWISE_PLACEHOLDER/",
-            "only": ["hyva-themes/*"]
         }
     },
     "config": {
         "allow-plugins": {
             "magento/composer-dependency-version-audit-plugin": true,
             "magento/magento-composer-installer": true,
+            "magento/inventory-composer-installer": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true,
             "phpro/grumphp": true,
