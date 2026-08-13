@@ -41,6 +41,7 @@
         "allow-plugins": {
             "magento/composer-dependency-version-audit-plugin": true,
             "magento/magento-composer-installer": true,
+            "magento/inventory-composer-installer": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true,
             "phpro/grumphp": true,
