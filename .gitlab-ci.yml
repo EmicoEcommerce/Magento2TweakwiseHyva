@@ -3,10 +3,6 @@ include:
     ref: main
     file: 'semantic-release.yml'
 
-  - project: 'ci-cd/composer-configuration'
-    ref: main
-    file: 'package.yml'
-
   - project: 'ci-cd/magento-module'
     ref: master
     file: 'codeception-ci.yml'
@@ -15,17 +11,73 @@ include:
     ref: master
     file: 'codequality-ci.yml'
 
-  - project: 'ci-cd/github-release'
+  - project: 'ci-cd/tweakwise'
     ref: main
     file: 'github-release.yml'
 
+  - project: 'ci-cd/tweakwise'
+    ref: main
+    file: 'demo-pipeline-trigger.yml'
+
 variables:
-  MAGENTO_PHP_VERSION: '8.1'
+  MAGENTO_PHP_VERSION: '8.2'
+
+# The hyva-themes/* packages are private (paid) Composer packages. Real consumers of
+# this module configure their own "hyva-themes" repository (with their own Private
+# Packagist access token) in the root composer.json of their Magento project - Composer
+# only reads the "repositories" key from the root package, so declaring it here would
+# never have applied to consumers anyway. It's added here only so our own CI/local
+# installs of this repo (where this composer.json *is* the root) can resolve those
+# packages, using the HYVA_PACKAGIST_ORG_TOKEN CI/CD variable.
+magento-module/prepare/dev:
+  script:
+    - $COMPOSER_COMMAND config --json repositories.hyva-themes '{"type":"composer","url":"https://hyva-themes.repo.packagist.com/'"$HYVA_PACKAGIST_ORG_TOKEN"'/","only":["hyva-themes/*"]}'
+    - !reference [.composer.install, script]
 
 magento-module/test/functional:
   variables:
-    MIN_PHP_VERSION: '8.1'
+    MIN_PHP_VERSION: '8.2'
     MIN_MAGENTO_VERSION: 2.4.7
+    DISABLE_DEPENDENCY_AUDIT: "true"
+  # Duplicated from ci-cd/magento-module's codeception-ci.yml (no hidden base job to
+  # !reference without hitting GitLab's circular-reference restriction) with one line
+  # added: registering the hyva-themes repository directly, since it's intentionally no
+  # longer declared in this module's own composer.json (see comment above).
+  before_script:
+    - COMPOSER_PACKAGE_NAME=$(sed -n 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' composer.json)
+    - if dpkg --compare-versions "${MIN_MAGENTO_VERSION}" ">>" "${MAGENTO_VERSION}"; then exit 125; fi
+    - if dpkg --compare-versions "${MIN_PHP_VERSION}" ">>" "${PHP_VERSION}"; then exit 125; fi
+    - '[ -f "codeception.yml" ] && cp -Rf codeception.yml /var/www/html'
+    - cp -Rf tests /var/www/html
+    - cd /var/www/html
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+    - $COMPOSER_COMMAND config minimum-stability dev
+    - |
+      if jq -e '.repositories // empty' "$CI_PROJECT_DIR/composer.json" > /dev/null; then
+        jq -r '
+          .repositories
+          | to_entries
+          | .[]
+          | @base64
+        ' "$CI_PROJECT_DIR/composer.json" | while read -r REPOSITORY_ENTRY; do
+          REPOSITORY_NAME=$(printf '%s' "$REPOSITORY_ENTRY" | base64 -d | jq -r '.key')
+          REPOSITORY_CONFIG=$(printf '%s' "$REPOSITORY_ENTRY" | base64 -d | jq -c '.value')
+          $COMPOSER_COMMAND config --json "repositories.${REPOSITORY_NAME}" "$REPOSITORY_CONFIG"
+        done
+      fi
+    - $COMPOSER_COMMAND config repositories.currentbranch path $CI_PROJECT_DIR
+    - $COMPOSER_COMMAND config --global http-basic.repo.magento.com $MAGENTO_USERNAME $MAGENTO_PASSWORD
+    - $COMPOSER_COMMAND config --global http-basic.hyva-themes.repo.packagist.com token $HYVA_PASSWORD
+    - $COMPOSER_COMMAND config --json repositories.hyva-themes '{"type":"composer","url":"https://hyva-themes.repo.packagist.com/'"$HYVA_PACKAGIST_ORG_TOKEN"'/","only":["hyva-themes/*"]}'
+    - $COMPOSER_COMMAND config --global -- bearer.git.emico.io ${GITLAB_TOKEN}
+    - if [ "${DISABLE_DEPENDENCY_AUDIT}" = "true" ]; then
+      $COMPOSER_COMMAND config allow-plugins.magento/composer-dependency-version-audit-plugin false;
+      $COMPOSER_COMMAND config allow-plugins.magento/magento-composer-installer true;
+      $COMPOSER_COMMAND config allow-plugins.magento/inventory-composer-installer true;
+      $COMPOSER_COMMAND config allow-plugins.magento/composer-root-update-plugin true;
+      $COMPOSER_COMMAND config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true;
+      $COMPOSER_COMMAND config allow-plugins.emico/codeception-m2 true;
+      fi
 
 release:
   rules:

@@ -148,18 +148,18 @@ class Plugin extends AbstractRecommendationPlugin
         $this->templateId = (int)$this->templateFinder->forProduct($items[0], $this->getType());
 
         try {
-            return $this->getCollection();
+            return $this->getRecommendationProductItems();
         } catch (ApiException $e) {
             return $proceed($linkType, ...$items);
         }
     }
 
     /**
-     * @return Collection
+     * @return Product[]
      * @throws ApiException
      * @throws InvalidArgumentException
      */
-    protected function getCollection()
+    protected function getRecommendationProductItems()
     {
         $requestFactory = new RequestFactory($this->objectManager, ProductRequest::class);
         $request = $requestFactory->create();
@@ -179,12 +179,11 @@ class Plugin extends AbstractRecommendationPlugin
         }
 
         $this->configureRequest($request);
-        $this->collection = $this->context->getCollection();
+        $collection = $this->context->getCollection();
 
-        $this->collection->load();
+        $collection->load();
 
-        // @phpstan-ignore-next-line
-        return $this->collection->getItems();
+        return $collection->getItems();
     }
 
     private function getShoppingcartTweakwiseItems(ProductInterface $product, array $result) // @phpstan-ignore-line
