@@ -23,12 +23,14 @@ use Magento\Framework\View\Element\Template;
             formFilters: false,
             seoEnabled: false,
             ajaxEndpoint: '/tweakwise/ajax/navigation',
+            countEndpoint: '/tweakwise/ajax/productcount',
             filterFormSelector: '#facet-filter-form',
             filterSelector: '#facet-filter-form',
             productListSelector: '.products.wrapper',
             toolbarSelector: '.toolbar.toolbar-products',
             isLoading: false,
             currentXhr: null,
+            countFetchController: null,
             fetchController: null,
             ajaxCache: true,
             urlStrategy: null,
@@ -42,6 +44,7 @@ use Magento\Framework\View\Element\Template;
 
                 if (filterOptions) {
                     this.ajaxEndpoint = filterOptions.ajaxEndpoint;
+                    this.countEndpoint = filterOptions.countEndpoint || this.countEndpoint;
                     this.ajaxFilters = filterOptions.ajaxFilters;
                     this.formFilters = filterOptions.formFilters;
                     this.seoEnabled = filterOptions.seoEnabled;
@@ -63,6 +66,10 @@ use Magento\Framework\View\Element\Template;
                         this.pmListReload(pmOptions.cookieName);
                     }
                 }
+
+                if (this.formFilters) {
+                    this.bindCountUpdateEvents();
+                }
             },
             bindFilterClickEvents() {
                 const filterForm = document.querySelector(this.filterFormSelector);
@@ -81,6 +88,81 @@ use Magento\Framework\View\Element\Template;
                 } else {
                     filterForm.addEventListener('change', (event) => this.defaultHandler(event));
                 }
+            },
+
+            /**
+             * Bind change events on filter inputs to update the "Show X items" button count.
+             * Only active when formFilters is enabled.
+             */
+            bindCountUpdateEvents() {
+                const filterForm = document.querySelector(this.filterFormSelector);
+
+                if (!filterForm) {
+                    return;
+                }
+
+                filterForm.addEventListener('change', (event) => {
+                    if (event.target.classList.contains('js-skip-submit')) {
+                        return;
+                    }
+
+                    this.fetchAndUpdateCount();
+                });
+            },
+
+            /**
+             * Fire a lightweight AJAX request to retrieve the product count for the current
+             * filter selection and update all "Show X items" buttons in the filter block.
+             */
+            fetchAndUpdateCount() {
+                if (this.countFetchController) {
+                    this.countFetchController.abort();
+                }
+
+                const filterParams = this.getFilterParameters();
+                let fetchUrl = this.countEndpoint;
+
+                if (filterParams) {
+                    fetchUrl = `${fetchUrl}?${filterParams}`;
+                }
+
+                this.countFetchController = new AbortController();
+
+                fetch(fetchUrl, { signal: this.countFetchController.signal, cache: 'no-cache' })
+                    .then(response => response.json())
+                    .then(response => {
+                        if (typeof response.product_count !== 'undefined') {
+                            this.updateFilterButtonCount(response.product_count);
+                        }
+                    })
+                    .catch((error) => {
+                        if (error.name !== 'AbortError') {
+                            console.error('Error fetching product count:', error);
+                        }
+                    });
+            },
+
+            /**
+             * Update the label of all "Show X items" buttons with the given product count.
+             *
+             * @param {number} count
+             */
+            updateFilterButtonCount(count) {
+                const filterForm = document.querySelector(this.filterFormSelector);
+
+                if (!filterForm) {
+                    return;
+                }
+
+                filterForm.querySelectorAll('.js-btn-filter').forEach((button) => {
+                    const label = button.dataset.countLabel || '';
+                    const text = label.replace('%count%', count);
+
+                    if (text) {
+                        button.textContent = text;
+                        button.setAttribute('aria-label', text);
+                    }
+                });
             },
 
             /**
@@ -246,6 +328,10 @@ use Magento\Framework\View\Element\Template;
                     .then(response => {
                         this.ajaxUpdateBlocks(response.html);
                         this.ajaxUpdateState(response);
+
+                        if (typeof response.product_count !== 'undefined') {
+                            this.updateFilterButtonCount(response.product_count);
+                        }
                     })
                     .catch((error) => {
                         if (error.name !== 'AbortError') {
