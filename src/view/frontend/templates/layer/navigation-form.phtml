@@ -35,9 +35,7 @@ use Magento\Framework\View\Element\Template;
             ajaxCache: true,
             urlStrategy: null,
             twRequestId: '',
-            analyticsEvents: false,
             productSelector: '.product-item',
-            analyticsEndpoint: '/tweakwise/ajax/analytics',
 
             initForm(initialValues) {
                 const filterOptions = initialValues.tweakwiseNavigationForm;
@@ -51,7 +49,6 @@ use Magento\Framework\View\Element\Template;
                     this.ajaxCache = filterOptions.ajaxCache;
                     this.urlStrategy = filterOptions.urlStrategy;
                     this.twRequestId = filterOptions.twRequestId;
-                    this.analyticsEvents = filterOptions.analyticsEvents;
                 }
 
                 this.bindFilterClickEvents();
