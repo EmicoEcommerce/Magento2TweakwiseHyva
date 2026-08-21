@@ -26,7 +26,7 @@ $additionalOptions = ['page' => 'p'];
         return {
             options: <?= /* @noEscape */ $block->getWidgetOptionsJson($additionalOptions) ?>.productListToolbarForm || {},
             filterFormSelector: '#facet-filter-form',
-            pagerItemSelector: '.pages li.item a',
+            pagerItemSelector: '.pages a',
             init() {
                 const filterForm = document.querySelector(this.filterFormSelector);
                 const pagerLinks = this.$root.querySelectorAll(this.pagerItemSelector);
