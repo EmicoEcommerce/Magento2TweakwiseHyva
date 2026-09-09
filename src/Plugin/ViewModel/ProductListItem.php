@@ -149,11 +149,6 @@ class ProductListItem
 
     private function addProductIdAttribute(string $itemHtml, Product $product): string
     {
-        $itemId = (string)$product->getId();
-        if ($itemId === '') {
-            return $itemHtml;
-        }
-
         $analyticsProductId = $this->getAnalyticsProductId($product);
         if ($analyticsProductId === '') {
             return $itemHtml;
@@ -166,20 +161,32 @@ class ProductListItem
             static function (array $matches) use ($analyticsProductId): string {
                 $tag = $matches[0];
                 if (str_contains($tag, 'data-product-id=')) {
-                    return preg_replace(
+                    $replacedTag = preg_replace(
                         "/\\sdata-product-id=([\"'])[^\"']*\\1/",
                         sprintf(' data-product-id="%s"', $analyticsProductId),
                         $tag,
                         1
-                    ) ?: $tag;
+                    );
+
+                    if ($replacedTag === null) {
+                        return $tag;
+                    }
+
+                    return $replacedTag;
                 }
 
-                return preg_replace(
+                $updatedTag = preg_replace(
                     '/>$/',
                     sprintf(' data-product-id="%s">', $analyticsProductId),
                     $tag,
                     1
-                ) ?: $tag;
+                );
+
+                if ($updatedTag === null) {
+                    return $tag;
+                }
+
+                return $updatedTag;
             },
             $itemHtml,
             1
@@ -189,10 +196,6 @@ class ProductListItem
     private function getAnalyticsProductId(Product $product): string
     {
         $parentId = (string)$product->getId();
-        if ($parentId === '') {
-            return '';
-        }
-
         if (!$this->config->isGroupedProductsEnabled()) {
             return $parentId;
         }
@@ -203,6 +206,10 @@ class ProductListItem
         }
 
         $resolvedId = (string)$this->groupedProductIdResolver->resolve($product);
-        return $resolvedId !== '' ? $resolvedId : $parentId;
+        if ($resolvedId === '') {
+            return $parentId;
+        }
+
+        return $resolvedId;
     }
 }
