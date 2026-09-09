@@ -26,43 +26,12 @@ function getTweakwiseItemId(rawId, storeId) {
         return getTweakwiseProductKey(rawId, storeId);
     }
 
-    const [parentId, childId] = rawId.split('-', 2);
-    if (!parentId || !childId) {
+    const [firstId, secondId] = rawId.split('-', 2);
+    if (!firstId || !secondId) {
         return getTweakwiseProductKey(rawId, storeId);
     }
 
-    return getTweakwiseProductKey(parentId, storeId) + '-' + getTweakwiseProductKey(childId, storeId);
-}
-
-function getListingProductKey(rawId) {
-    if (!rawId || !window.tweakwiseListingProductData) {
-        return null;
-    }
-
-    const listingData = window.tweakwiseListingProductData[rawId];
-    if (!listingData || !listingData.productKey) {
-        return null;
-    }
-
-    return listingData.productKey;
-}
-
-function normalizeGroupedProductKeyOrder(productKey, parentRawId, storeId) {
-    if (!productKey || !productKey.includes('-')) {
-        return productKey;
-    }
-
-    const [first, second] = productKey.split('-', 2);
-    if (!first || !second) {
-        return productKey;
-    }
-
-    const parentKey = getTweakwiseProductKey(parentRawId, storeId);
-    if (first === parentKey) {
-        return second + '-' + first;
-    }
-
-    return productKey;
+    return getTweakwiseProductKey(firstId, storeId) + '-' + getTweakwiseProductKey(secondId, storeId);
 }
 
 function pushTweakwiseEventsData(eventsData) {
@@ -178,42 +147,10 @@ function handleItemClick(event, config) {
         if (product) {
             const rawProductId = product.getAttribute('data-product-id');
             if (rawProductId) {
-                productId = getTweakwiseItemId(rawProductId, config.storeId);
-            }
-        }
-
-        if (!productId && product) {
-            const idPrefix = config.productItemInfoPrefix || 'product-item-info';
-            const productInfo = product.querySelector('[id^="' + idPrefix + '_"]');
-            if (productInfo) {
-                productId = productInfo.id.replace(idPrefix + '_', '');
-            }
-        }
-
-        if (!productId) {
-            let visual = event.target.closest('.visual');
-            if (!visual) {
-                const link = event.target.closest('a');
-                if (link) {
-                    visual = link.querySelector('.visual');
-                }
-            }
-            if (visual) {
-                productId = visual.getAttribute('id');
-            }
-        }
-
-        // Hyva's grid only exposes the raw Magento id (via the add-to-cart input); map it here.
-        if (!productId && product) {
-            const productInput = product.querySelector('input[name="product"]');
-            const rawId = productInput ? productInput.value : null;
-            if (rawId) {
-                const listingProductKey = getListingProductKey(rawId);
-                if (listingProductKey) {
-                    productId = normalizeGroupedProductKeyOrder(listingProductKey, rawId, config.storeId);
-                } else {
-                    productId = getTweakwiseItemId(rawId, config.storeId);
-                }
+                const rawProductIdType = product.getAttribute('data-product-id-type');
+                productId = rawProductIdType === 'tweakwise'
+                    ? rawProductId
+                    : getTweakwiseItemId(rawProductId, config.storeId);
             }
         }
 

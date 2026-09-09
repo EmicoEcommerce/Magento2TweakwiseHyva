@@ -159,7 +159,7 @@ class ProductListItem
             return $itemHtml;
         }
 
-        $pattern = '/<([a-zA-Z0-9]+)([^>]*\bclass=("|\")[^"\']*\bproduct-item\b[^"\']*\3[^>]*)>/';
+        $pattern = "/<([a-zA-Z0-9]+)([^>]*\\bclass=([\"'])[^\"']*(?:\\s|^)product-item(?:\\s|$)[^\"']*\\3[^>]*)>/";
 
         return (string)preg_replace_callback(
             $pattern,
@@ -167,7 +167,7 @@ class ProductListItem
                 $tag = $matches[0];
                 if (str_contains($tag, 'data-product-id=')) {
                     return preg_replace(
-                        '/\sdata-product-id=("|\")[^"\']*\1/',
+                        "/\\sdata-product-id=([\"'])[^\"']*\\1/",
                         sprintf(' data-product-id="%s"', $analyticsProductId),
                         $tag,
                         1

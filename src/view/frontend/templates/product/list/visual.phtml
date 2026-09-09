@@ -15,12 +15,18 @@ if (!$visual) {
     return;
 }
 $hasUrl = !empty($visual->getUrl());
+$visualTrackingId = (string)$visual->getData('tw_id');
 ?>
 
 <?php if ($hasUrl): ?>
 <a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>">
     <?php endif; ?>
-    <div class="visual" id="<?= $escaper->escapeHtmlAttr($visual->getId()) ?>">
+    <div
+        class="product-item visual"
+        id="<?= $escaper->escapeHtmlAttr((string)$visual->getId()) ?>"
+        data-product-id="<?= $escaper->escapeHtmlAttr($visualTrackingId) ?>"
+        data-product-id-type="tweakwise"
+    >
         <img class="visual-image" src="<?= $escaper->escapeUrl($visual->getImageUrl()) ?>" loading="lazy" alt="<?= $escaper->escapeHtmlAttr($visual->getName()) ?>"/>
     </div>
     <?php if ($hasUrl): ?>
