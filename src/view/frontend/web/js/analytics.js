@@ -12,13 +12,57 @@ function pushTweakwiseEvent(event, data) {
     window.tweakwiseLayer.push({ event: event, data: data });
 }
 
-// Simple (non-grouped) id mapping only - a group code needs a DB lookup unavailable client-side.
+// Build the Tweakwise item id from raw Magento ids.
 function getTweakwiseProductKey(rawId, storeId) {
     if (!storeId) {
         return rawId;
     }
 
     return '1' + String(storeId).padStart(4, '0') + rawId;
+}
+
+function getTweakwiseItemId(rawId, storeId) {
+    if (!rawId || !rawId.includes('-')) {
+        return getTweakwiseProductKey(rawId, storeId);
+    }
+
+    const [parentId, childId] = rawId.split('-', 2);
+    if (!parentId || !childId) {
+        return getTweakwiseProductKey(rawId, storeId);
+    }
+
+    return getTweakwiseProductKey(parentId, storeId) + '-' + getTweakwiseProductKey(childId, storeId);
+}
+
+function getListingProductKey(rawId) {
+    if (!rawId || !window.tweakwiseListingProductData) {
+        return null;
+    }
+
+    const listingData = window.tweakwiseListingProductData[rawId];
+    if (!listingData || !listingData.productKey) {
+        return null;
+    }
+
+    return listingData.productKey;
+}
+
+function normalizeGroupedProductKeyOrder(productKey, parentRawId, storeId) {
+    if (!productKey || !productKey.includes('-')) {
+        return productKey;
+    }
+
+    const [first, second] = productKey.split('-', 2);
+    if (!first || !second) {
+        return productKey;
+    }
+
+    const parentKey = getTweakwiseProductKey(parentRawId, storeId);
+    if (first === parentKey) {
+        return second + '-' + first;
+    }
+
+    return productKey;
 }
 
 function pushTweakwiseEventsData(eventsData) {
@@ -132,6 +176,13 @@ function handleItemClick(event, config) {
         let productId;
 
         if (product) {
+            const rawProductId = product.getAttribute('data-product-id');
+            if (rawProductId) {
+                productId = getTweakwiseItemId(rawProductId, config.storeId);
+            }
+        }
+
+        if (!productId && product) {
             const idPrefix = config.productItemInfoPrefix || 'product-item-info';
             const productInfo = product.querySelector('[id^="' + idPrefix + '_"]');
             if (productInfo) {
@@ -157,7 +208,12 @@ function handleItemClick(event, config) {
             const productInput = product.querySelector('input[name="product"]');
             const rawId = productInput ? productInput.value : null;
             if (rawId) {
-                productId = getTweakwiseProductKey(rawId, config.storeId);
+                const listingProductKey = getListingProductKey(rawId);
+                if (listingProductKey) {
+                    productId = normalizeGroupedProductKeyOrder(listingProductKey, rawId, config.storeId);
+                } else {
+                    productId = getTweakwiseItemId(rawId, config.storeId);
+                }
             }
         }
 

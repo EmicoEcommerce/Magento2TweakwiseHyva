@@ -13,7 +13,10 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\AbstractBlock;
+use Tweakwise\Magento2Tweakwise\Model\Analytics\GroupedProductIdResolver;
+use Tweakwise\Magento2Tweakwise\Model\Config;
 use Tweakwise\Magento2Tweakwise\Model\Visual;
+use Tweakwise\Magento2TweakwiseExport\Model\Helper;
 
 class ProductListItem
 {
@@ -27,7 +30,9 @@ class ProductListItem
         private readonly Cache $cacheHelper,
         private readonly LayoutInterface $layout,
         private readonly StoreManagerInterface $storeManager,
-        private readonly Session $customerSession
+        private readonly Session $customerSession,
+        private readonly Config $config,
+        private readonly GroupedProductIdResolver $groupedProductIdResolver
     ) {
     }
 
@@ -66,7 +71,7 @@ class ProductListItem
                 return $this->getVisualHtml($product);
             }
 
-            return $proceed(
+            $itemHtml = $proceed(
                 $itemRendererBlock,
                 $product,
                 $parentBlock,
@@ -75,6 +80,8 @@ class ProductListItem
                 $imageDisplayArea,
                 $showDescription
             );
+
+            return $this->addProductIdAttribute($itemHtml, $product);
         }
 
         $itemId = (string)$product->getId();
@@ -103,6 +110,7 @@ class ProductListItem
                     $imageDisplayArea,
                     $showDescription
                 );
+                $itemHtml = $this->addProductIdAttribute($itemHtml, $product);
                 $this->cacheHelper->save(
                     $itemHtml,
                     $hashedCacheKeyInfo,
@@ -137,5 +145,64 @@ class ProductListItem
         $visualRendererBlock->setData('visual', $visual);
 
         return $visualRendererBlock->toHtml();
+    }
+
+    private function addProductIdAttribute(string $itemHtml, Product $product): string
+    {
+        $itemId = (string)$product->getId();
+        if ($itemId === '') {
+            return $itemHtml;
+        }
+
+        $analyticsProductId = $this->getAnalyticsProductId($product);
+        if ($analyticsProductId === '') {
+            return $itemHtml;
+        }
+
+        $pattern = '/<([a-zA-Z0-9]+)([^>]*\bclass=("|\")[^"\']*\bproduct-item\b[^"\']*\3[^>]*)>/';
+
+        return (string)preg_replace_callback(
+            $pattern,
+            static function (array $matches) use ($analyticsProductId): string {
+                $tag = $matches[0];
+                if (str_contains($tag, 'data-product-id=')) {
+                    return preg_replace(
+                        '/\sdata-product-id=("|\")[^"\']*\1/',
+                        sprintf(' data-product-id="%s"', $analyticsProductId),
+                        $tag,
+                        1
+                    ) ?: $tag;
+                }
+
+                return preg_replace(
+                    '/>$/',
+                    sprintf(' data-product-id="%s">', $analyticsProductId),
+                    $tag,
+                    1
+                ) ?: $tag;
+            },
+            $itemHtml,
+            1
+        );
+    }
+
+    private function getAnalyticsProductId(Product $product): string
+    {
+        $parentId = (string)$product->getId();
+        if ($parentId === '') {
+            return '';
+        }
+
+        if (!$this->config->isGroupedProductsEnabled()) {
+            return $parentId;
+        }
+
+        $childId = (string)$product->getData('tw_id');
+        if ($childId !== '') {
+            return $childId . Helper::GROUP_CODE_DELIMITER . $parentId;
+        }
+
+        $resolvedId = (string)$this->groupedProductIdResolver->resolve($product);
+        return $resolvedId !== '' ? $resolvedId : $parentId;
     }
 }
