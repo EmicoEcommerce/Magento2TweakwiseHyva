@@ -159,7 +159,7 @@ class ProductListItem
             return $itemHtml;
         }
 
-        $pattern = "/<([a-zA-Z0-9]+)([^>]*\\bclass=([\"'])[^\"']*(?:\\s|^)product-item(?:\\s|$)[^\"']*\\3[^>]*)>/";
+        $pattern = "/<([a-zA-Z0-9]+)([^>]*\\bclass=([\"'])[^\"']*(?<![\\w-])product-item(?![\\w-])[^\"']*\\3[^>]*)>/";
 
         return (string)preg_replace_callback(
             $pattern,
