@@ -15,7 +15,7 @@ if (!$visual) {
     return;
 }
 $hasUrl = !empty($visual->getUrl());
-$visualTrackingId = (string)$visual->getData('tw_id');
+$visualTrackingId = (string)$visual->getId();
 ?>
 
 <?php if ($hasUrl): ?>
