@@ -135,4 +135,94 @@ class ProductListItemTest extends Unit
 
         $this->assertStringContainsString('data-product-id="1210-1220"', (string)$result);
     }
+
+    /**
+     * Cache key must differ for two products that share the same parent id but have
+     * a different `tw_id`, otherwise ESI/personal-merchandising would serve the same
+     * cached `data-product-id` for both grouped variants.
+     */
+    public function testEsiCacheKeyDiffersPerGroupedVariantOfSameParent(): void
+    {
+        $cacheHelper = Mockery::mock(Cache::class);
+        $layout = Mockery::mock(LayoutInterface::class);
+        $storeManager = Mockery::mock(StoreManagerInterface::class);
+        $customerSession = Mockery::mock(Session::class);
+        $config = Mockery::mock(Config::class);
+        $groupedProductIdResolver = Mockery::mock(GroupedProductIdResolver::class);
+
+        $cacheHelper->shouldReceive('personalMerchandisingCanBeApplied')->andReturn(true);
+        $cacheHelper->shouldReceive('isTweakwiseAjaxRequest')->andReturn(false);
+        $cacheHelper->shouldReceive('getImage')->andReturn('image.jpg');
+        $cacheHelper->shouldReceive('load')->andReturn('cached-html');
+
+        $store = Mockery::mock(StoreInterface::class);
+        $store->shouldReceive('getId')->andReturn(1);
+        $storeManager->shouldReceive('getStore')->andReturn($store);
+        $customerSession->shouldReceive('getCustomerGroupId')->andReturn(0);
+
+        $config->shouldReceive('isGroupedProductsEnabled')->andReturn(true);
+        $groupedProductIdResolver->shouldNotReceive('resolve');
+
+        $capturedKeys = [];
+        $cacheHelper->shouldReceive('hashCacheKeyInfo')
+            ->andReturnUsing(static function (...$args) use (&$capturedKeys): string {
+                $key = implode('|', $args);
+                $capturedKeys[] = $key;
+                return $key;
+            });
+
+        $subject = new ProductListItem(
+            $cacheHelper,
+            $layout,
+            $storeManager,
+            $customerSession,
+            $config,
+            $groupedProductIdResolver
+        );
+
+        $itemRendererBlock = Mockery::mock(AbstractBlock::class);
+        $itemRendererBlock->shouldReceive('getNameInLayout')->andReturn('product.card');
+        $parentBlock = Mockery::mock(AbstractBlock::class);
+        $subjectMock = Mockery::mock(Subject::class);
+
+        $variantA = Mockery::mock(Product::class);
+        $variantA->shouldReceive('getId')->andReturn(1220);
+        $variantA->shouldReceive('getData')->with('tw_id')->andReturn('1211');
+
+        $variantB = Mockery::mock(Product::class);
+        $variantB->shouldReceive('getId')->andReturn(1220);
+        $variantB->shouldReceive('getData')->with('tw_id')->andReturn('1212');
+
+        $noop = static fn () => '';
+
+        $subject->aroundGetItemHtmlWithRenderer(
+            $subjectMock,
+            $noop,
+            $itemRendererBlock,
+            $variantA,
+            $parentBlock,
+            'grid',
+            'default',
+            'category_page_grid',
+            false
+        );
+        $subject->aroundGetItemHtmlWithRenderer(
+            $subjectMock,
+            $noop,
+            $itemRendererBlock,
+            $variantB,
+            $parentBlock,
+            'grid',
+            'default',
+            'category_page_grid',
+            false
+        );
+
+        $this->assertCount(2, $capturedKeys);
+        $this->assertNotSame(
+            $capturedKeys[0],
+            $capturedKeys[1],
+            'ESI cache key must include child (tw_id) so grouped variants of the same parent are cached separately'
+        );
+    }
 }

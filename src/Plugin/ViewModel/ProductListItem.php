@@ -87,7 +87,12 @@ class ProductListItem
         $itemId = (string)$product->getId();
         $storeId = (int)$this->storeManager->getStore()->getId();
         $customerGroupId = (int)$this->customerSession->getCustomerGroupId();
-        $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
+        $analyticsProductId = $isVisual ? '' : $this->getAnalyticsProductId($product);
+        $cardType = sprintf(
+            'renderer_%s_%s',
+            urlencode($itemRendererBlock->getNameInLayout()),
+            $analyticsProductId
+        );
         $hashedCacheKeyInfo = $this->cacheHelper->hashCacheKeyInfo(
             $itemId,
             $storeId,
