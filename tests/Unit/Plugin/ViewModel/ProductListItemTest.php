@@ -17,6 +17,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use ReflectionException;
 use ReflectionMethod;
+use stdClass;
 use Tweakwise\Magento2Tweakwise\Helper\Cache;
 use Tweakwise\Magento2Tweakwise\Model\Analytics\GroupedProductIdResolver;
 use Tweakwise\Magento2Tweakwise\Model\Config;
@@ -163,7 +164,7 @@ class ProductListItemTest extends Unit
         $config->shouldReceive('isGroupedProductsEnabled')->andReturn(true);
         $groupedProductIdResolver->shouldNotReceive('resolve');
 
-        $capturedKeys = new \stdClass();
+        $capturedKeys = new stdClass();
         $capturedKeys->list = [];
         $cacheHelper->shouldReceive('hashCacheKeyInfo')
             ->andReturnUsing(static function (...$args) use ($capturedKeys): string {
