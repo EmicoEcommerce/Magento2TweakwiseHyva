@@ -163,11 +163,12 @@ class ProductListItemTest extends Unit
         $config->shouldReceive('isGroupedProductsEnabled')->andReturn(true);
         $groupedProductIdResolver->shouldNotReceive('resolve');
 
-        $capturedKeys = [];
+        $capturedKeys = new \stdClass();
+        $capturedKeys->list = [];
         $cacheHelper->shouldReceive('hashCacheKeyInfo')
-            ->andReturnUsing(static function (...$args) use (&$capturedKeys): string {
+            ->andReturnUsing(static function (...$args) use ($capturedKeys): string {
                 $key = implode('|', $args);
-                $capturedKeys[] = $key;
+                $capturedKeys->list[] = $key;
                 return $key;
             });
 
@@ -218,10 +219,11 @@ class ProductListItemTest extends Unit
             false
         );
 
-        $this->assertCount(2, $capturedKeys);
+        $keys = $capturedKeys->list;
+        $this->assertCount(2, $keys);
         $this->assertNotSame(
-            $capturedKeys[0],
-            $capturedKeys[1],
+            $keys[0],
+            $keys[1],
             'ESI cache key must include child (tw_id) so grouped variants of the same parent are cached separately'
         );
     }
