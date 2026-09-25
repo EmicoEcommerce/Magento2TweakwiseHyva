@@ -23,7 +23,6 @@ $eventsData = $viewModel->getEventsData($twRequestId);
     bindItemClickEventsConfig: {
         productListSelector: ".products.wrapper",
         productSelector: ".product-item",
-        productItemInfoPrefix: "<?= $escaper->escapeHtmlAttr($jsFormConfig->tweakwiseNavigationForm->productSelector ?? 'product-item-info'); ?>",
         twRequestId: "<?= $escaper->escapeHtmlAttr($twRequestId); ?>",
         storeId: <?= (int)$viewModel->getStoreManager()->getStore()->getId(); ?>
     }
