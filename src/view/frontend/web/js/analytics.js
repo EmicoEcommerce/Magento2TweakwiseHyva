@@ -12,13 +12,26 @@ function pushTweakwiseEvent(event, data) {
     window.tweakwiseLayer.push({ event: event, data: data });
 }
 
-// Simple (non-grouped) id mapping only - a group code needs a DB lookup unavailable client-side.
+// Build the Tweakwise item id from raw Magento ids.
 function getTweakwiseProductKey(rawId, storeId) {
     if (!storeId) {
         return rawId;
     }
 
     return '1' + String(storeId).padStart(4, '0') + rawId;
+}
+
+function getTweakwiseItemId(rawId, storeId) {
+    if (!rawId || !rawId.includes('-')) {
+        return getTweakwiseProductKey(rawId, storeId);
+    }
+
+    const [firstId, secondId] = rawId.split('-', 2);
+    if (!firstId || !secondId) {
+        return getTweakwiseProductKey(rawId, storeId);
+    }
+
+    return getTweakwiseProductKey(firstId, storeId) + '-' + getTweakwiseProductKey(secondId, storeId);
 }
 
 function pushTweakwiseEventsData(eventsData) {
@@ -132,32 +145,12 @@ function handleItemClick(event, config) {
         let productId;
 
         if (product) {
-            const idPrefix = config.productItemInfoPrefix || 'product-item-info';
-            const productInfo = product.querySelector('[id^="' + idPrefix + '_"]');
-            if (productInfo) {
-                productId = productInfo.id.replace(idPrefix + '_', '');
-            }
-        }
-
-        if (!productId) {
-            let visual = event.target.closest('.visual');
-            if (!visual) {
-                const link = event.target.closest('a');
-                if (link) {
-                    visual = link.querySelector('.visual');
-                }
-            }
-            if (visual) {
-                productId = visual.getAttribute('id');
-            }
-        }
-
-        // Hyva's grid only exposes the raw Magento id (via the add-to-cart input); map it here.
-        if (!productId && product) {
-            const productInput = product.querySelector('input[name="product"]');
-            const rawId = productInput ? productInput.value : null;
-            if (rawId) {
-                productId = getTweakwiseProductKey(rawId, config.storeId);
+            const rawProductId = product.getAttribute('data-product-id');
+            if (rawProductId) {
+                const rawProductIdType = product.getAttribute('data-product-id-type');
+                productId = rawProductIdType === 'tweakwise'
+                    ? rawProductId
+                    : getTweakwiseItemId(rawProductId, config.storeId);
             }
         }
 

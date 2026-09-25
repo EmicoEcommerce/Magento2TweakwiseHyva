@@ -13,7 +13,10 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\AbstractBlock;
+use Tweakwise\Magento2Tweakwise\Model\Analytics\GroupedProductIdResolver;
+use Tweakwise\Magento2Tweakwise\Model\Config;
 use Tweakwise\Magento2Tweakwise\Model\Visual;
+use Tweakwise\Magento2TweakwiseExport\Model\Helper;
 
 class ProductListItem
 {
@@ -22,12 +25,16 @@ class ProductListItem
      * @param LayoutInterface $layout
      * @param StoreManagerInterface $storeManager
      * @param Session $customerSession
+     * @param Config $config
+     * @param GroupedProductIdResolver $groupedProductIdResolver
      */
     public function __construct(
         private readonly Cache $cacheHelper,
         private readonly LayoutInterface $layout,
         private readonly StoreManagerInterface $storeManager,
-        private readonly Session $customerSession
+        private readonly Session $customerSession,
+        private readonly Config $config,
+        private readonly GroupedProductIdResolver $groupedProductIdResolver
     ) {
     }
 
@@ -66,7 +73,7 @@ class ProductListItem
                 return $this->getVisualHtml($product);
             }
 
-            return $proceed(
+            $itemHtml = $proceed(
                 $itemRendererBlock,
                 $product,
                 $parentBlock,
@@ -75,12 +82,19 @@ class ProductListItem
                 $imageDisplayArea,
                 $showDescription
             );
+
+            return $this->addProductIdAttribute($itemHtml, $product);
         }
 
         $itemId = (string)$product->getId();
         $storeId = (int)$this->storeManager->getStore()->getId();
         $customerGroupId = (int)$this->customerSession->getCustomerGroupId();
-        $cardType = sprintf('renderer_%s', urlencode($itemRendererBlock->getNameInLayout()));
+        $analyticsProductId = $isVisual ? '' : $this->getAnalyticsProductId($product);
+        $cardType = sprintf(
+            'renderer_%s_%s',
+            urlencode($itemRendererBlock->getNameInLayout()),
+            $analyticsProductId
+        );
         $hashedCacheKeyInfo = $this->cacheHelper->hashCacheKeyInfo(
             $itemId,
             $storeId,
@@ -103,6 +117,7 @@ class ProductListItem
                     $imageDisplayArea,
                     $showDescription
                 );
+                $itemHtml = $this->addProductIdAttribute($itemHtml, $product);
                 $this->cacheHelper->save(
                     $itemHtml,
                     $hashedCacheKeyInfo,
@@ -137,5 +152,88 @@ class ProductListItem
         $visualRendererBlock->setData('visual', $visual);
 
         return $visualRendererBlock->toHtml();
+    }
+
+    /**
+     * Injects data-product-id="<analyticsId>" into the first product-item tag of the rendered HTML.
+     *
+     * @param string $itemHtml
+     * @param Product $product
+     *
+     * @return string
+     */
+    private function addProductIdAttribute(string $itemHtml, Product $product): string
+    {
+        $analyticsProductId = $this->getAnalyticsProductId($product);
+        if ($analyticsProductId === '') {
+            return $itemHtml;
+        }
+
+        $pattern = "/<([a-zA-Z0-9]+)([^>]*\\bclass=([\"'])[^\"']*(?<![\\w-])product-item(?![\\w-])[^\"']*\\3[^>]*)>/";
+
+        $result = preg_replace_callback(
+            $pattern,
+            static function (array $matches) use ($analyticsProductId): string {
+                $tag = $matches[0];
+                if (str_contains($tag, 'data-product-id=')) {
+                    $replacedTag = preg_replace(
+                        "/\\sdata-product-id=([\"'])[^\"']*\\1/",
+                        sprintf(' data-product-id="%s"', $analyticsProductId),
+                        $tag,
+                        1
+                    );
+
+                    if ($replacedTag === null) {
+                        return $tag;
+                    }
+
+                    return $replacedTag;
+                }
+
+                $updatedTag = preg_replace(
+                    '/(\\/?)>$/',
+                    sprintf(' data-product-id="%s"$1>', $analyticsProductId),
+                    $tag,
+                    1
+                );
+
+                if ($updatedTag === null) {
+                    return $tag;
+                }
+
+                return $updatedTag;
+            },
+            $itemHtml,
+            1
+        );
+
+        return $result ?? $itemHtml;
+    }
+
+    /**
+     * Resolves the analytics product id for the given product, respecting the grouped-product configuration.
+     *
+     * @param Product $product
+     *
+     * @return string
+     */
+    private function getAnalyticsProductId(Product $product): string
+    {
+        $parentId = (string)$product->getId();
+        if (!$this->config->isGroupedProductsEnabled()) {
+            return $parentId;
+        }
+
+        $childId = (string)$product->getData('tw_id');
+        if ($childId !== '') {
+            return $childId . Helper::GROUP_CODE_DELIMITER . $parentId;
+        }
+
+        $resolvedId = (string)$this->groupedProductIdResolver->resolve($product);
+        if ($resolvedId === '') {
+            return $parentId;
+        }
+
+        return $resolvedId;
     }
 }
