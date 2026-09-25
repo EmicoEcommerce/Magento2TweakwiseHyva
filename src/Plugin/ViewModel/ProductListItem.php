@@ -25,6 +25,8 @@ class ProductListItem
      * @param LayoutInterface $layout
      * @param StoreManagerInterface $storeManager
      * @param Session $customerSession
+     * @param Config $config
+     * @param GroupedProductIdResolver $groupedProductIdResolver
      */
     public function __construct(
         private readonly Cache $cacheHelper,
@@ -152,6 +154,14 @@ class ProductListItem
         return $visualRendererBlock->toHtml();
     }
 
+    /**
+     * Injects data-product-id="<analyticsId>" into the first product-item tag of the rendered HTML.
+     *
+     * @param string $itemHtml
+     * @param Product $product
+     *
+     * @return string
+     */
     private function addProductIdAttribute(string $itemHtml, Product $product): string
     {
         $analyticsProductId = $this->getAnalyticsProductId($product);
@@ -161,7 +171,7 @@ class ProductListItem
 
         $pattern = "/<([a-zA-Z0-9]+)([^>]*\\bclass=([\"'])[^\"']*(?<![\\w-])product-item(?![\\w-])[^\"']*\\3[^>]*)>/";
 
-        return (string)preg_replace_callback(
+        $result = preg_replace_callback(
             $pattern,
             static function (array $matches) use ($analyticsProductId): string {
                 $tag = $matches[0];
@@ -181,8 +191,8 @@ class ProductListItem
                 }
 
                 $updatedTag = preg_replace(
-                    '/>$/',
-                    sprintf(' data-product-id="%s">', $analyticsProductId),
+                    '/(\\/?)>$/',
+                    sprintf(' data-product-id="%s"$1>', $analyticsProductId),
                     $tag,
                     1
                 );
@@ -196,8 +206,17 @@ class ProductListItem
             $itemHtml,
             1
         );
+
+        return $result ?? $itemHtml;
     }
 
+    /**
+     * Resolves the analytics product id for the given product, respecting the grouped-product configuration.
+     *
+     * @param Product $product
+     *
+     * @return string
+     */
     private function getAnalyticsProductId(Product $product): string
     {
         $parentId = (string)$product->getId();

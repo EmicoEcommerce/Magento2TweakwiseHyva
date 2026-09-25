@@ -11,6 +11,7 @@
         "hyva-themes/magento2-compat-module-fallback": "*",
         "hyva-themes/magento2-default-theme": "^1.3.15",
         "tweakwise/magento2-tweakwise": ">=11.0.0",
+        "tweakwise/magento2-tweakwise-export": ">=7.8.3",
         "magento/framework": "*",
         "magento/module-swatches": "*"
     },
