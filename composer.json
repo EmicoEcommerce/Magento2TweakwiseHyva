@@ -46,7 +46,7 @@
     },
     "require-dev": {
         "emico/code-quality": "^10.8",
-        "phpmd/phpmd": "^2.15",
-        "pdepend/pdepend": "^2.16"
+        "pdepend/pdepend": "^2.16",
+        "phpmd/phpmd": "^2.15"
     }
 }
