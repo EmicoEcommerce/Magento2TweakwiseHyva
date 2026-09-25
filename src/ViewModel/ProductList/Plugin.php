@@ -11,6 +11,7 @@ use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Tweakwise\Magento2Tweakwise\Block\Catalog\Product\ProductList\AbstractRecommendationPlugin;
 use Tweakwise\Magento2Tweakwise\Exception\ApiException;
 use Tweakwise\Magento2Tweakwise\Exception\InvalidArgumentException;
+use Tweakwise\Magento2Tweakwise\Model\Analytics\RecommendationImpressionCollector;
 use Tweakwise\Magento2Tweakwise\Model\Catalog\Product\Recommendation\Collection;
 use Tweakwise\Magento2Tweakwise\Model\Catalog\Product\Recommendation\Context;
 use Tweakwise\Magento2Tweakwise\Model\Client\Request\Recommendations\FeaturedRequest;
@@ -45,6 +46,7 @@ class Plugin extends AbstractRecommendationPlugin
      * @param Registry $registry
      * @param Context $context
      * @param TemplateFinder $templateFinder
+     * @param RecommendationImpressionCollector $impressionCollector
      * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
@@ -52,9 +54,10 @@ class Plugin extends AbstractRecommendationPlugin
         Registry $registry,
         Context $context,
         TemplateFinder $templateFinder,
+        RecommendationImpressionCollector $impressionCollector,
         ObjectManagerInterface $objectManager
     ) {
-        parent::__construct($config, $registry, $context, $templateFinder);
+        parent::__construct($config, $registry, $context, $templateFinder, $impressionCollector);
         $this->objectManager = $objectManager;
     }
 
@@ -181,6 +184,8 @@ class Plugin extends AbstractRecommendationPlugin
         $this->configureRequest($request);
         $collection = $this->context->getCollection();
 
+        $this->recordImpressionIfNonEmpty($collection);
+
         $collection->load();
 
         return $collection->getItems();
@@ -217,8 +222,16 @@ class Plugin extends AbstractRecommendationPlugin
             return $result;
         }
 
+        // Captured immediately after this call, since $this->context is also reused by
+        // getFeaturedItems() and a later setRequest() there would overwrite this response.
+        $requestId = $this->context->getTweakwiseRequestId();
+
         foreach ($collection as $item) {
             $items[] = $item;
+        }
+
+        if (!empty($items)) {
+            $this->impressionCollector->add($requestId);
         }
 
         return $items;
