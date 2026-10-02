@@ -10,6 +10,7 @@ use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Eav\Model\Config as EavConfig;
 use Magento\Framework\App\Request\Http as HttpRequest;
+use Magento\Framework\View\ConfigInterface;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Swatches\Helper\Data as SwatchHelper;
@@ -39,19 +40,24 @@ class SwatchRenderer implements ArgumentInterface
      */
     private $blockCache;
 
-    /**
-     * @param SwatchHelper $swatchHelper
-     */
     public function __construct(
         SwatchHelper $swatchHelper,
         HttpRequest $httpRequest,
         EavConfig $eavConfig,
-        BlockCache $blockCache
+        BlockCache $blockCache,
+        private readonly ConfigInterface $viewConfig
     ) {
         $this->swatchHelper = $swatchHelper;
         $this->httpRequest  = $httpRequest;
         $this->eavConfig    = $eavConfig;
         $this->blockCache   = $blockCache;
+    }
+
+    public function getSwatchDimension(string $type, string $dimension = 'width', int $fallback = 30): int
+    {
+        $config = $this->viewConfig->getViewConfig()->getMediaAttributes('Magento_Catalog', 'images', $type);
+
+        return (int) ($config[$dimension] ?? $fallback);
     }
 
     /**
