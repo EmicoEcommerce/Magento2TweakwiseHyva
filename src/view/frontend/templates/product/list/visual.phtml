@@ -19,10 +19,10 @@ $visualTrackingId = (string)$visual->getId();
 ?>
 
 <?php if ($hasUrl): ?>
-<a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>">
+<a href="<?= $escaper->escapeUrl($visual->getUrl()); ?>" class="block h-full">
     <?php endif; ?>
     <div
-        class="product-item visual"
+        class="product-item visual h-full"
         id="<?= $escaper->escapeHtmlAttr((string)$visual->getId()) ?>"
         data-product-id="<?= $escaper->escapeHtmlAttr($visualTrackingId) ?>"
         data-product-id-type="tweakwise"
