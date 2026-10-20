@@ -10,6 +10,7 @@ use Magento\Customer\Model\Session;
 use Magento\Store\Model\StoreManagerInterface;
 use Tweakwise\Magento2Tweakwise\Helper\Cache;
 use Magento\Catalog\Model\Product;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\AbstractBlock;
@@ -132,6 +133,34 @@ class ProductListItem
             $itemId,
             $hashedCacheKeyInfo
         );
+    }
+
+    /**
+     * @param Subject $subject
+     * @param array $result
+     * @param Product $product
+     * @param AbstractBlock $block
+     * @param string $viewMode
+     * @param string $templateType
+     *
+     * @return array
+     * @SuppressWarnings("PHPMD.UnusedFormalParameter")
+     */
+    public function afterGetItemCacheKeyInfo(
+        Subject $subject,
+        array $result,
+        Product $product,
+        AbstractBlock $block,
+        string $viewMode,
+        string $templateType
+    ): array {
+        if ($product->getTypeId() !== Configurable::TYPE_CODE || !$this->config->isGroupedProductsEnabled()) {
+            return $result;
+        }
+
+        $result[] = sprintf('tw_id_%s', (string)$product->getData('tw_id'));
+
+        return $result;
     }
 
     /**
