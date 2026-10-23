@@ -7,6 +7,7 @@ namespace Tweakwise\Test\Unit\Plugin\ViewModel;
 use Emico\CodeCept\Test\Unit;
 use Hyva\Theme\ViewModel\ProductListItem as Subject;
 use Magento\Catalog\Model\Product;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\LayoutInterface;
@@ -226,6 +227,66 @@ class ProductListItemTest extends Unit
             $keys[0],
             $keys[1],
             'ESI cache key must include child (tw_id) so grouped variants of the same parent are cached separately'
+        );
+    }
+
+    public function testItemCacheKeyInfoDiffersPerVariantChosenByTweakwiseWhenGroupedProductsAreEnabled(): void
+    {
+        $this->config->shouldReceive('isGroupedProductsEnabled')->andReturn(true);
+
+        $green = $this->createConfigurableProduct('1211');
+        $red = $this->createConfigurableProduct('1212');
+        $base = ['1220', 'grid'];
+
+        $greenKey = $this->callAfterGetItemCacheKeyInfo($base, $green);
+        $redKey = $this->callAfterGetItemCacheKeyInfo($base, $red);
+
+        $this->assertCount(3, $greenKey);
+        $this->assertSame($base, array_slice($greenKey, 0, 2));
+        $this->assertNotSame($greenKey, $redKey);
+    }
+
+    public function testItemCacheKeyInfoIsUnchangedWhenGroupedProductsAreDisabled(): void
+    {
+        $this->config->shouldReceive('isGroupedProductsEnabled')->andReturn(false);
+
+        $base = ['1220', 'grid'];
+        $product = $this->createConfigurableProduct('1211');
+
+        $this->assertSame($base, $this->callAfterGetItemCacheKeyInfo($base, $product));
+    }
+
+    public function testItemCacheKeyInfoIsUnchangedForNonConfigurableProducts(): void
+    {
+        $this->config->shouldReceive('isGroupedProductsEnabled')->andReturn(true);
+
+        $product = Mockery::mock(Product::class);
+        $product->shouldReceive('getTypeId')->andReturn('simple');
+        $product->shouldNotReceive('getData');
+
+        $base = ['1220', 'grid'];
+
+        $this->assertSame($base, $this->callAfterGetItemCacheKeyInfo($base, $product));
+    }
+
+    private function createConfigurableProduct(string $twId): Product&MockInterface
+    {
+        $product = Mockery::mock(Product::class);
+        $product->shouldReceive('getTypeId')->andReturn(Configurable::TYPE_CODE);
+        $product->shouldReceive('getData')->with('tw_id')->andReturn($twId);
+
+        return $product;
+    }
+
+    private function callAfterGetItemCacheKeyInfo(array $keyInfo, Product $product): array
+    {
+        return $this->subject->afterGetItemCacheKeyInfo(
+            Mockery::mock(Subject::class),
+            $keyInfo,
+            $product,
+            Mockery::mock(AbstractBlock::class),
+            'grid',
+            'default'
         );
     }
 }
