@@ -139,6 +139,31 @@ class ProductListItemTest extends Unit
     }
 
     /**
+     * @throws ReflectionException
+     */
+    public function testAddProductIdAttributeSelfGroupsProductWithoutChildWhenGroupedProductsAreEnabled(): void
+    {
+        $this->config->shouldReceive('isGroupedProductsEnabled')->once()->andReturn(true);
+
+        $product = Mockery::mock(Product::class);
+        $product->shouldReceive('getId')->atLeast()->once()->andReturn(1230);
+        $product->shouldReceive('getData')->with('tw_id')->once()->andReturn(null);
+
+        $this->groupedProductIdResolver->shouldReceive('resolve')->once()->with($product)->andReturn(1230);
+
+        $method = new ReflectionMethod(ProductListItem::class, 'addProductIdAttribute');
+        $method->setAccessible(true);
+
+        $result = $method->invoke(
+            $this->subject,
+            "<div class='item product product-item'></div>",
+            $product
+        );
+
+        $this->assertStringContainsString('data-product-id="1230-1230"', (string)$result);
+    }
+
+    /**
      * Cache key must differ for two products that share the same parent id but have
      * a different `tw_id`, otherwise ESI/personal-merchandising would serve the same
      * cached `data-product-id` for both grouped variants.

@@ -260,7 +260,11 @@ class ProductListItem
 
         $resolvedId = (string)$this->groupedProductIdResolver->resolve($product);
         if ($resolvedId === '') {
-            return $parentId;
+            $resolvedId = $parentId;
+        }
+
+        if (!str_contains($resolvedId, Helper::GROUP_CODE_DELIMITER)) {
+            return $resolvedId . Helper::GROUP_CODE_DELIMITER . $resolvedId;
         }
 
         return $resolvedId;
