@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Tweakwise\Test\Unit\Plugin\ViewModel;
 
+use Closure;
 use Emico\CodeCept\Test\Unit;
 use Hyva\Theme\ViewModel\ProductListItem as Subject;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
 use Magento\Framework\View\Element\AbstractBlock;
@@ -16,12 +18,18 @@ use Magento\Store\Model\StoreManagerInterface;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use stdClass;
 use Tweakwise\Magento2Tweakwise\Helper\Cache;
 use Tweakwise\Magento2Tweakwise\Model\Analytics\GroupedProductIdResolver;
+use Tweakwise\Magento2Tweakwise\Model\Catalog\Layer\NavigationContext;
+use Tweakwise\Magento2Tweakwise\Model\Catalog\Product\Collection;
+use Tweakwise\Magento2Tweakwise\Model\Client\Request;
+use Tweakwise\Magento2Tweakwise\Model\Client\Response\ProductNavigationResponse;
 use Tweakwise\Magento2Tweakwise\Model\Config;
+use Tweakwise\Magento2TweakwiseExport\Model\Helper;
 use Tweakwise\TweakwiseHyva\Plugin\ViewModel\ProductListItem;
 
 class ProductListItemTest extends Unit
@@ -164,6 +172,39 @@ class ProductListItemTest extends Unit
     }
 
     /**
+     * @throws ReflectionException
+     */
+    public function testSimpleProductFromTweakwiseListingGetsSelfGroupedIdWhenGroupedProductsAreEnabled(): void
+    {
+        $this->config->shouldReceive('isGroupedProductsEnabled')->andReturn(true);
+        $this->groupedProductIdResolver->shouldReceive('resolve')
+            ->andReturnUsing([new GroupedProductIdResolver(), 'resolve']);
+
+        $simple = $this->createListingProduct(1230, Type::TYPE_SIMPLE);
+        $configurable = $this->createListingProduct(1220, Configurable::TYPE_CODE);
+
+        $this->enrichFromTweakwiseResponse(
+            [$simple, $configurable],
+            [$this->createGroup(1230, 1230), $this->createGroup(1220, 1210)]
+        );
+
+        $this->assertNull($simple->getData('tw_id'));
+
+        $method = new ReflectionMethod(ProductListItem::class, 'addProductIdAttribute');
+        $method->setAccessible(true);
+        $tile = '<div class="item product product-item"></div>';
+
+        $this->assertStringContainsString(
+            'data-product-id="1230-1230"',
+            (string)$method->invoke($this->subject, $tile, $simple)
+        );
+        $this->assertStringContainsString(
+            'data-product-id="1210-1220"',
+            (string)$method->invoke($this->subject, $tile, $configurable)
+        );
+    }
+
+    /**
      * Cache key must differ for two products that share the same parent id but have
      * a different `tw_id`, otherwise ESI/personal-merchandising would serve the same
      * cached `data-product-id` for both grouped variants.
@@ -301,6 +342,65 @@ class ProductListItemTest extends Unit
         $product->shouldReceive('getData')->with('tw_id')->andReturn($twId);
 
         return $product;
+    }
+
+    private function createListingProduct(int $id, string $typeId): Product&MockInterface
+    {
+        $product = Mockery::mock(Product::class)->makePartial();
+        $product->setId($id);
+        $product->setTypeId($typeId);
+
+        return $product;
+    }
+
+    private function createGroup(int $parentId, int $matchedChildId): array
+    {
+        return [
+            'code' => sprintf('1%04d%d', 1, $parentId),
+            'items' => [
+                'item' => [
+                    'itemno' => sprintf('1%04d%d', 1, $matchedChildId),
+                    'title' => 'Product ' . $matchedChildId,
+                    'type' => 'product',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param Product[] $products
+     * @throws ReflectionException
+     */
+    private function enrichFromTweakwiseResponse(array $products, array $groups): void
+    {
+        $response = new ProductNavigationResponse(
+            Mockery::mock(Helper::class)->makePartial(),
+            Mockery::mock(Request::class),
+            ['groups' => $groups]
+        );
+
+        $navigationContext = Mockery::mock(NavigationContext::class);
+        $navigationContext->shouldReceive('getResponse')->andReturn($response);
+
+        $items = [];
+        foreach ($products as $product) {
+            $items[(int)$product->getId()] = $product;
+        }
+
+        $collection = (new ReflectionClass(Collection::class))->newInstanceWithoutConstructor();
+        $config = $this->config;
+        Closure::bind(
+            function () use ($navigationContext, $config, $items): void {
+                $this->navigationContext = $navigationContext;
+                $this->config = $config;
+                $this->_items = $items;
+            },
+            $collection,
+            Collection::class
+        )();
+
+        $method = new ReflectionMethod(Collection::class, 'enrichProducts');
+        $method->invoke($collection);
     }
 
     private function callAfterGetItemCacheKeyInfo(array $keyInfo, Product $product): array
